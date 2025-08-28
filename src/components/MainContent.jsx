@@ -24,6 +24,7 @@ const MainContent = ({ setDownloads }) => {
   const [processingStats, setProcessingStats] = useState(null);
   const [processingStartTime, setProcessingStartTime] = useState(null);
 
+
  useEffect(() => {
   console.log('[DEBUG] Fetching entities from backend...');
 
@@ -156,9 +157,38 @@ const MainContent = ({ setDownloads }) => {
   };
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Container maxWidth="lg">
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 4 }}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        minHeight: "100vh",
+        background: "#2c2c3a", // keep your dark color
+        px: { xs: 0, sm: 2, md: 4 }, // horizontal padding for space from sidebar/right
+        ml: { xs: 0, sm: '240px' },
+      }}
+    >
+      <Container
+        maxWidth="md"
+        sx={{
+          mx: "auto",
+          my: 4,
+          px: { xs: 1, sm: 2, md: 3 },
+          width: "100%",
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: { xs: 0, sm: 4, md: 4 },
+            borderRadius: 4,
+            background: "#f0f7ff", // keep your dark color
+            color: "#100808ff",
+            boxSizing: "border-box",
+          }}
+        >
           <Typography variant="h3" align="center" gutterBottom>
             DataHEC
           </Typography>
@@ -374,7 +404,7 @@ const MainContent = ({ setDownloads }) => {
           )}
 
           {/* Help Section */}
-          {!selectedEntity && (
+          {/* {!selectedEntity && (
             <Alert severity="info" sx={{ mt: 4 }}>
               <Typography variant="h6" gutterBottom>How to Use This Interface</Typography>
               <Box component="ol" sx={{ pl: 2 }}>
@@ -383,7 +413,7 @@ const MainContent = ({ setDownloads }) => {
                 <li><strong>Workflow:</strong> Process files individually first, then use those outputs in cross-system mode for comprehensive deduplication</li>
               </Box>
             </Alert>
-          )}
+          )} */}
         </Paper>
       </Container>
     </Box>
