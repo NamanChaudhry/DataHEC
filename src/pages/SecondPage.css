@@ -1,64 +1,156 @@
 .page-container {
   display: flex;
   height: 100vh;
+  background: #070709;
   font-family: Arial, sans-serif;
+  overflow: hidden; /* Prevent overflow */
 }
 
 /* Sidebar styles */
+.sidebar-container {
+  background: #2c2c3a;
+  min-height: 100vh;
+  display: flex;
+}
+
 .sidebar {
-  width: 220px;
-  background: #2d3748; /* dark gray */
-  padding: 20px;
+  min-width: 180px;
+  max-width: 220px;
+  width: 18vw; /* Responsive width */
+  background: transparent;
+  padding: 20px 10px;
   color: white;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  border: 1px solid #e0e0e0;      /* Light border */
+  border-radius: 16px;             /* Rounded corners */
+  margin: 16px 8px 16px 16px;      /* Smaller margin for responsiveness */
+  box-sizing: border-box;
 }
 
-.sidebar .logo {
-  font-size: 1.4rem;
-  margin-bottom: 20px;
-  text-align: center;
+.ey-logo {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 48px;
+  text-align: left;
+  letter-spacing: 2px;
 }
 
-.sidebar button {
-  background: #4a5568; /* medium gray */
+.sidebar-btn {
+  background: transparent;
   color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 10px;
-  margin: 8px 0;
+  border: 1px solid #e0e0e0;       /* Light border */
+  border-radius: 8px;              /* Rounded corners */
+  padding: 12px 18px;              /* Inner padding */
+  margin: 10px 0;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, color 0.3s;
+  text-align: left;
+  font-size: 0rem;
 }
 
-.sidebar button:hover {
-  background: #718096; /* lighter gray */
+/* Add this for the first button in the sidebar */
+.sidebar .sidebar-btn:first-of-type {
+  margin-top: 24px; }/* Push first button further down */
+.sidebar-btn:hover,
+.dropdown .sidebar-btn:hover {
+  background: #ffd600;
+  color: #2c2c3a;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.arrow {
+  float: right;
+  margin-left: 8px;
+}
+
+.dropdown-content {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: #2c2c3a;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  min-width: 160px;
+  z-index: 10;
+}
+
+.dropdown-item {
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.dropdown-item:hover {
+  background: #ffd600;
+  color: #2c2c3a;
 }
 
 /* Main content styles */
 .content {
   flex: 1;
-  padding: 40px;
-  background: #f7fafc; /* light background */
+  margin: 16px 16px 16px 0; /* Remove left margin, add right/bottom/top margin */
+  padding: 32px 16px;
+  background: #2c2c3a;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  color: #fff;
   overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* Center horizontally */
+  justify-content: center;  /* Center vertically */
+  text-align: center;       /* Center text */
+  min-width: 0; /* Prevent flexbox overflow */
+  max-width: 100vw;
+  height: auto;
+}
+
+.content h1,
+.content h2,
+.content ol {
+  color: #fff; /* make text white for contrast */
 }
 
 .content h1 {
   font-size: 2.5rem;
   margin-bottom: 20px;
-  color: #2d3748;
+  text-align: center;
 }
 
 .content h2 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;        /* Smaller subheading */
   margin-bottom: 15px;
-  color: #4a5568;
+  font-weight: normal;
+  text-align: center;
 }
 
 .content ol {
-  text-align: left;
+  text-align: center;
   display: inline-block;
-  font-size: 1.1rem;
+  font-size: 0.95rem;       /* Smaller instructions */
   line-height: 1.6;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.content-full {
+  flex: 1;
+  margin: 0;
+  border-radius: 0;
+  padding: 0;
+  background: #2c2c3a;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  box-sizing: border-box;
 }

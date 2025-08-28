@@ -1,0 +1,53 @@
+# =========================
+# Python backend
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.egg-info/
+venv/
+.venv/
+.env
+.env/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# =========================
+# React frontend (Node.js)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# =========================
+# Data files (generated)
+# =========================
+*.csv
+*.xlsx
+*.xls
+*.xlsm
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# OS & Editor
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.history/
+
+# =========================
+# Build / Dist
+# =========================
+dist/
+build/
