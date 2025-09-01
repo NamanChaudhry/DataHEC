@@ -160,36 +160,51 @@ const MainContent = ({ setDownloads }) => {
     <Box
       component="main"
       sx={{
-        flexGrow: 1,
         display: "flex",
         justifyContent: "flex-start",
-        alignItems: "flex-start",
-        minHeight: "100vh",
-        background: "#2c2c3a", // keep your dark color
+        alignItems: "center",
+        flexDirection: "column",
+        // minHeight: "100vh",
+        width: "70%",
+        height: "100%",
+        overflowY: "auto",
+        p: 0,
+        m: 0,
+        background: "#f9fafb", // keep your dark color
         px: { xs: 0, sm: 2, md: 4 }, // horizontal padding for space from sidebar/right
         ml: { xs: 0, sm: '240px' },
       }}
     >
       <Container
-        maxWidth="md"
+        // maxWidth="md"
         sx={{
-          mx: "auto",
-          my: 4,
-          px: { xs: 1, sm: 2, md: 3 },
+          m : 0,
+          p: 0,
           width: "100%",
-        }}
+          height: "100%",
+          maxWidth: "100%important",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "auto",
+            }}
       >
         <Paper
           elevation={3}
           sx={{
-            p: { xs: 0, sm: 4, md: 4 },
+            width: "100%",
+            height: "100%",
+            p: { xs: 2, sm: 4, md: 4 },
             borderRadius: 4,
-            background: "#f0f7ff", // keep your dark color
+            background: "#f9fafb", // keep your dark color
             color: "#100808ff",
             boxSizing: "border-box",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            overflowY: "auto",
           }}
         >
-          <Typography variant="h3" align="center" gutterBottom>
+          <Typography variant="h4" align="center" gutterBottom>
             DataHEC
           </Typography>
           <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>

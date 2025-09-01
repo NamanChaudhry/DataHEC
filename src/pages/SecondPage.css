@@ -4,6 +4,8 @@
   background: #070709;
   font-family: Arial, sans-serif;
   overflow: hidden; /* Prevent overflow */
+  border: 2px solid #ffd600; 
+  
 }
 
 /* Sidebar styles */
@@ -11,6 +13,7 @@
   background: #2c2c3a;
   min-height: 100vh;
   display: flex;
+  border: 2px solid #ffd600;
 }
 
 .sidebar {
@@ -23,9 +26,9 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 1px solid #e0e0e0;      /* Light border */
+  /* border: 2px solid #ffd600;      Light border */
   border-radius: 16px;             /* Rounded corners */
-  margin: 16px 8px 16px 16px;      /* Smaller margin for responsiveness */
+  margin: 24px 24px 16px 16px;      /* Smaller margin for responsiveness */
   box-sizing: border-box;
 }
 
@@ -46,8 +49,11 @@
   margin: 10px 0;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
-  text-align: left;
-  font-size: 0rem;
+  text-align: center;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Add this for the first button in the sidebar */
@@ -56,7 +62,7 @@
 .sidebar-btn:hover,
 .dropdown .sidebar-btn:hover {
   background: #ffd600;
-  color: #2c2c3a;
+  color: #2c2c3a
 }
 
 .dropdown {
@@ -94,22 +100,21 @@
 /* Main content styles */
 .content {
   flex: 1;
-  margin: 16px 16px 16px 0; /* Remove left margin, add right/bottom/top margin */
-  padding: 32px 16px;
+  margin: 20px 16px 40px 200px; /* Sidebar width + margin */
+  padding-bottom: 24px;
   background: #2c2c3a;
-  border: 1px solid #e0e0e0;
-  border-radius: 16px;
+  border: 2px solid #ffd600;
+  border-radius: 10px;
   color: #fff;
-  overflow-y: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* Center horizontally */
-  justify-content: center;  /* Center vertically */
-  text-align: center;       /* Center text */
-  min-width: 0; /* Prevent flexbox overflow */
-  max-width: 100vw;
-  height: auto;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  min-width: 0;
+  height: calc(100vh - 32px); /* Only the container scrolls */
+  overflow-y: auto;           /* Enable scrolling inside the box */
 }
 
 .content h1,
@@ -153,4 +158,5 @@
   min-width: 0;
   height: auto;
   box-sizing: border-box;
+  border: 2px solid #ffd600;
 }

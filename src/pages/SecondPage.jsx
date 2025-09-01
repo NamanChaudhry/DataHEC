@@ -64,11 +64,14 @@ return (
     PaperProps={{
       sx: {
         background: "#2c2c3a",
-        color: "#fff",
+        color: "#f9fafb",
         width: 180,
         borderRight: "1px solid #e0e0e0",
         boxSizing: "border-box",
-      },
+        padding: 2,
+        margin: 1,
+        border: "2px solid #ffd600",
+        borderRadius: "16px",      },
     }}
   >
     <Box
@@ -99,13 +102,12 @@ return (
                 borderRadius: 2,
                 mb: 1,
                 mx: 1,
-                background: "#393961ff",
+                background: "#23233a",
                 color: "#fff",
-                mt: 3,
-              }}
+                mt: 3,}}
             >
               <ListItemText primary={parent.label} />
-              {openMenus[parent.label] ? <ExpandLess /> : <ExpandMore />}
+              {/* {openMenus[parent.label] ? <ExpandLess /> : <ExpandMore />} */}
             </ListItemButton>
 
             <Collapse in={openMenus[parent.label]} timeout="auto" unmountOnExit>
@@ -123,14 +125,16 @@ return (
                       color: activeItem === child.label ? "#23233a" : "#fff",
                       "&:hover": {
                         background: "#ffd600",
-                        color: "#23233a",
-                      },
+                        color: "#23233a",  
+                        border: "2px solid #ffd600",
+                        },
+                        border: activeItem === child.label ? "2px solid #ffd600" : "none",  // Yellow border for active item
                     }}
                   >
                     <ListItemText
                       primary={child.label}
                       primaryTypographyProps={{
-                        fontSize: 15,
+                        fontSize: 13,
                       }}
                     />
                   </ListItemButton>

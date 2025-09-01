@@ -450,7 +450,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {/* REPLACE THE INLINE FILE SELECTION WITH FileSystemMappingItem COMPONENT */}
         {!crossSystemEnabled && (
           <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#f9f9f9' }}>
-            <Typography variant="h6" gutterBottom>File Display</Typography>
+            <Typography variant="h6" gutterBottom>File Diplay</Typography>
             <FileSystemMappingItem
               entity={entity}
               sourceSystems={sourceSystems}
