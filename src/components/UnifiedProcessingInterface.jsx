@@ -1296,9 +1296,9 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
               All source systems have been automatically added. Choose between source files or processed outputs for each system.
             </Typography>
 
-            <Grid container spacing={2.5} sx={{ width: '100%' }}>
+            <Grid container spacing={2} >
               {fileConfigs.map((config) => (
-                <Grid item xs={12} md={4} key={config.id}>
+                <Grid item xs={12} md={4} key={config.id} >
                   <Paper elevation={2} sx={{ p: 2, bgcolor: '#fff', border: '1px solid #e3f2fd' }}>
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                       {config.sourceSystem}
@@ -1306,8 +1306,8 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
                     {/* Source Files Selection */}
                     {config.availableSourceFiles && config.availableSourceFiles.length > 0 && (
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
+                      <Box sx={{ mb: 1}}>
+                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1}}>
                           📤 Upload Source File
                         </Typography>
                         <FormControl fullWidth>
@@ -1346,7 +1346,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
                     {/* Processed Output Files Selection */}
                     {config.availableOutputFiles && config.availableOutputFiles.length > 0 && (
-                      <Box sx={{ mb: 2 }}>
+                      <Box sx={{ mb: 1 }}>
                         <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
                           📤 Upload Processed Output
                         </Typography>
