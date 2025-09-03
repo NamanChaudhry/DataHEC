@@ -95,6 +95,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 '& .MuiMenuItem-root': {
                   fontWeight: 500,
+                  fontSize: '0.85rem', // ✅ Smaller font size
                   color: '#000000',
                   bgcolor: '#ffffff',
                   '&:hover': {
@@ -133,11 +134,14 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
                     color: '#bbdefb',
                   },
                   '& .MuiSvgIcon-root': {
-                    fontSize: 24,
+                    fontSize: 20,
                   },
                 }}
               />
-              <ListItemText primary={option} />
+              <ListItemText
+                primary={option}
+                primaryTypographyProps={{ fontSize: '0.9rem' }} // ✅ Smaller text
+              />
             </MenuItem>
           ))}
         </Select>

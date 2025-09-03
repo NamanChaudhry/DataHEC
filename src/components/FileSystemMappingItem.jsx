@@ -432,6 +432,7 @@ const FileSystemMappingItem = ({
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     '& .MuiMenuItem-root': {
                       fontWeight: 500,
+                      fontSize : '0.5rem',
                       color: '#000000',
                       bgcolor: '#ffffff',
                       '&:hover': {
@@ -476,12 +477,15 @@ const FileSystemMappingItem = ({
                         },
                         '&.MuiCheckbox-root': {
                           '& svg': {
-                            fontSize: 24, // optional: larger checkbox icon
+                            fontSize: 20, // size of checkbox icon
                           },
                         },
                       }}
                     />
-                    <ListItemText primary={rule} />
+                    <ListItemText
+                      primary={rule}
+                      primaryTypographyProps={{ fontSize: '0.9rem' }} // ✅ Smaller text
+                    />
                   </MenuItem>
                 ))
               )}
