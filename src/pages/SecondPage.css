@@ -4,7 +4,7 @@
   background: #070709;
   font-family: Arial, sans-serif;
   overflow: hidden; /* Prevent overflow */
-  border: 2px solid #ffd600; 
+  border: 1px solid #3c3c4e; 
   
 }
 
@@ -13,7 +13,7 @@
   background: #2c2c3a;
   min-height: 100vh;
   display: flex;
-  border: 2px solid #ffd600;
+  border: 1px solid #3c3c4e;
 }
 
 .sidebar {
@@ -26,17 +26,17 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  /* border: 2px solid #ffd600;      Light border */
+  border: 1px solid #3c3c4e;      /* Light border */
   border-radius: 16px;             /* Rounded corners */
   margin: 24px 24px 16px 16px;      /* Smaller margin for responsiveness */
   box-sizing: border-box;
 }
 
 .ey-logo {
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: bold;
   margin-bottom: 48px;
-  text-align: left;
+  text-align: right;
   letter-spacing: 2px;
 }
 
@@ -100,22 +100,28 @@
 /* Main content styles */
 .content {
   flex: 1;
-  margin: 20px 16px 40px 200px; /* Sidebar width + margin */
-  padding-bottom: 24px;
+  margin: 80px 16px 40px 200px;   /* Adds space around the box */
+  padding: 20px;                  /* Inner space inside the box */
   background: #2c2c3a;
-  border: 2px solid #ffd600;
+  border: 1px solid #3c3c4e;
   border-radius: 10px;
   color: #fff;
   box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
   min-width: 0;
-  height: calc(100vh - 32px); /* Only the container scrolls */
-  overflow-y: auto;           /* Enable scrolling inside the box */
+
+  /* New height to allow top + bottom gaps */
+  height: calc(100vh - 90px); /* 40px top + 40px bottom gap */
+
+  overflow-y: auto;
 }
+
+
 
 .content h1,
 .content h2,
@@ -158,5 +164,6 @@
   min-width: 0;
   height: auto;
   box-sizing: border-box;
-  border: 2px solid #ffd600;
+  border: 1px solid #3c3c4e;
+
 }

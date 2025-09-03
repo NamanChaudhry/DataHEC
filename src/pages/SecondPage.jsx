@@ -13,26 +13,39 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 const menuConfig = [
   {
-    label: "Entity",
+    label: "Extract",
+    children: [
+    ],
+  },
+  {
+      label: "Harmonize",
+      onClick: (setActiveContent) => setActiveContent("thirdPage"),
+    },
+
+
+    {
+    label: "Profile",
     children: [
       { label: "Customer" },
       { label: "Item" },
       { label: "Supplier" },
     ],
-  },
-  {
-    label: "Activity",
+    },
+    {
+    label: "Configure",
     children: [
-      {
-        label: "Configure Harmonization",
-        onClick: (setActiveContent) => setActiveContent("thirdPage"),
-      },
-      { label: "Reports" },
+      { label: "Source" },
+      { label: "Data Domain" },
       { label: "Match Rule" },
-      { label: "Metadata" },
-      { label: "Merge Rules" },
-      { label: "Reconciliation" },
-      { label: "Cross" },
+      { label: "Merge Rule" },
+    ],
+  },
+      {
+    label: "Reports",
+    children: [
+      { label: "Customer" },
+      { label: "Item" },
+      { label: "Supplier" },
     ],
   },
 ];
@@ -70,7 +83,8 @@ return (
         boxSizing: "border-box",
         padding: 2,
         margin: 1,
-        border: "2px solid #ffd600",
+        height: "calc(100vh - 16px)",
+        border: "1px solid #3c3c4e",
         borderRadius: "16px",      },
     }}
   >
@@ -81,13 +95,13 @@ return (
         fontWeight: "bold",
         fontSize: 20,
         letterSpacing: 2,
-        mb: 6
+        mb: 6,
       }}
     >
         <img
     src="/logo_EY.png"
     alt="EY Logo"
-    style={{ height: "48px", width: "auto" }}
+    style={{ height: "38px", width: "auto" }}
   />
     </Box>
     <List>
@@ -99,12 +113,22 @@ return (
           >
             <ListItemButton
               sx={{
-                borderRadius: 2,
+                borderRadius: 1,
                 mb: 1,
                 mx: 1,
                 background: "#23233a",
                 color: "#fff",
-                mt: 3,}}
+                mt: 2,
+                ":hover": {
+                  background: "#ffd600",
+                  color: "#23233a",
+                  border: "1px solid #3c3c4e",
+                }
+              }}
+              onClick={() => {
+                // run only if this parent has an onClick (like Harmonize)
+                if (parent.onClick) parent.onClick(setActiveContent);
+              }}
             >
               <ListItemText primary={parent.label} />
               {/* {openMenus[parent.label] ? <ExpandLess /> : <ExpandMore />} */}
@@ -112,39 +136,48 @@ return (
 
             <Collapse in={openMenus[parent.label]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {parent.children.map((child) => (
-                  <ListItemButton
-                    key={child.label}
-                    onClick={() => handleChildClick(child)}
-                    sx={{
-                      ml: 3,
-                      mb: 1,
-                      borderRadius: 2,
-                      background:
-                        activeItem === child.label ? "#ffd600" : "transparent",
-                      color: activeItem === child.label ? "#23233a" : "#fff",
-                      "&:hover": {
-                        background: "#ffd600",
-                        color: "#23233a",  
-                        border: "2px solid #ffd600",
-                        },
-                        border: activeItem === child.label ? "2px solid #ffd600" : "none",  // Yellow border for active item
-                    }}
-                  >
-                    <ListItemText
-                      primary={child.label}
-                      primaryTypographyProps={{
-                        fontSize: 13,
+                {parent.children &&
+                  parent.children.length > 0 &&
+                  parent.children.map((child) => (
+                    <ListItemButton
+                      key={child.label}
+                      onClick={() => {
+                        handleChildClick(child); // child logic
+                        if (parent.onClick) parent.onClick(setActiveContent); // parent logic if defined
                       }}
-                    />
-                  </ListItemButton>
-                ))}
+                      sx={{
+                        ml: 2,
+                        mb: 1,
+                        borderRadius: 1,
+                        background:
+                          activeItem === child.label ? "#ffd600" : "transparent",
+                        color: activeItem === child.label ? "#23233a" : "#fff",
+                        "&:hover": {
+                          background: "#ffd600",
+                          color: "#23233a",
+                          border: "1px solid #3c3c4e",
+                        },
+                        border:
+                          activeItem === child.label
+                            ? "1px solid #3c3c4e"
+                            : "none",
+                      }}
+                    >
+                      <ListItemText
+                        primary={child.label}
+                        primaryTypographyProps={{
+                          fontSize: 13,
+                        }}
+                      />
+                    </ListItemButton>
+                  ))}
               </List>
             </Collapse>
           </Box>
         </React.Fragment>
       ))}
     </List>
+
   </Drawer>
 );
 };
