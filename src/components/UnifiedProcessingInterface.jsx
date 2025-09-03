@@ -35,14 +35,14 @@
 //   const [availableColumns, setAvailableColumns] = useState([]);
 //   const [mergeRule, setMergeRule] = useState('');
 
-  
+
 //   // For adding new files
 //   const [selectedSourceSystem, setSelectedSourceSystem] = useState('');
 //   const [selectedFile, setSelectedFile] = useState('');
 //   const [availableFiles, setAvailableFiles] = useState([]);
 //   const [processedOutputs, setProcessedOutputs] = useState({});
 //   const [showProcessedOutputs, setShowProcessedOutputs] = useState(false);
-  
+
 //   // For cross-system auto-selection
 //   const [crossSystemFileSelections, setCrossSystemFileSelections] = useState({});
 
@@ -105,18 +105,18 @@
 //         .then(response => {
 //           const sourceFiles = response.data;
 //           const outputFiles = processedOutputs[sourceSystem] || [];
-          
+
 //           // Create a config for this source system with all available options
 //           if (sourceFiles.length > 0 || outputFiles.length > 0) {
 //             // Default to the first source file, but allow switching
 //             const defaultFile = sourceFiles[0] || outputFiles[0];
 //             const defaultType = sourceFiles.length > 0 ? 'source' : 'output';
-            
+
 //             // Get columns for the default file
 //             const apiUrl = defaultType === 'source' 
 //               ? `http://localhost:5001/api/columns/${entity}/${sourceSystem}/${defaultFile}`
 //               : `http://localhost:5001/api/output-columns/${defaultFile}`;
-              
+
 //             return axios.get(apiUrl)
 //               .then(columnsResponse => ({
 //                 id: `${sourceSystem}-${Date.now()}`,
@@ -139,7 +139,7 @@
 //           console.error(`Error loading files for ${sourceSystem}:`, err);
 //           return null;
 //         });
-      
+
 //       promises.push(promise);
 //     });
 
@@ -309,7 +309,7 @@
 //     };
 
 //     console.log('Processing single file:', payload);
-    
+
 //     axios.post('http://localhost:5001/api/process-single', payload)
 //       .then(response => {
 //         alert(`✅ File processed successfully! Output: ${response.data.output_file}`);
@@ -325,7 +325,7 @@
 //   const handleUseInCrossSystem = (sourceSystem, outputFile) => {
 //     // Switch to cross-system mode and add this file
 //     setCrossSystemEnabled(true);
-    
+
 //     // Get columns for this output file
 //     axios.get(`http://localhost:5001/api/output-columns/${outputFile}`)
 //       .then(columnsResponse => {
@@ -342,7 +342,7 @@
 //         };
 
 //         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);
-        
+
 //         // Show success message
 //         alert(`✅ Added ${outputFile} to cross-system configuration`);
 //       })
@@ -478,7 +478,7 @@
 //             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
 //               All source systems have been automatically added. Choose between source files or processed outputs for each system.
 //             </Typography>
-            
+
 //             <Grid container spacing={2}>
 //               {fileConfigs.map((config) => (
 //                 <Grid item xs={12} md={4} key={config.id}>
@@ -486,7 +486,7 @@
 //                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
 //                       {config.sourceSystem}
 //                     </Typography>
-                    
+
 //                     {/* Source Files Selection */}
 //                     {config.availableSourceFiles && config.availableSourceFiles.length > 0 && (
 //                       <Box sx={{ mb: 2 }}>
@@ -514,7 +514,7 @@
 //                         </FormControl>
 //                       </Box>
 //                     )}
-                    
+
 //                     {/* Processed Output Files Selection */}
 //                     {config.availableOutputFiles && config.availableOutputFiles.length > 0 && (
 //                       <Box sx={{ mb: 2 }}>
@@ -542,7 +542,7 @@
 //                         </FormControl>
 //                       </Box>
 //                     )}
-                    
+
 //                     {/* Currently Selected */}
 //                     <Box sx={{ p: 1, bgcolor: '#f5f5f5', borderRadius: 1 }}>
 //                       <Typography variant="caption" color="text.secondary">
@@ -585,7 +585,7 @@
 //                 {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
 //               </Button>
 //             </Box>
-            
+
 //             <Collapse in={showProcessedOutputs}>
 //               <Stack spacing={2}>
 //                 {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
@@ -717,7 +717,7 @@
 //                       }}
 //                     />
 //                   )}
-                  
+
 //                   {crossSystemEnabled && (
 //                     <Box sx={{ p: 2, bgcolor: '#f0f7ff', borderRadius: 1 }}>
 //                       <Typography variant="body2" color="text.secondary">
@@ -813,6 +813,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Typography from '@mui/material/Typography';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -1295,7 +1296,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
               All source systems have been automatically added. Choose between source files or processed outputs for each system.
             </Typography>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={2.5} sx={{ width: '100%' }}>
               {fileConfigs.map((config) => (
                 <Grid item xs={12} md={4} key={config.id}>
                   <Paper elevation={2} sx={{ p: 2, bgcolor: '#fff', border: '1px solid #e3f2fd' }}>
@@ -1307,54 +1308,77 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                     {config.availableSourceFiles && config.availableSourceFiles.length > 0 && (
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
-                          Source Files:
+                          📤 Upload Source File
                         </Typography>
-                        <FormControl fullWidth size="small">
-                          <Select
-                            value={config.fileType === 'source' ? config.filename : ''}
-                            onChange={(e) => handleSwitchFileType(config.id, e.target.value, 'source')}
-                            displayEmpty
+                        <FormControl fullWidth>
+                          <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<UploadFileIcon />}
+                            sx={{
+                              padding: '10px 16px',
+                              border: '2px dashed #90caf9',
+                              backgroundColor: '#f1f8e9',
+                              color: '#558b2f',
+                              '&:hover': {
+                                backgroundColor: '#dcedc8',
+                                borderColor: '#7cb342',
+                              }
+                            }}
                           >
-                            <MenuItem value="">
-                              <em>Select source file</em>
-                            </MenuItem>
-                            {config.availableSourceFiles.map(file => (
-                              <MenuItem key={file} value={file}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip size="small" label="source" color="default" />
-                                  {file}
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </Select>
+                            Upload Source File
+                            <input
+                              type="file"
+                              hidden
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handleSwitchFileType(config.id, file.name, 'source');
+                                }
+                              }}
+                              accept=".csv,.xlsx,.json"
+                            />
+                          </Button>
                         </FormControl>
                       </Box>
+
                     )}
 
                     {/* Processed Output Files Selection */}
                     {config.availableOutputFiles && config.availableOutputFiles.length > 0 && (
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
-                          Processed Outputs:
+                          📤 Upload Processed Output
                         </Typography>
-                        <FormControl fullWidth size="small">
-                          <Select
-                            value={config.fileType === 'output' ? config.filename : ''}
-                            onChange={(e) => handleSwitchFileType(config.id, e.target.value, 'output')}
-                            displayEmpty
+                        <FormControl fullWidth>
+                          <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<UploadFileIcon />}
+                            sx={{
+                              padding: '10px 16px',
+                              border: '2px dashed #90caf9',
+                              backgroundColor: '#e3f2fd',
+                              color: '#1565c0',
+                              '&:hover': {
+                                backgroundColor: '#bbdefb',
+                                borderColor: '#1976d2',
+                              }
+                            }}
                           >
-                            <MenuItem value="">
-                              <em>Select processed output</em>
-                            </MenuItem>
-                            {config.availableOutputFiles.map(file => (
-                              <MenuItem key={file} value={file}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip size="small" label="output" color="success" />
-                                  {file}
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </Select>
+                            Upload Output File
+                            <input
+                              type="file"
+                              hidden
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handleSwitchFileType(config.id, file.name, 'output');
+                                }
+                              }}
+                              accept=".csv,.xlsx,.json"
+                            />
+                          </Button>
                         </FormControl>
                       </Box>
                     )}
