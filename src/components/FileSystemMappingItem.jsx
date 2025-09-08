@@ -1,186 +1,3 @@
-// // // src/components/FileSystemMappingItem.jsx
-// // import React from 'react';
-// // import Box from '@mui/material/Box';
-// // import Grid from '@mui/material/Grid';
-// // import FormControl from '@mui/material/FormControl';
-// // import InputLabel from '@mui/material/InputLabel';
-// // import Select from '@mui/material/Select';
-// // import MenuItem from '@mui/material/MenuItem';
-// // import Button from '@mui/material/Button';
-// // import AddIcon from '@mui/icons-material/Add';
-
-// // const FileSystemMappingItem = ({
-// //   entity,
-// //   sourceSystems,
-// //   selectedSourceSystem,
-// //   setSelectedSourceSystem,
-// //   files,
-// //   selectedFile,
-// //   setSelectedFile,
-// //   onAddFile
-// // }) => {
-// //   return (
-// //     <Box>
-// //       <Grid container spacing={3}>
-// //         <Grid item xs={12} md={4} >
-// //           <FormControl fullWidth>
-// //             <InputLabel shrink>Source System</InputLabel>
-// //             <Select
-// //               value={selectedSourceSystem}
-// //               label="Source System"
-// //               onChange={(e) => setSelectedSourceSystem(e.target.value)}
-// //               disabled={!entity}
-// //             >
-// //               {sourceSystems.map(system => (
-// //                 <MenuItem key={system} value={system}>{system}</MenuItem>
-// //               ))}
-// //             </Select>
-// //           </FormControl>
-// //         </Grid>
-        
-// //         <Grid item xs={12} md={4}>
-// //           <FormControl fullWidth disabled={!selectedSourceSystem}>
-// //             <InputLabel>File</InputLabel>
-// //             <Select
-// //               value={selectedFile}
-// //               label="File"
-// //               onChange={(e) => setSelectedFile(e.target.value)}
-// //             >
-// //               {files.map(file => (
-// //                 <MenuItem key={file} value={file}>{file}</MenuItem>
-// //               ))}
-// //             </Select>
-// //           </FormControl>
-// //         </Grid>
-        
-// //         <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center' }}>
-// //           <Button
-// //             variant="outlined"
-// //             color="primary"
-// //             startIcon={<AddIcon />}
-// //             onClick={onAddFile}
-// //             disabled={!selectedSourceSystem || !selectedFile}
-// //             fullWidth
-// //           >
-// //             Add File Configuration
-// //           </Button>
-// //         </Grid>
-// //       </Grid>
-// //     </Box>
-// //   );
-// // };
-
-// // export default FileSystemMappingItem;
-
-// import React from 'react';
-// import Box from '@mui/material/Box';
-// import Stack from '@mui/material/Stack';
-// import FormControl from '@mui/material/FormControl';
-// import InputLabel from '@mui/material/InputLabel';
-// import Select from '@mui/material/Select';
-// import MenuItem from '@mui/material/MenuItem';
-// import Button from '@mui/material/Button';
-// import AddIcon from '@mui/icons-material/Add';
-// import Typography from '@mui/material/Typography';
-
-// const FileSystemMappingItem = ({
-//   entity,
-//   sourceSystems,
-//   selectedSourceSystem,
-//   setSelectedSourceSystem,
-//   files,
-//   selectedFile,
-//   setSelectedFile,
-//   onAddFile
-// }) => {
-//   return (
-//     <Box sx={{ width: '100%', overflow: 'visible' }}>
-//       <Stack spacing={2}>
-//         {/* Source System Row */}
-//         <Box>
-//           <Typography variant="subtitle2" gutterBottom>
-//             Source System
-//           </Typography>
-//           <FormControl fullWidth>
-//             <Select
-//               value={selectedSourceSystem}
-//               onChange={(e) => setSelectedSourceSystem(e.target.value)}
-//               disabled={!entity}
-//               displayEmpty
-//               sx={{
-//                 '& .MuiSelect-select': {
-//                   padding: '14px',
-//                   fontSize: '1rem',
-//                 }
-//               }}
-//             >
-//               <MenuItem value="">
-//                 <em>Select source system...</em>
-//               </MenuItem>
-//               {sourceSystems.map((system) => (
-//                 <MenuItem key={system} value={system}>
-//                   {system}
-//                 </MenuItem>
-//               ))}
-//             </Select>
-//           </FormControl>
-//         </Box>
-
-//         {/* File Row */}
-//         <Box>
-//           <Typography variant="subtitle2" gutterBottom>
-//             File (Source or Processed Output)
-//           </Typography>
-//           <FormControl fullWidth disabled={!selectedSourceSystem}>
-//             <Select
-//               value={selectedFile}
-//               onChange={(e) => setSelectedFile(e.target.value)}
-//               displayEmpty
-//               sx={{
-//                 '& .MuiSelect-select': {
-//                   padding: '14px',
-//                   fontSize: '1rem',
-//                 }
-//               }}
-//             >
-//               <MenuItem value="">
-//                 <em>Select file...</em>
-//               </MenuItem>
-//               {files.map((file) => (
-//                 <MenuItem key={file} value={file}>
-//                   {file}
-//                 </MenuItem>
-//               ))}
-//             </Select>
-//           </FormControl>
-//         </Box>
-
-//         {/* Button Row */}
-//         <Box sx={{ pt: 1 }}>
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             startIcon={<AddIcon />}
-//             onClick={onAddFile}
-//             disabled={!selectedSourceSystem || !selectedFile}
-//             size="large"
-//             sx={{
-//               width: 'fit-content',
-//               minWidth: '200px',
-//               padding: '12px 24px',
-//               fontSize: '1rem'
-//             }}
-//           >
-//             Add File Configuration
-//           </Button>
-//         </Box>
-//       </Stack>
-//     </Box>
-//   );
-// };
-
-// export default FileSystemMappingItem;
-
 // src/components/FileSystemMappingItem.jsx
 import React, { useEffect, useState } from 'react';
 import {
@@ -201,6 +18,11 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import MergeRuleSelector from './Mergeruleselector';
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
 
 
 const FileSystemMappingItem = ({
@@ -222,13 +44,45 @@ const FileSystemMappingItem = ({
   const [mergeRule, setMergeRule] = useState([]);
   const [resetDropdowns, setResetDropdowns] = useState(false);
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newRule, setNewRule] = useState("");
 
   useEffect(() => {
-    fetch('/utils/matchrules.json')
+    fetch("http://localhost:5001/api/match-rules")
       .then((res) => res.json())
       .then((data) => setRules(data))
-      .catch((err) => console.error('Error loading match rules:', err));
+      .catch((err) => console.error("Error loading match rules:", err));
   }, []);
+
+  const handleAddRule = async () => {
+    const newRule = prompt("Enter new match rule:");
+    if (!newRule) return;
+
+    try {
+      const response = await fetch("http://localhost:5001/api/match-rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rule: newRule }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setRules(data.rules); // update rules state
+      } else {
+        alert(data.error || "Failed to add rule");
+      }
+    } catch (err) {
+      console.error("Error adding rule:", err);
+    }
+  };
+
+
+  // useEffect(() => {
+  //   fetch('/utils/matchrules.json')
+  //     .then((res) => res.json())
+  //     .then((data) => setRules(data))
+  //     .catch((err) => console.error('Error loading match rules:', err));
+  // }, []);
 
   useEffect(() => {
     if (resetDropdowns) {
@@ -237,7 +91,7 @@ const FileSystemMappingItem = ({
       setResetDropdowns(false);
     }
   }, [resetDropdowns]);
-  
+
   return (
     <Box sx={{ width: '100%', overflow: 'visible' }}>
       <Stack spacing={2}>
@@ -398,6 +252,8 @@ const FileSystemMappingItem = ({
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
             🎯 Match Rule
           </Typography>
+
+          {/* Dropdown */}
           <FormControl fullWidth variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -410,56 +266,23 @@ const FileSystemMappingItem = ({
               },
             }}
           >
-            <InputLabel
-              id="match-rule-label"
-
-              sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}
-            >Select match rule
+            <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}>
+              Select match rule
             </InputLabel>
 
             <Select
               labelId="match-rule-label"
               multiple
               value={selectedRule}
-              onChange={(e) => setSelectedRule(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
+              onChange={(e) =>
+                setSelectedRule(
+                  typeof e.target.value === "string"
+                    ? e.target.value.split(",")
+                    : e.target.value
+                )
+              }
               label="Match Rule"
-              renderValue={(selected) => selected.join(', ')}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: '#ffffff',
-                    borderRadius: 2,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    '& .MuiMenuItem-root': {
-                      fontWeight: 500,
-                      fontSize : '0.5rem',
-                      color: '#000000',
-                      bgcolor: '#ffffff',
-                      '&:hover': {
-                        bgcolor: '#e3f2fd',
-                        color: '#1976d2',
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: '#2c2f4a', // dark background for selected item only
-                        color: '#ffffff',
-                        '&:hover': {
-                          bgcolor: '#3c3f5c', // hover 
-                        },
-                      },
-                    },
-                  },
-                },
-              }}
-              sx={{
-                '& .MuiSelect-select': {
-                  padding: '14px',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  color: '#0a2958ff',
-                  backgroundColor: '#e3f2fd',
-                  borderRadius: '12px',
-                },
-              }}
+              renderValue={(selected) => selected.join(", ")}
             >
               {rules.length === 0 ? (
                 <MenuItem disabled>
@@ -468,32 +291,48 @@ const FileSystemMappingItem = ({
               ) : (
                 rules.map((rule, index) => (
                   <MenuItem key={index} value={rule}>
-                    <Checkbox
-                      checked={selectedRule.indexOf(rule) > -1}
-                      sx={{
-                        color: '#0a1f44', // dark navy blue
-                        '&.Mui-checked': {
-                          color: '#bbdefb', // same color
-                        },
-                        '&.MuiCheckbox-root': {
-                          '& svg': {
-                            fontSize: 20, // size of checkbox icon
-                          },
-                        },
-                      }}
-                    />
-                    <ListItemText
-                      primary={rule}
-                      primaryTypographyProps={{ fontSize: '0.9rem' }} // ✅ Smaller text
-                    />
+                    <Checkbox checked={selectedRule.indexOf(rule) > -1} />
+                    <ListItemText primary={rule} />
                   </MenuItem>
                 ))
               )}
             </Select>
           </FormControl>
+
+          {/* Button aligned to right, below dropdown */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              onClick={() => setOpenDialog(true)}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                borderColor: "#42a5f5",
+                color: "#1976d2",
+                "&:hover": {
+                  borderColor: "#1e88e5",
+                  backgroundColor: "#e3f2fd",
+                },
+              }}
+              startIcon={<AddIcon fontSize="small" />}
+            >
+              New Rule
+            </Button>
+          </Box>
         </Box>
 
-         <MergeRuleSelector
+        {/* <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => setOpenDialog(true)}
+          sx={{ ml: 2 }}
+        >
+          + New Rule
+        </Button> */}
+
+        <MergeRuleSelector
           isCrossSystem={false}
           mergeRule={mergeRule}
           onChange={setMergeRule}
@@ -525,9 +364,117 @@ const FileSystemMappingItem = ({
               }
             }}
           >
-            File Display 
+            File Display
           </Button>
         </Box>
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: "16px",
+              p: 2,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontWeight: 600,
+              fontSize: "1.2rem",
+              textAlign: "center",
+              color: "#1976d2",
+              pb: 2,
+            }}
+          >
+            Add New Match Rule
+          </DialogTitle>
+
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Rule Name"
+              fullWidth
+              variant="outlined"
+              value={newRule}
+              onChange={(e) => setNewRule(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  backgroundColor: "#f5f9ff",
+                  "& fieldset": { borderColor: "#90caf9" },
+                  "&:hover fieldset": { borderColor: "#42a5f5" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#1976d2",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  color: "#1976d2",
+                  transform: "translate(14px, -6px) scale(0.85)",
+                },
+              }}
+            />
+
+          </DialogContent>
+
+          <DialogActions sx={{ px: 3, pb: 2, justifyContent: "space-between" }}>
+            <Button
+              onClick={() => setOpenDialog(false)}
+              variant="outlined"
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                color: "#1976d2",
+                borderColor: "#42a5f5",
+                "&:hover": { borderColor: "#1e88e5", background: "#e3f2fd" },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!newRule.trim()) return;
+                try {
+                  const response = await fetch("http://localhost:5001/api/match-rules", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ rule: newRule }),
+                  });
+                  const data = await response.json();
+                  if (response.ok) {
+                    setRules(data.rules);
+                    setNewRule("");
+                    setOpenDialog(false);
+                  } else {
+                    alert(data.error || "Failed to add rule");
+                  }
+                } catch (err) {
+                  console.error("Error adding rule:", err);
+                }
+              }}
+              variant="contained"
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                background: "linear-gradient(45deg, #42a5f5 30%, #1e88e5 90%)",
+                boxShadow: "0px 4px 12px rgba(33, 150, 243, 0.4)",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #1e88e5 30%, #1565c0 90%)",
+                },
+              }}
+            >
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
+
       </Stack>
     </Box>
   );

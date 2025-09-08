@@ -74,7 +74,7 @@ const handleStart = () => {
     <div style={styles.wrapper}>
       <div style={styles.background}>
         <h1 style={styles.heading}>Good Afternoon,</h1>
-
+      
         <button
           style={styles.startBtn}
           onClick={handleStart}
