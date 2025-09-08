@@ -108,8 +108,8 @@
 .content {
   flex: 1;
   margin: 140px 16px 60px 200px;   /* Adds space around the box */
-  padding: 20px;                  /* Inner space inside the box */
-  background: #23233a;
+  padding: 10px;                  /* Inner space inside the box */
+  background: #eaf0fa;
   border: 1px solid #fff;
   border-radius: 10px;
   color: #fff;
@@ -124,7 +124,7 @@
   min-width: 0;
 
   /* New height to allow top + bottom gaps */
-  height: calc(100vh - 30px); 
+  height: calc(100vh - 20px); 
   /* min-height: 100vh; */
   overflow-y: auto;
 }
