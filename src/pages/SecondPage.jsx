@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./SecondPage.css";
 import MainContent from "../components/MainContent";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 import {
   Drawer,
   List,
@@ -13,26 +15,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 const menuConfig = [
   {
-    label: "Extract",
-    children: [
-    ],
-  },
-  {
-      label: "Harmonize",
-      onClick: (setActiveContent) => setActiveContent("thirdPage"),
-    },
-
-
-    {
-    label: "Profile",
-    children: [
-      { label: "Customer" },
-      { label: "Item" },
-      { label: "Supplier" },
-    ],
-    },
-    {
-    label: "Configure",
+      label: "Configure",
     children: [
       { label: "Source" },
       { label: "Data Domain" },
@@ -40,12 +23,25 @@ const menuConfig = [
       { label: "Merge Rule" },
     ],
   },
+  {
+    label: "Extract",
+    children: [
+    ],
+  },
+
+
+    {
+    label: "Profile",
+    children: [
+    ],
+    },
+ {
+      label: "Harmonize",
+      onClick: (setActiveContent) => setActiveContent("thirdPage"),
+    },
       {
     label: "Reports",
     children: [
-      { label: "Customer" },
-      { label: "Item" },
-      { label: "Supplier" },
     ],
   },
 ];
@@ -76,15 +72,15 @@ return (
     variant="permanent"
     PaperProps={{
       sx: {
-        background: "#2c2c3a",
+        background: "#23233a",
         color: "#f9fafb",
         width: 180,
-        borderRight: "1px solid #e0e0e0",
+        borderRight: "20px solid #e0e0e0",
         boxSizing: "border-box",
         padding: 2,
         margin: 1,
         height: "calc(100vh - 16px)",
-        border: "1px solid #3c3c4e",
+        border: "1px solid #e0e0e0",
         borderRadius: "16px",      },
     }}
   >
@@ -113,16 +109,17 @@ return (
           >
             <ListItemButton
               sx={{
-                borderRadius: 1,
-                mb: 1,
+                borderRadius: 2,
+                mb: 2,
                 mx: 1,
                 background: "#23233a",
                 color: "#fff",
-                mt: 2,
+                mt: 1,
+                border: "1px solid #fff",
                 ":hover": {
                   background: "#ffd600",
                   color: "#23233a",
-                  border: "1px solid #3c3c4e",
+                  border: "3px solid #fff",
                 }
               }}
               onClick={() => {
@@ -130,6 +127,7 @@ return (
                 if (parent.onClick) parent.onClick(setActiveContent);
               }}
             >
+              <ChevronRightIcon sx={{ mr: 0.5 }} /> {/* Arrow in front */}
               <ListItemText primary={parent.label} />
               {/* {openMenus[parent.label] ? <ExpandLess /> : <ExpandMore />} */}
             </ListItemButton>
@@ -146,8 +144,8 @@ return (
                         if (parent.onClick) parent.onClick(setActiveContent); // parent logic if defined
                       }}
                       sx={{
-                        ml: 2,
-                        mb: 1,
+                        ml: 1,
+                        mb: 2,
                         borderRadius: 1,
                         background:
                           activeItem === child.label ? "#ffd600" : "transparent",
@@ -188,30 +186,12 @@ const SecondPage = () => {
 
   return (
     <div className="page-container">
+      
       <Sidebar activeContent={activeContent} setActiveContent={setActiveContent} />
+    
       <div className={activeContent === "thirdPage" ? "content content-full" : "content"}>
-        {activeContent === "default" ? (
-          <>
-            <h1>DataHEC</h1>
-            <h2>How to Use This Tool</h2>
-            <ol>
-              <li>
-                <b>Single File Mode:</b> Process individual files and generate
-                outputs that can be reused later
-              </li>
-              <li>
-                <b>Cross-System Mode:</b> Select multiple files for global
-                deduplication
-              </li>
-              <li>
-                <b>Workflow:</b> Process files individually first, then use those
-                outputs in cross-system mode for comprehensive deduplication
-              </li>
-            </ol>
-          </>
-        ) : (
-          <MainContent />
-        )}
+        {activeContent !== "default" && <MainContent />}
+
       </div>
     </div>
   );
