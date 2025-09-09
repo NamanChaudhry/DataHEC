@@ -160,55 +160,48 @@ const MainContent = ({ setDownloads }) => {
     <Box
       component="main"
       sx={{
+        mt: 1,
+        ml: { xs: 0, sm: '220px' },
+        mr: { xs: 0, sm: 3 },
+        // mb: 3,
+        px: 3,
+        // pb: 3,
+        Height: '100vh',                    // limits Paper width for a clean layout        // internal padding for space
+        background: "transparent",             // lighter background
+        // color: "#100808",
+        boxSizing: "border-box",
         display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
         flexDirection: "column",
-        // minHeight: "100vh",
-        width: "70%",
-        height: "100%",
-        overflowY: "auto",
-        p: 0,
-        m: 0,
-        background: "#f9fafb", // keep your dark color
-        px: { xs: 0, sm: 2, md: 4 }, // horizontal padding for space from sidebar/right
-        ml: { xs: 0, sm: '240px' },
+        alignItems: "center",
+        justifyContent: "flex-start",
       }}
     >
-      <Container
-        // maxWidth="md"
+      <Paper
+
+        elevation={3}
         sx={{
-          m : 0,
-          p: 0,
           width: "100%",
-          height: "100%",
-          maxWidth: "100%important",
+          maxWidth: { xs: '95vw', sm: '900px' },  // Responsive, fills center, keeps space at edges
+          // maxHeight: 'calc(100vh - 64px)', 
+          height: "100%",  // Adjust if you need more/less vertical space
+          p: { xs: 2, sm: 4, md: 5 },        // Internal padding is necessary for aesthetics
+          borderRadius: 5,
+          background: "#eaf0fa",                // Card background
+          color: "#100808",
+          boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          overflow: "auto",
-            }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            width: "100%",
-            height: "100%",
-            p: { xs: 2, sm: 4, md: 4 },
-            borderRadius: 4,
-            background: "#f9fafb", // keep your dark color
-            color: "#100808ff",
-            boxSizing: "border-box",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            overflowY: "auto",
-          }}
-        >
+          alignItems: "center",
+          boxShadow: 3,
+          // my: 2,
+          overflowY: "auto",   
+        }}
+      >            
           <Typography variant="h4" align="center" gutterBottom>
-            DataHEC
+            EY Data Harmonization
           </Typography>
           <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>
-            DataHEC: Streamlining Data Harmonization and Cleaning Processes
+            Streamlining Data Harmonization
           </Typography>
 
           {/* Entity Selection*/}
@@ -430,7 +423,6 @@ const MainContent = ({ setDownloads }) => {
             </Alert>
           )} */}
         </Paper>
-      </Container>
     </Box>
   );
 };

@@ -247,6 +247,81 @@ def process_output_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzz
         raise
 
 # API Routes
+# --- MATCH RULES API ---
+MATCH_RULES_FILE = os.path.join(STATIC_DIR, "matchrules.json")
+
+def load_match_rules():
+    if os.path.exists(MATCH_RULES_FILE):
+        with open(MATCH_RULES_FILE, "r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+def save_match_rules(rules):
+    with open(MATCH_RULES_FILE, "w") as f:
+        json.dump(rules, f, indent=2)
+
+@app.route("/api/match-rules", methods=["GET"])
+def get_match_rules():
+    """Fetch all match rules"""
+    try:
+        rules = load_match_rules()
+        return jsonify(rules)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/match-rules", methods=["POST"])
+def add_match_rule():
+    """Add a new match rule"""
+    try:
+        data = request.json
+        new_rule = data.get("rule")
+
+        if not new_rule:
+            return jsonify({"error": "Rule is required"}), 400
+
+        rules = load_match_rules()
+
+        if new_rule in rules:
+            return jsonify({"error": "Rule already exists"}), 400
+
+        rules.append(new_rule)
+        save_match_rules(rules)
+
+        return jsonify({"message": "Rule added successfully", "rules": rules})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/match-rules", methods=["PUT"])
+def update_match_rule():
+    """Update an existing match rule"""
+    try:
+        data = request.json
+        old_rule = data.get("oldRule")
+        new_rule = data.get("rule")
+
+        if not old_rule or not new_rule:
+            return jsonify({"error": "Both oldRule and rule are required"}), 400
+
+        rules = load_match_rules()
+
+        if old_rule not in rules:
+            return jsonify({"error": "Rule not found"}), 404
+
+        if new_rule in rules and new_rule != old_rule:
+            return jsonify({"error": "Rule already exists"}), 400
+
+        # replace old rule with new one
+        rules = [new_rule if r == old_rule else r for r in rules]
+        save_match_rules(rules)
+
+        return jsonify({"message": "Rule updated successfully", "rules": rules})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
 @app.route('/api/entities', methods=['GET'])
 def get_entities():
     """Get all available entities"""

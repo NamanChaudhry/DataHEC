@@ -4,7 +4,15 @@
       "PS93_Customer_Output.xlsx"
     ],
     "Great_Plains": [
+<<<<<<< HEAD
       "Sample-file_Output.xlsx"
+=======
+      "PS95_Customer_Output.xlsx"
+    ],
+    "People_Soft9.1": [
+      "PS93_Customer - Copy_Output.xlsx",
+      "PS91_1k_Output.xlsx"
+>>>>>>> 676eadedefa6d6c8e576395729abc1ea5355bdda
     ]
   }
 }

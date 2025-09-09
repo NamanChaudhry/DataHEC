@@ -1,8 +1,8 @@
-
 // UnifiedProcessingInterface.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Typography from '@mui/material/Typography';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -33,16 +33,16 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
   const [globalExactColumns, setGlobalExactColumns] = useState([]);
   const [globalThresholds, setGlobalThresholds] = useState({});
   const [availableColumns, setAvailableColumns] = useState([]);
-  const [mergeRule, setMergeRule] = useState('');
+  const [mergeRule, setMergeRule] = useState([]);
 
-  
+
   // For adding new files
   const [selectedSourceSystem, setSelectedSourceSystem] = useState('');
   const [selectedFile, setSelectedFile] = useState('');
   const [availableFiles, setAvailableFiles] = useState([]);
   const [processedOutputs, setProcessedOutputs] = useState({});
   const [showProcessedOutputs, setShowProcessedOutputs] = useState(false);
-  
+
   // For cross-system auto-selection
   const [crossSystemFileSelections, setCrossSystemFileSelections] = useState({});
 
@@ -105,18 +105,18 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         .then(response => {
           const sourceFiles = response.data;
           const outputFiles = processedOutputs[sourceSystem] || [];
-          
+
           // Create a config for this source system with all available options
           if (sourceFiles.length > 0 || outputFiles.length > 0) {
             // Default to the first source file, but allow switching
             const defaultFile = sourceFiles[0] || outputFiles[0];
             const defaultType = sourceFiles.length > 0 ? 'source' : 'output';
-            
+
             // Get columns for the default file
-            const apiUrl = defaultType === 'source' 
+            const apiUrl = defaultType === 'source'
               ? `http://localhost:5001/api/columns/${entity}/${sourceSystem}/${defaultFile}`
               : `http://localhost:5001/api/output-columns/${defaultFile}`;
-              
+
             return axios.get(apiUrl)
               .then(columnsResponse => ({
                 id: `${sourceSystem}-${Date.now()}`,
@@ -139,7 +139,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           console.error(`Error loading files for ${sourceSystem}:`, err);
           return null;
         });
-      
+
       promises.push(promise);
     });
 
@@ -159,7 +159,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     const config = fileConfigs.find(c => c.id === configId);
     if (!config) return;
 
-    const apiUrl = newFileType === 'source' 
+    const apiUrl = newFileType === 'source'
       ? `http://localhost:5001/api/columns/${entity}/${config.sourceSystem}/${newFileName}`
       : `http://localhost:5001/api/output-columns/${newFileName}`;
 
@@ -169,16 +169,16 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           prevConfigs.map(prevConfig =>
             prevConfig.id === configId
               ? {
-                  ...prevConfig,
-                  filename: newFileName,
-                  fileType: newFileType,
-                  displayName: newFileType === 'source' ? newFileName : `${newFileName} (Processed Output)`,
-                  columns: [...columnsResponse.data],
-                  // Reset column selections when switching files
-                  fuzzyColumns: [],
-                  exactColumns: [],
-                  thresholds: {}
-                }
+                ...prevConfig,
+                filename: newFileName,
+                fileType: newFileType,
+                displayName: newFileType === 'source' ? newFileName : `${newFileName} (Processed Output)`,
+                columns: [...columnsResponse.data],
+                // Reset column selections when switching files
+                fuzzyColumns: [],
+                exactColumns: [],
+                thresholds: {}
+              }
               : prevConfig
           )
         );
@@ -281,11 +281,11 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       prevConfigs.map(config =>
         config.id === configId
           ? {
-              ...config,
-              fuzzyColumns: [...newFuzzyColumns],
-              exactColumns: [...newExactColumns],
-              thresholds: { ...newThresholds }
-            }
+            ...config,
+            fuzzyColumns: [...newFuzzyColumns],
+            exactColumns: [...newExactColumns],
+            thresholds: { ...newThresholds }
+          }
           : config
       )
     );
@@ -309,7 +309,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     };
 
     console.log('Processing single file:', payload);
-    
+
     axios.post('http://localhost:5001/api/process-single', payload)
       .then(response => {
         alert(`✅ File processed successfully! Output: ${response.data.output_file}`);
@@ -325,7 +325,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
   const handleUseInCrossSystem = (sourceSystem, outputFile) => {
     // Switch to cross-system mode and add this file
     setCrossSystemEnabled(true);
-    
+
     // Get columns for this output file
     axios.get(`http://localhost:5001/api/output-columns/${outputFile}`)
       .then(columnsResponse => {
@@ -342,7 +342,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         };
 
         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);
-        
+
         // Show success message
         alert(`✅ Added ${outputFile} to cross-system configuration`);
       })
@@ -422,10 +422,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     <Box sx={{ width: '100%', mt: 4 }}>
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h5">
+          <Typography variant="h6">
             Unified Processing Interface
-            {crossSystemEnabled ? 
-              <span style={{ color: '#1976d2', fontSize: '0.8em' }}> (Cross-System Mode)</span> : 
+            {crossSystemEnabled ?
+              <span style={{ color: '#1976d2', fontSize: '0.8em' }}> (Cross-System Mode)</span> :
               <span style={{ color: '#ed6c02', fontSize: '0.8em' }}> (Single File Mode)</span>
             }
           </Typography>
@@ -450,7 +450,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {/* REPLACE THE INLINE FILE SELECTION WITH FileSystemMappingItem COMPONENT */}
         {!crossSystemEnabled && (
           <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#f9f9f9' }}>
-            <Typography variant="h6" gutterBottom>File Diplay</Typography>
+            <Typography variant="h6" gutterBottom>File Display</Typography>
             <FileSystemMappingItem
               entity={entity}
               sourceSystems={sourceSystems}
@@ -459,99 +459,128 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
               files={availableFiles}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
+              availableFiles={availableFiles}
+              setAvailableFiles={setAvailableFiles}
               onAddFile={handleAddFile}
             />
           </Paper>
         )}
-                <MergeRuleSelector
-  isCrossSystem={crossSystemEnabled}
-  mergeRule={mergeRule}
-  onChange={setMergeRule}
-/>
+
+        {crossSystemEnabled && (
+          <MergeRuleSelector
+            isCrossSystem={true}
+            mergeRule={mergeRule}
+            onChange={setMergeRule}
+          />
+        )}
+
 
         {/* Cross-System Auto-Added Files */}
         {crossSystemEnabled && fileConfigs.length > 0 && (
-          <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#f0f7ff' }}>
+          <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#e2e7edff', marginTop: '1rem' }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>
               📋 Cross-System Files (Auto-Added)
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               All source systems have been automatically added. Choose between source files or processed outputs for each system.
             </Typography>
-            
-            <Grid container spacing={2}>
+
+            <Grid container spacing={2} >
               {fileConfigs.map((config) => (
-                <Grid item xs={12} md={4} key={config.id}>
+                <Grid item xs={12} md={4} key={config.id} >
                   <Paper elevation={2} sx={{ p: 2, bgcolor: '#fff', border: '1px solid #e3f2fd' }}>
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                       {config.sourceSystem}
                     </Typography>
-                    
+
                     {/* Source Files Selection */}
                     {config.availableSourceFiles && config.availableSourceFiles.length > 0 && (
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
-                          Source Files:
+                      <Box sx={{ mb: 1}}>
+                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1}}>
+                          📤 Upload Source File
                         </Typography>
-                        <FormControl fullWidth size="small">
-                          <Select
-                            value={config.fileType === 'source' ? config.filename : ''}
-                            onChange={(e) => handleSwitchFileType(config.id, e.target.value, 'source')}
-                            displayEmpty
+                        <FormControl fullWidth>
+                          <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<UploadFileIcon />}
+                            sx={{
+                              padding: '10px 16px',
+                              border: '2px dashed #90caf9',
+                              backgroundColor: '#f1f8e9',
+                              color: '#558b2f',
+                              '&:hover': {
+                                backgroundColor: '#dcedc8',
+                                borderColor: '#7cb342',
+                              }
+                            }}
                           >
-                            <MenuItem value="">
-                              <em>Select source file</em>
-                            </MenuItem>
-                            {config.availableSourceFiles.map(file => (
-                              <MenuItem key={file} value={file}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip size="small" label="source" color="default" />
-                                  {file}
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </Select>
+                            Upload Source File
+                            <input
+                              type="file"
+                              hidden
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handleSwitchFileType(config.id, file.name, 'source');
+                                }
+                              }}
+                              accept=".csv,.xlsx,.json"
+                            />
+                          </Button>
                         </FormControl>
                       </Box>
+
                     )}
-                    
+
                     {/* Processed Output Files Selection */}
                     {config.availableOutputFiles && config.availableOutputFiles.length > 0 && (
-                      <Box sx={{ mb: 2 }}>
+                      <Box sx={{ mb: 1 }}>
                         <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
-                          Processed Outputs:
+                          📤 Upload Processed Output
                         </Typography>
-                        <FormControl fullWidth size="small">
-                          <Select
-                            value={config.fileType === 'output' ? config.filename : ''}
-                            onChange={(e) => handleSwitchFileType(config.id, e.target.value, 'output')}
-                            displayEmpty
+                        <FormControl fullWidth>
+                          <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<UploadFileIcon />}
+                            sx={{
+                              padding: '10px 16px',
+                              border: '2px dashed #90caf9',
+                              backgroundColor: '#e3f2fd',
+                              color: '#1565c0',
+                              '&:hover': {
+                                backgroundColor: '#bbdefb',
+                                borderColor: '#1976d2',
+                              }
+                            }}
                           >
-                            <MenuItem value="">
-                              <em>Select processed output</em>
-                            </MenuItem>
-                            {config.availableOutputFiles.map(file => (
-                              <MenuItem key={file} value={file}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Chip size="small" label="output" color="success" />
-                                  {file}
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </Select>
+                            Upload Output File
+                            <input
+                              type="file"
+                              hidden
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  handleSwitchFileType(config.id, file.name, 'output');
+                                }
+                              }}
+                              accept=".csv,.xlsx,.json"
+                            />
+                          </Button>
                         </FormControl>
                       </Box>
                     )}
-                    
+
                     {/* Currently Selected */}
                     <Box sx={{ p: 1, bgcolor: '#f5f5f5', borderRadius: 1 }}>
                       <Typography variant="caption" color="text.secondary">
                         Currently Selected:
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <Chip 
-                          size="small" 
-                          label={config.fileType} 
+                        <Chip
+                          size="small"
+                          label={config.fileType}
                           color={config.fileType === 'output' ? 'success' : 'default'}
                         />
                         <Typography variant="body2" fontWeight="medium">
@@ -585,7 +614,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                 {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
               </Button>
             </Box>
-            
+
             <Collapse in={showProcessedOutputs}>
               <Stack spacing={2}>
                 {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
@@ -596,10 +625,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                     <Grid container spacing={1}>
                       {outputs.map((outputFile, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                          <Paper 
-                            elevation={1} 
-                            sx={{ 
-                              p: 1.5, 
+                          <Paper
+                            elevation={1}
+                            sx={{
+                              p: 1.5,
                               bgcolor: '#fff',
                               border: '1px solid #e0e0e0',
                               '&:hover': { boxShadow: 2 }
@@ -667,18 +696,18 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                         {config.sourceSystem} / {config.filename}
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                        <Chip 
-                          size="small" 
-                          label={config.fileType} 
+                        <Chip
+                          size="small"
+                          label={config.fileType}
                           color={config.fileType === 'output' ? 'success' : 'default'}
                         />
-                        <Chip 
-                          size="small" 
+                        <Chip
+                          size="small"
                           label={`Fuzzy: ${config.fuzzyColumns.length}`}
                           variant="outlined"
                         />
-                        <Chip 
-                          size="small" 
+                        <Chip
+                          size="small"
                           label={`Exact: ${config.exactColumns.length}`}
                           variant="outlined"
                         />
@@ -717,7 +746,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                       }}
                     />
                   )}
-                  
+
                   {crossSystemEnabled && (
                     <Box sx={{ p: 2, bgcolor: '#f0f7ff', borderRadius: 1 }}>
                       <Typography variant="body2" color="text.secondary">
@@ -777,7 +806,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {!crossSystemEnabled && fileConfigs.length > 0 && (
           <Alert severity="success" sx={{ mt: 3 }}>
             <Typography variant="body2">
-              In single file mode, configure fuzzy/exact columns for each file and process them individually using the "Process" button. 
+              In single file mode, configure fuzzy/exact columns for each file and process them individually using the "Process" button.
               Processed outputs will be available for cross-system mode.
             </Typography>
           </Alert>
@@ -786,7 +815,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {crossSystemEnabled && fileConfigs.length > 0 && fileConfigs.length < 2 && (
           <Alert severity="warning" sx={{ mt: 3 }}>
             <Typography variant="body2">
-              Cross-system mode requires at least 2 files from different source systems. 
+              Cross-system mode requires at least 2 files from different source systems.
               Add more files to enable cross-system processing.
             </Typography>
           </Alert>

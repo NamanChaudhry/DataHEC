@@ -229,6 +229,8 @@ const CrossSystemSelector = ({ entity, onProcess, sourceSystems, columns }) => {
           files={files}
           selectedFile={selectedFile}
           setSelectedFile={setSelectedFile}
+          availableFiles={availableFiles}
+          setAvailableFiles={setAvailableFiles}
           onAddFile={handleAddFile}
         />
 
