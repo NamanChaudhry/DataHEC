@@ -238,7 +238,7 @@ except ImportError:
     from fuzzywuzzy import fuzz
     RAPIDFUZZ_AVAILABLE = False
     print("⚠️ Install rapidfuzz for better performance: pip install rapidfuzz")
-
+print("your_existing_script.py loaded")
 
 def preprocess_data_for_speed(df, fuzzy_columns, exact_columns):
     """
@@ -369,6 +369,107 @@ def union_find_grouping(matches):
     
     return final_groups, group_id
 
+def get_rule_matches(df, fuzzy_columns, exact_columns, fuzzy_thresholds, exact_threshold=90, rule_id=None):
+    """
+    Run a single rule and return matches as list of tuples
+    Each tuple: (idx_a, idx_b, overall_score, match_scores)
+    """
+    df, _ = preprocess_data_for_speed(df, fuzzy_columns, exact_columns)
+    all_matches = []
+
+    for a, b in combinations(df.index, 2):
+        match_scores = {}
+
+        # fuzzy matching
+        for column in fuzzy_columns:
+            threshold = fuzzy_thresholds.get(column, 90)
+            val_a, val_b = str(df.at[a, column]), str(df.at[b, column])
+            score = fast_fuzzy_ratio(val_a, val_b, threshold)
+            match_scores[column] = score
+            if score < threshold:
+                break  # early exit
+
+        # check if all fuzzy passed
+        if all(match_scores[c] >= fuzzy_thresholds.get(c, 90) for c in fuzzy_columns):
+            # check exact columns
+            exact_match = all(df.at[a, col] == df.at[b, col] for col in exact_columns)
+            overall_score = sum(match_scores.values()) / len(match_scores) if match_scores else 0.0
+
+            if exact_match and overall_score >= exact_threshold:
+                all_matches.append((a, b, overall_score, match_scores,rule_id))
+
+    return all_matches
+
+def find_fuzzy_duplicates_multi_rules(df, rules, exact_threshold=90):
+    """
+    Process multiple rules:
+      - Run get_rule_matches for each rule independently
+      - Combine all matches
+      - Apply Union-Find ONCE to handle transitivity
+    """
+    print(f"Processing {len(rules)} rules for duplicate detection...")
+
+    all_matches = []
+    for i, rule in enumerate(rules, start=1):
+        fuzzy_cols = rule.get("fuzzy_columns", [])
+        exact_cols = rule.get("exact_columns", [])
+        thresholds = rule.get("thresholds", {})
+        print(f"▶ Rule {i}: fuzzy={fuzzy_cols}, exact={exact_cols}, thresholds={thresholds}")
+
+        matches = get_rule_matches(df, fuzzy_cols, exact_cols, thresholds, exact_threshold,rule_id=f"Rule_{i}")
+        print(f"   Rule {i} matches found: {len(matches)}")
+        all_matches.extend(matches)
+
+    print(f"Total combined matches from all rules: {len(all_matches)}")
+
+    if "matched_rules" not in df.columns:
+        df["matched_rules"] = ""
+
+    # Assign group IDs with union-find
+    if all_matches:
+        matches_for_union_find = [(a, b, s, m) for (a, b, s, m, r) in all_matches]
+        groups, next_group_id = union_find_grouping(matches_for_union_find)
+
+
+        for idx_a, idx_b, overall_score, match_scores, rule_id in all_matches:
+            # Update match percentage
+            df.at[idx_a, "match_percentage"] = float(overall_score)
+            df.at[idx_b, "match_percentage"] = float(overall_score)
+
+
+            # Update per-column fuzzy percentages
+            for col, score in match_scores.items():
+                col_name = f"{col}_fuzzy_match_percentage"
+                if col_name not in df.columns:
+                    df[col_name] = 0.0
+                df.at[idx_a, col_name] = score
+                df.at[idx_b, col_name] = score
+
+            for idx in [idx_a, idx_b]:
+                if pd.isnull(df.at[idx, "matched_rules"]) or df.at[idx, "matched_rules"] == "":
+                    df.at[idx, "matched_rules"] = rule_id
+                else:
+                    existing = str(df.at[idx, "matched_rules"])
+                    if rule_id not in existing.split(","):
+                        df.at[idx, "matched_rules"] = existing + "," + rule_id
+
+        for index, group_id in groups.items():
+            df.at[index, "group_id"] = group_id
+
+        group_id = next_group_id
+    else:
+        group_id = 1
+
+    # Assign unique group IDs for unmatched rows
+    for index, row in df.iterrows():
+        if pd.isnull(row.get("group_id")):
+            df.at[index, "group_id"] = group_id
+            group_id += 1
+
+    duplicate_groups = len([g for g in df["group_id"].value_counts() if g > 1])
+    print(f"✅ Found {duplicate_groups} duplicate groups across all rules")
+
+    return df
 
 def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, exact_threshold=90):
     print(f"Finding duplicates with fuzzy_columns: {fuzzy_columns}, exact_columns: {exact_columns}")
@@ -457,7 +558,6 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
     duplicate_groups = len([g for g in df['group_id'].value_counts() if g > 1])
     print(f"Found {duplicate_groups} duplicate groups using optimized Union-Find")
     return df
-
 
 def assign_winner(df, source_system, rulebook, is_cross_system=False, source_system_main_file=None):
     print(f"Assigning winners for source_system: {source_system}, is_cross_system: {is_cross_system}")

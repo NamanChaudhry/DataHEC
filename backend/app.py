@@ -7,7 +7,6 @@ import os
 import pandas as pd
 import json
 from datetime import datetime
-
 # Import your existing deduplication functions
 try:
     from your_existing_script import (
@@ -15,6 +14,7 @@ try:
         generate_cross_system_winner,
         process_excel_file,
         find_fuzzy_duplicates,
+        find_fuzzy_duplicates_multi_rules,
         assign_winner
     )
     print("✅ Successfully imported deduplication functions")
@@ -34,6 +34,7 @@ PROCESSED_OUTPUTS_DIR = 'processed_outputs'
 # Ensure directories exist
 for directory in [DATA_DIR, STATIC_DIR, OUTPUT_DIR, PROCESSED_OUTPUTS_DIR]:
     os.makedirs(directory, exist_ok=True)
+
 
 # Registry management functions
 def load_processed_outputs_registry():
@@ -71,7 +72,7 @@ def add_to_processed_outputs(entity, source_system, output_file):
     save_processed_outputs_registry(registry)
 
 # Enhanced processing functions with statistics
-def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy_thresholds, rulebook, output_dir):
+def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy_thresholds, rulebook, output_dir,rules=None):
     """Enhanced version of process_excel_file that returns statistics"""
     stats_start = time.time()
     
@@ -91,7 +92,11 @@ def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy
         
         # Find duplicates with timing
         dup_start = time.time()
-        df = find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds)
+        #df = find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds)
+        if rules:  # multi-rule mode
+            df = find_fuzzy_duplicates_multi_rules(df, rules)
+        else:      # single-rule mode (backward compatibility)
+            df = find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds)  
         dup_time = time.time() - dup_start
         
         duplicate_rows = df[df.duplicated('group_id', keep=False)].copy()
@@ -345,6 +350,7 @@ def process_single_file():
         fuzzy_columns = data.get('fuzzy_columns', [])
         exact_columns = data.get('exact_columns', [])
         thresholds = data.get('thresholds', {})
+        rules = data.get('rules', [])
 
         # Validation
         if not all([entity, source_system, filename]):
@@ -393,7 +399,7 @@ def process_single_file():
             )
         else:
             output_file, processing_stats = process_excel_file_with_stats(
-                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR
+                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR,rules=rules
             )
 
         processing_time = time.time() - processing_start
