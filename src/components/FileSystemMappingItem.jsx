@@ -23,6 +23,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
+import { Edit, Edit2Icon, Edit3Icon, EditIcon } from 'lucide-react';
 
 
 const FileSystemMappingItem = ({
@@ -46,6 +47,10 @@ const FileSystemMappingItem = ({
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [newRule, setNewRule] = useState("");
+
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:5001/api/match-rules")
@@ -300,7 +305,50 @@ const FileSystemMappingItem = ({
           </FormControl>
 
           {/* Button aligned to right, below dropdown */}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          {/* Button row aligned to right, below dropdown */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1, gap: 1 }}>
+            {/* Edit Rule */}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setOpenEditDialog(true)}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                borderColor: "#ff9800",
+                color: "#ef6c00",
+                "&:hover": { borderColor: "#ef6c00", backgroundColor: "#fff3e0" },
+              }}
+              startIcon={<Edit />}
+            >
+              Edit Rules
+            </Button>
+            {/* New Rule */}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setNewRule(""); // empty for new
+                setOpenDialog(true);
+              }}
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                borderColor: "#42a5f5",
+                color: "#1976d2",
+                "&:hover": {
+                  borderColor: "#1e88e5",
+                  backgroundColor: "#e3f2fd",
+                },
+              }}
+              startIcon={<AddIcon fontSize="small" />}
+            >
+              Add Rule
+            </Button>
+
+          </Box>
+
+          {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
             <Button
               variant="outlined"
               color="primary"
@@ -320,7 +368,7 @@ const FileSystemMappingItem = ({
             >
               New Rule
             </Button>
-          </Box>
+          </Box> */}
         </Box>
 
         {/* <Button
@@ -472,6 +520,94 @@ const FileSystemMappingItem = ({
             >
               Add
             </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openEditDialog}
+          onClose={() => {
+            setOpenEditDialog(false);
+            setEditingIndex(null);
+          }}
+          PaperProps={{
+            sx: { borderRadius: "16px", p: 2, minWidth: "550px" },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 600, color: "#1976d2" }}>
+            Edit Match Rules
+          </DialogTitle>
+          <DialogContent dividers>
+            {rules.map((rule, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1,
+                  p: 1,
+                  borderRadius: "8px",
+                  bgcolor: "#f9f9f9",
+                }}
+              >
+                {editingIndex === index ? (
+                  <TextField
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    size="small"
+                    fullWidth
+                    sx={{ mr: 1 }}
+                  />
+                ) : (
+                  <Typography>{rule}</Typography>
+                )}
+
+                {editingIndex === index ? (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={async () => {
+                      if (!editValue.trim()) return;
+                      try {
+                        const response = await fetch("http://localhost:5001/api/match-rules", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ oldRule: rule, rule: editValue }),
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                          setRules(data.rules);
+                          setEditingIndex(null);
+                          setEditValue("");
+                        } else {
+                          alert(data.error || "Update failed");
+                        }
+                      } catch (err) {
+                        console.error("Error updating rule:", err);
+                      }
+                    }}
+                    sx={{ borderRadius: "8px" }}
+                  >
+                    Save
+                  </Button>
+                ) : (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => {
+                      setEditingIndex(index);
+                      setEditValue(rule);
+                    }}
+                    sx={{ borderRadius: "8px" }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </Box>
+            ))}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenEditDialog(false)}>Close</Button>
           </DialogActions>
         </Dialog>
 
