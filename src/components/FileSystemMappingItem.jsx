@@ -23,7 +23,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
-import { Edit, Edit2Icon, Edit3Icon, EditIcon } from 'lucide-react';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import { ActivityIcon, Edit, Edit2Icon, Edit3Icon, EditIcon } from 'lucide-react';
 
 
 const FileSystemMappingItem = ({
@@ -391,7 +392,7 @@ const FileSystemMappingItem = ({
           <Button
             variant="contained"
             color="primary"
-            startIcon={<AddIcon />}
+            startIcon={<AutorenewIcon />}
             onClick={() => {
               onAddFile?.();
               setResetDropdowns(true);
@@ -412,7 +413,7 @@ const FileSystemMappingItem = ({
               }
             }}
           >
-            File Display
+            Process
           </Button>
         </Box>
         <Dialog
