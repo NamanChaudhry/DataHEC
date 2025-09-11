@@ -10,21 +10,13 @@ import {
   Button,
   Typography,
   Divider,
-  Paper,
   CircularProgress
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import MergeRuleSelector from './Mergeruleselector';
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import { ActivityIcon, Edit, Edit2Icon, Edit3Icon, EditIcon } from 'lucide-react';
 
 
 const FileSystemMappingItem = ({
@@ -47,7 +39,7 @@ const FileSystemMappingItem = ({
   const [resetDropdowns, setResetDropdowns] = useState(false);
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [newRule, setNewRule] = useState("");
+  const [newRule, setNewRule] = useState({ rule: "", description: "" });
 
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -295,91 +287,25 @@ const FileSystemMappingItem = ({
                   <CircularProgress size={20} sx={{ mr: 1 }} /> Loading rules...
                 </MenuItem>
               ) : (
-                rules.map((rule, index) => (
-                  <MenuItem key={index} value={rule}>
-                    <Checkbox checked={selectedRule.indexOf(rule) > -1} />
-                    <ListItemText primary={rule} />
+                rules.map((ruleObj, index) => (
+                  <MenuItem key={index} value={ruleObj.rule}>
+                    <Checkbox checked={selectedRule.includes(ruleObj.rule)} />
+                    <ListItemText
+                      primary={ruleObj.rule}
+
+                      primaryTypographyProps={{ fontWeight: 500 }}
+                      secondaryTypographyProps={{ fontSize: 12, color: 'text.secondary' }}
+                    />
                   </MenuItem>
                 ))
               )}
             </Select>
+
           </FormControl>
 
           {/* Button aligned to right, below dropdown */}
           {/* Button row aligned to right, below dropdown */}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1, gap: 1 }}>
-            {/* Edit Rule */}
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => setOpenEditDialog(true)}
-              sx={{
-                borderRadius: "8px",
-                textTransform: "none",
-                borderColor: "#ff9800",
-                color: "#ef6c00",
-                "&:hover": { borderColor: "#ef6c00", backgroundColor: "#fff3e0" },
-              }}
-              startIcon={<Edit />}
-            >
-              Edit Rules
-            </Button>
-            {/* New Rule */}
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => {
-                setNewRule(""); // empty for new
-                setOpenDialog(true);
-              }}
-              sx={{
-                borderRadius: "8px",
-                textTransform: "none",
-                borderColor: "#42a5f5",
-                color: "#1976d2",
-                "&:hover": {
-                  borderColor: "#1e88e5",
-                  backgroundColor: "#e3f2fd",
-                },
-              }}
-              startIcon={<AddIcon fontSize="small" />}
-            >
-              Add Rule
-            </Button>
-
-          </Box>
-
-          {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              onClick={() => setOpenDialog(true)}
-              sx={{
-                borderRadius: "8px",
-                textTransform: "none",
-                borderColor: "#42a5f5",
-                color: "#1976d2",
-                "&:hover": {
-                  borderColor: "#1e88e5",
-                  backgroundColor: "#e3f2fd",
-                },
-              }}
-              startIcon={<AddIcon fontSize="small" />}
-            >
-              New Rule
-            </Button>
-          </Box> */}
         </Box>
-
-        {/* <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setOpenDialog(true)}
-          sx={{ ml: 2 }}
-        >
-          + New Rule
-        </Button> */}
 
         <MergeRuleSelector
           isCrossSystem={false}
@@ -416,202 +342,6 @@ const FileSystemMappingItem = ({
             Process
           </Button>
         </Box>
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          PaperProps={{
-            sx: {
-              borderRadius: "16px",
-              p: 2,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-            },
-          }}
-        >
-          <DialogTitle
-            sx={{
-              fontWeight: 600,
-              fontSize: "1.2rem",
-              textAlign: "center",
-              color: "#1976d2",
-              pb: 2,
-            }}
-          >
-            Add New Match Rule
-          </DialogTitle>
-
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Rule Name"
-              fullWidth
-              variant="outlined"
-              value={newRule}
-              onChange={(e) => setNewRule(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "12px",
-                  backgroundColor: "#f5f9ff",
-                  "& fieldset": { borderColor: "#90caf9" },
-                  "&:hover fieldset": { borderColor: "#42a5f5" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#1976d2",
-                    borderWidth: 2,
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  fontSize: "0.9rem",
-                  fontWeight: 500,
-                  color: "#1976d2",
-                  transform: "translate(14px, -6px) scale(0.85)",
-                },
-              }}
-            />
-
-          </DialogContent>
-
-          <DialogActions sx={{ px: 3, pb: 2, justifyContent: "space-between" }}>
-            <Button
-              onClick={() => setOpenDialog(false)}
-              variant="outlined"
-              sx={{
-                borderRadius: "10px",
-                textTransform: "none",
-                color: "#1976d2",
-                borderColor: "#42a5f5",
-                "&:hover": { borderColor: "#1e88e5", background: "#e3f2fd" },
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={async () => {
-                if (!newRule.trim()) return;
-                try {
-                  const response = await fetch("http://localhost:5001/api/match-rules", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ rule: newRule }),
-                  });
-                  const data = await response.json();
-                  if (response.ok) {
-                    setRules(data.rules);
-                    setNewRule("");
-                    setOpenDialog(false);
-                  } else {
-                    alert(data.error || "Failed to add rule");
-                  }
-                } catch (err) {
-                  console.error("Error adding rule:", err);
-                }
-              }}
-              variant="contained"
-              sx={{
-                borderRadius: "10px",
-                textTransform: "none",
-                background: "linear-gradient(45deg, #42a5f5 30%, #1e88e5 90%)",
-                boxShadow: "0px 4px 12px rgba(33, 150, 243, 0.4)",
-                "&:hover": {
-                  background: "linear-gradient(45deg, #1e88e5 30%, #1565c0 90%)",
-                },
-              }}
-            >
-              Add
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={openEditDialog}
-          onClose={() => {
-            setOpenEditDialog(false);
-            setEditingIndex(null);
-          }}
-          PaperProps={{
-            sx: { borderRadius: "16px", p: 2, minWidth: "550px" },
-          }}
-        >
-          <DialogTitle sx={{ fontWeight: 600, color: "#1976d2" }}>
-            Edit Match Rules
-          </DialogTitle>
-          <DialogContent dividers>
-            {rules.map((rule, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 1,
-                  p: 1,
-                  borderRadius: "8px",
-                  bgcolor: "#f9f9f9",
-                }}
-              >
-                {editingIndex === index ? (
-                  <TextField
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    size="small"
-                    fullWidth
-                    sx={{ mr: 1 }}
-                  />
-                ) : (
-                  <Typography>{rule}</Typography>
-                )}
-
-                {editingIndex === index ? (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={async () => {
-                      if (!editValue.trim()) return;
-                      try {
-                        const response = await fetch("http://localhost:5001/api/match-rules", {
-                          method: "PUT",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ oldRule: rule, rule: editValue }),
-                        });
-                        const data = await response.json();
-                        if (response.ok) {
-                          setRules(data.rules);
-                          setEditingIndex(null);
-                          setEditValue("");
-                        } else {
-                          alert(data.error || "Update failed");
-                        }
-                      } catch (err) {
-                        console.error("Error updating rule:", err);
-                      }
-                    }}
-                    sx={{ borderRadius: "8px" }}
-                  >
-                    Save
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                      setEditingIndex(index);
-                      setEditValue(rule);
-                    }}
-                    sx={{ borderRadius: "8px" }}
-                  >
-                    Edit
-                  </Button>
-                )}
-              </Box>
-            ))}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenEditDialog(false)}>Close</Button>
-          </DialogActions>
-        </Dialog>
-
       </Stack>
     </Box>
   );

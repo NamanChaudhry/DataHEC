@@ -1,12 +1,38 @@
 [
-  "Name and Address",
-  "Capital IQ ID",
-  "Country and Tax Registration Number",
-  "Taxpayer ID",
-  "Bank Id",
-  "Email Domain & Name",
-  "Phone Number and Name",
-  "Manufacturer Name and ID",
-  "Manufacturer ID and Suppllier Ref ID",
-  "Zip"
+  {
+    "rule": "Name and Address",
+    "description": "Matches using the name & address."
+  },
+  {
+    "rule": "Capital IQ ID",
+    "description": "Uses the unique Capital IQ identifier to match entities."
+  },
+  {
+    "rule": "Country and Tax Registration Number",
+    "description": "Matches entities using country information and official tax registration number."
+  },
+  {
+    "rule": "Taxpayer ID",
+    "description": "Identifies matches using the entity's taxpayer identification number."
+  },
+  {
+    "rule": "Bank Id",
+    "description": "Matches based on the banking institution's identifier assigned to the entity."
+  },
+  {
+    "rule": "Email Domain & Name",
+    "description": "Matches using the domain of the email and the entity's name."
+  },
+  {
+    "rule": "Phone Number and Name",
+    "description": "Uses contact phone number and entity name for matching."
+  },
+  {
+    "rule": "Manufacturer Name and ID",
+    "description": "Matches based on the manufacturer's name along with their assigned ID."
+  },
+  {
+    "rule": "Manufacturer ID and Suppllier Ref ID",
+    "description": "Matches using the manufacturer's ID and a reference ID from the supplier system."
+  }
 ]
