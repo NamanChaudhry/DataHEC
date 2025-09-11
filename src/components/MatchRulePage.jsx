@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Divider,
-  IconButton,
-  Box
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+  Button, TextField, Divider, IconButton, Box, Typography, Chip, Dialog,
+  DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import WorkingColumnMapping from "./WorkingColumnMapping";
 
 const MatchRulePage = () => {
   const [rules, setRules] = useState([]);
@@ -25,6 +14,23 @@ const MatchRulePage = () => {
   const [editValue, setEditValue] = useState({ rule: "", description: "" });
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newRule, setNewRule] = useState({ rule: "", description: "" });
+  const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
+
+  const staticColumns = [
+    'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
+    'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
+    'Phone2', 'Email', 'Web', 'Transaction_Date'
+  ];
+
+  const [fuzzyColumns, setFuzzyColumns] = useState([]);
+  const [exactColumns, setExactColumns] = useState([]);
+  const [thresholds, setThresholds] = useState({});
+
+  const handleMappingChange = (newFuzzy, newExact, newThresholds) => {
+    setFuzzyColumns(newFuzzy);
+    setExactColumns(newExact);
+    setThresholds(newThresholds);
+  };
 
   useEffect(() => {
     fetch("http://localhost:5001/api/match-rules")
@@ -87,28 +93,33 @@ const MatchRulePage = () => {
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: "1.8rem" }}>Match Rules</h1>
-      <Divider/>
-      <Box marginTop={'1rem'}>
-        <TableContainer component={Paper} style={{ marginTop: '0.5rem' }}>
+    <Box sx={{ mx: "auto" }}>
+      <h1 style={{ fontSize: '1.5rem' }}>Match Rules</h1>
+      <Divider />
+
+      <Box mt={1.5}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            mt: 1,
+            mx: 0,
+            boxShadow: 1,
+            border: "1px solid #ddd",
+            width: "100%",
+            maxWidth: "100%",
+          }}
+        >
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell style={{ fontWeight: "bold" }}>Rule Name</TableCell>
-                <TableCell style={{ fontWeight: "bold" }}>Description</TableCell>
-                <TableCell align="right" style={{ fontWeight: "bold" }}>
-                  Action
-                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Rule Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold" }}>Action</TableCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
               {rules.map((ruleItem, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ height: "2rem" }}
-                >
+                <TableRow key={index} sx={{ height: "2rem" }}>
                   <TableCell sx={{ py: 2 }}>{ruleItem.rule}</TableCell>
                   <TableCell sx={{ py: 2 }}>{ruleItem.description}</TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
@@ -121,18 +132,108 @@ const MatchRulePage = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Box display="flex" justifyContent="flex-end" mt={1}>
+
+        <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
-            style={{ backgroundColor: "pink" }}
+            variant="contained"
+            sx={{ backgroundColor: "pink" }}
             onClick={() => setAddDialogOpen(true)}
+            disabled={addDialogOpen}
           >
             Add New Rule
           </Button>
         </Box>
-
       </Box>
 
-      {/* Edit Dialog */}
+      {/* Add Rule Dialog */}
+      <Dialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>Add New Match Rule
+        </DialogTitle>
+        <DialogContent dividers sx={{ pt: 3, px: 3, pb: 1 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+            {/* Rule Name & Description Fields */}
+            <Box flexGrow={1} display="flex" gap={2} flexWrap="wrap">
+              <TextField
+                label="Rule Name"
+                variant="outlined"
+                value={newRule.rule}
+                onChange={(e) => setNewRule({ ...newRule, rule: e.target.value })}
+                sx={{ minWidth: 250, flex: 1 }}
+              />
+              <TextField
+                label="Description"
+                variant="outlined"
+                value={newRule.description}
+                onChange={(e) => setNewRule({ ...newRule, description: e.target.value })}
+                multiline
+                rows={1}
+                sx={{ minWidth: 300, flex: 2 }}
+              />
+            </Box>
+          </Box>
+
+          {/* File Info Chips */}
+          <Box mt={3}>
+            <Typography variant="h6">Source System / File Name</Typography>
+            <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+              <Chip size="small" label="filetype" color="default" />
+              <Chip size="small" label={`Fuzzy: ${fuzzyColumns.length}`} variant="outlined" />
+              <Chip size="small" label={`Exact: ${exactColumns.length}`} variant="outlined" />
+            </Box>
+          </Box>
+
+          {/* Column Mapping Component */}
+          {!crossSystemEnabled && (
+            <Box mt={3}>
+              <WorkingColumnMapping
+                columns={staticColumns}
+                fuzzyColumns={fuzzyColumns}
+                exactColumns={exactColumns}
+                thresholds={thresholds}
+                onMappingChange={handleMappingChange}
+              />
+            </Box>
+          )}
+
+          {/* Info Note */}
+          <Box
+            sx={{
+              p: 2,
+              bgcolor: "#f0f7ff",
+              borderRadius: 1,
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              📋 Available columns:
+            </Typography>
+            <Typography variant="caption" color="primary">
+              File type can be changed above. Column configuration will be set globally for all files.
+            </Typography>
+          </Box>
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddDialogOpen(false)} variant="" color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddSave} variant="contained" color="primary">
+            Save Rule
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Rule Dialog */}
       <Dialog
         open={editingIndex !== null}
         onClose={() => setEditingIndex(null)}
@@ -145,9 +246,7 @@ const MatchRulePage = () => {
             fullWidth
             label="Rule"
             value={editValue.rule}
-            onChange={(e) =>
-              setEditValue({ ...editValue, rule: e.target.value })
-            }
+            onChange={(e) => setEditValue({ ...editValue, rule: e.target.value })}
             variant="outlined"
             margin="dense"
           />
@@ -155,9 +254,7 @@ const MatchRulePage = () => {
             fullWidth
             label="Description"
             value={editValue.description}
-            onChange={(e) =>
-              setEditValue({ ...editValue, description: e.target.value })
-            }
+            onChange={(e) => setEditValue({ ...editValue, description: e.target.value })}
             variant="outlined"
             margin="dense"
             multiline
@@ -171,44 +268,7 @@ const MatchRulePage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Dialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Add New Match Rule</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Rule Name"
-            value={newRule.rule}
-            onChange={(e) => setNewRule({ ...newRule, rule: e.target.value })}
-            variant="outlined"
-            margin="dense"
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            value={newRule.description}
-            onChange={(e) =>
-              setNewRule({ ...newRule, description: e.target.value })
-            }
-            variant="outlined"
-            margin="dense"
-            multiline
-            rows={3}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddSave} variant="contained" color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    </Box>
   );
 };
 
