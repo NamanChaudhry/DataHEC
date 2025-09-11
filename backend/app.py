@@ -272,20 +272,28 @@ def add_match_rule():
     """Add a new match rule"""
     try:
         data = request.json
-        new_rule = data.get("rule")
+        new_rule_name = data.get("rule")
+        new_description = data.get("description", "")
 
-        if not new_rule:
-            return jsonify({"error": "Rule is required"}), 400
+        if not new_rule_name:
+            return jsonify({"error": "Rule name is required"}), 400
 
         rules = load_match_rules()
 
-        if new_rule in rules:
+        # Check if rule name already exists (case insensitive)
+        if any(r["rule"].strip().lower() == new_rule_name.strip().lower() for r in rules):
             return jsonify({"error": "Rule already exists"}), 400
 
-        rules.append(new_rule)
+        # Append new rule object
+        rules.append({
+            "rule": new_rule_name.strip(),
+            "description": new_description.strip()
+        })
+
         save_match_rules(rules)
 
         return jsonify({"message": "Rule added successfully", "rules": rules})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
