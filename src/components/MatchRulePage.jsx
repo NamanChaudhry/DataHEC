@@ -262,7 +262,7 @@ const MatchRulePage = () => {
             rows={3}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions style={{margin:'0.5rem'}}>
           <Button onClick={() => setEditingIndex(null)}>Cancel</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
             Save
