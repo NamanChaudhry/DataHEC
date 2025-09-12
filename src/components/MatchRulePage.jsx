@@ -16,6 +16,10 @@ const MatchRulePage = () => {
   const [newRule, setNewRule] = useState({ rule: "", description: "" });
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
 
+  // 🔹 Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState(null);
+
   const staticColumns = [
     'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
     'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
@@ -105,6 +109,34 @@ const MatchRulePage = () => {
     }
   };
 
+  // 🔹 Confirm delete (open dialog)
+  const confirmDelete = (rule) => {
+    setRuleToDelete(rule);
+    setDeleteDialogOpen(true);
+  };
+
+  // 🔹 Perform delete
+  const handleDelete = async () => {
+    if (!ruleToDelete) return;
+    try {
+      const response = await fetch("http://localhost:5001/api/match-rules", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rule: ruleToDelete.rule }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setRules(data.rules);
+        setDeleteDialogOpen(false);
+        setRuleToDelete(null);
+      } else {
+        alert(data.error || "Failed to delete rule");
+      }
+    } catch (err) {
+      console.error("Error deleting rule:", err);
+    }
+  };
 
   return (
     <Box sx={{ mx: "auto" }}>
@@ -132,7 +164,7 @@ const MatchRulePage = () => {
                 <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Fuzzy Columns</TableCell>
                 <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Exact Columns</TableCell>
                 <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Thresholds</TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Action</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -169,8 +201,11 @@ const MatchRulePage = () => {
                         .join(", ")
                       : "-"}
                   </TableCell>
-                  <TableCell align="right" sx={{ py: 1 }}>
-                    <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
+                  <TableCell align="right" sx={{ py: 1 }} style={{display:'flex'}}>
+                    <IconButton size="small" onClick={() => confirmDelete(ruleItem)} style={{ color: 'red' }}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                     <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
@@ -192,6 +227,22 @@ const MatchRulePage = () => {
         </Box>
       </Box>
 
+      {/* 🔹 Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete the rule <b>{ruleToDelete?.rule}</b>?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Add Rule Dialog */}
       <Dialog
         open={addDialogOpen}

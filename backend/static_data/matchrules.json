@@ -104,18 +104,5 @@
     "fuzzy_columns": [],
     "exact_columns": [],
     "thresholds": {}
-  },
-  {
-    "rule": "test1",
-    "description": "test1",
-    "fuzzy_columns": [
-      "Cust_Id"
-    ],
-    "exact_columns": [
-      "Zip"
-    ],
-    "thresholds": {
-      "Cust_Id": 90
-    }
   }
 ]

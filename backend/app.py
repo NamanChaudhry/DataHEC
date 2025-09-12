@@ -364,7 +364,37 @@ def update_match_rule():
         return jsonify({"message": "Rule updated successfully", "rules": rules})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/match-rules", methods=["DELETE"])
+def delete_match_rule():
+    """Delete a match rule"""
+    try:
+        data = request.json
+        rule_to_delete = data.get("rule")
 
+        if not rule_to_delete:
+            return jsonify({"error": "Rule name is required"}), 400
+
+        rules = load_match_rules()
+
+        # Find index of the rule by matching rule name (case insensitive & trimmed)
+        index = next(
+            (i for i, r in enumerate(rules)
+                if r["rule"].strip().lower() == rule_to_delete.strip().lower()),
+            None
+        )
+
+        if index is None:
+            return jsonify({"error": "Rule not found"}), 404
+
+        # Remove the rule
+        rules.pop(index)
+
+        save_match_rules(rules)
+
+        return jsonify({"message": "Rule deleted successfully", "rules": rules})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/entities', methods=['GET'])
 def get_entities():
