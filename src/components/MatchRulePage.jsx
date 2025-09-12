@@ -107,6 +107,7 @@ const MatchRulePage = () => {
             border: "1px solid #ddd",
             width: "100%",
             maxWidth: "100%",
+            p:1.2
           }}
         >
           <Table size="small">
@@ -114,14 +115,46 @@ const MatchRulePage = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Rule Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Fuzzy Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Exact Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Thresholds</TableCell>
                 <TableCell align="right" sx={{ fontWeight: "bold" }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rules.map((ruleItem, index) => (
-                <TableRow key={index} sx={{ height: "2rem" }}>
-                  <TableCell sx={{ py: 2 }}>{ruleItem.rule}</TableCell>
-                  <TableCell sx={{ py: 2 }}>{ruleItem.description}</TableCell>
+                <TableRow key={index} sx={{ height: "1rem" }}>
+                  <TableCell sx={{
+                      py: 1.1,
+                      maxWidth: 180,        
+                      whiteSpace: "normal",
+                      wordBreak: "break-word" 
+                    }}>{ruleItem.rule}</TableCell>
+                  <TableCell
+                    sx={{
+                      py: 1.1,
+                      maxWidth: 300,        
+                      whiteSpace: "normal",
+                      wordBreak: "break-word" 
+                    }}
+                    title={ruleItem.description}
+                  >
+                    {ruleItem.description}
+                  </TableCell>
+
+                  <TableCell sx={{ py: 1.1 }}>
+                    {ruleItem.fuzzy_columns?.join(", ") || "-"}
+                  </TableCell>
+                  <TableCell sx={{ py: 1.1 }}>
+                    {ruleItem.exact_columns?.join(", ") || "-"}
+                  </TableCell>
+                  <TableCell sx={{ py: 1.1 }}>
+                    {ruleItem.thresholds
+                      ? Object.entries(ruleItem.thresholds)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(", ")
+                      : "-"}
+                  </TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
                     <IconButton size="small" onClick={() => handleEdit(index)}>
                       <EditIcon fontSize="small" />
@@ -241,7 +274,7 @@ const MatchRulePage = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Edit Match Rule</DialogTitle>
+        <DialogTitle>Edit Rule Configuration</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -262,7 +295,7 @@ const MatchRulePage = () => {
             rows={3}
           />
         </DialogContent>
-        <DialogActions style={{margin:'0.5rem'}}>
+        <DialogActions style={{ margin: '0.5rem' }}>
           <Button onClick={() => setEditingIndex(null)}>Cancel</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
             Save
