@@ -40,8 +40,15 @@ const MatchRulePage = () => {
   }, []);
 
   const handleEdit = (index) => {
+    const selectedRule = rules[index];
     setEditingIndex(index);
-    setEditValue(rules[index]);
+    setEditValue({
+      rule: selectedRule.rule,
+      description: selectedRule.description,
+    });
+    setFuzzyColumns(selectedRule.fuzzy_columns || []);
+    setExactColumns(selectedRule.exact_columns || []);
+    setThresholds(selectedRule.thresholds || {});
   };
 
   const handleAddSave = async () => {
@@ -76,6 +83,9 @@ const MatchRulePage = () => {
           oldRule: oldRuleName,
           rule: editValue.rule,
           description: editValue.description,
+          fuzzy_columns: fuzzyColumns,
+          exact_columns: exactColumns,
+          thresholds: thresholds,
         }),
       });
 
@@ -84,6 +94,9 @@ const MatchRulePage = () => {
         setRules(data.rules);
         setEditingIndex(null);
         setEditValue({ rule: "", description: "" });
+        setFuzzyColumns([]);
+        setExactColumns([]);
+        setThresholds({});
       } else {
         alert(data.error || "Failed to update rule");
       }
@@ -91,6 +104,7 @@ const MatchRulePage = () => {
       console.error("Error updating rule:", err);
     }
   };
+
 
   return (
     <Box sx={{ mx: "auto" }}>
@@ -107,35 +121,35 @@ const MatchRulePage = () => {
             border: "1px solid #ddd",
             width: "100%",
             maxWidth: "100%",
-            p:1.2
+            p: 1.2
           }}
         >
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Rule Name</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Description</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Fuzzy Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Exact Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Thresholds</TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Action</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Rule Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Fuzzy Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Exact Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Thresholds</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rules.map((ruleItem, index) => (
                 <TableRow key={index} sx={{ height: "1rem" }}>
                   <TableCell sx={{
-                      py: 1.1,
-                      maxWidth: 180,        
-                      whiteSpace: "normal",
-                      wordBreak: "break-word" 
-                    }}>{ruleItem.rule}</TableCell>
+                    py: 1.1,
+                    maxWidth: 180,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word"
+                  }}>{ruleItem.rule}</TableCell>
                   <TableCell
                     sx={{
                       py: 1.1,
-                      maxWidth: 300,        
+                      maxWidth: 300,
                       whiteSpace: "normal",
-                      wordBreak: "break-word" 
+                      wordBreak: "break-word"
                     }}
                     title={ruleItem.description}
                   >
@@ -156,7 +170,7 @@ const MatchRulePage = () => {
                       : "-"}
                   </TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
-                      <IconButton size="small" onClick={() => handleEdit(index)} style={{color:'GrayText'}}>
+                    <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
@@ -182,7 +196,7 @@ const MatchRulePage = () => {
       <Dialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
-        maxWidth="lg"
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle style={{ fontSize: '1.5rem' }}>Select Rule Configuration</DialogTitle>
@@ -215,7 +229,7 @@ const MatchRulePage = () => {
           <Box mt={3}>
             {/* <Typography variant="h6">Source System / File Name</Typography> */}
             <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-              <Chip size="small" label="filetype" color="default" />
+              {/* <Chip size="small" label="filetype" color="default" /> */}
               <Chip size="small" label={`Fuzzy: ${fuzzyColumns.length}`} variant="outlined" />
               <Chip size="small" label={`Exact: ${exactColumns.length}`} variant="outlined" />
             </Box>
@@ -271,29 +285,78 @@ const MatchRulePage = () => {
       <Dialog
         open={editingIndex !== null}
         onClose={() => setEditingIndex(null)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>Edit Rule Configuration</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Rule"
-            value={editValue.rule}
-            onChange={(e) => setEditValue({ ...editValue, rule: e.target.value })}
-            variant="outlined"
-            margin="dense"
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            value={editValue.description}
-            onChange={(e) => setEditValue({ ...editValue, description: e.target.value })}
-            variant="outlined"
-            margin="dense"
-            multiline
-            rows={3}
-          />
+        <DialogContent dividers sx={{ pt: 1, px: 3, pb: 1 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+            {/* Rule Name & Description Fields */}
+            <Box flexGrow={1} display="flex" gap={1} flexWrap="wrap">
+              <TextField
+                fullWidth
+                label="Rule"
+                value={editValue.rule}
+                onChange={(e) => setEditValue({ ...editValue, rule: e.target.value })}
+                variant="outlined"
+                margin="dense"
+              />
+              <TextField
+                fullWidth
+                label="Description"
+                value={editValue.description}
+                onChange={(e) => setEditValue({ ...editValue, description: e.target.value })}
+                variant="outlined"
+                margin="dense"
+                multiline
+                rows={3}
+              />
+            </Box>
+          </Box>
+          <Box mt={3}>
+            {/* <Typography variant="h6">Source System / File Name</Typography> */}
+            <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+              {/* <Chip size="small" label="filetype" color="default" /> */}
+              <Chip size="small" label={`Fuzzy: ${fuzzyColumns.length}`} variant="outlined" />
+              <Chip size="small" label={`Exact: ${exactColumns.length}`} variant="outlined" />
+            </Box>
+          </Box>
+
+          {/* Column Mapping Component */}
+          {!crossSystemEnabled && (
+            <Box mt={3}>
+              <WorkingColumnMapping
+                columns={staticColumns}
+                fuzzyColumns={fuzzyColumns}
+                exactColumns={exactColumns}
+                thresholds={thresholds}
+                onMappingChange={handleMappingChange}
+              />
+            </Box>
+          )}
+
+          {/* Info Note */}
+          <Box
+            sx={{
+              p: 2,
+              bgcolor: "#f0f7ff",
+              borderRadius: 1,
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              📋 Available columns:
+            </Typography>
+            <Typography variant="caption" color="primary">
+              File type can be changed above. Column configuration will be set globally for all files.
+            </Typography>
+          </Box>
+
         </DialogContent>
         <DialogActions style={{ margin: '0.5rem' }}>
           <Button onClick={() => setEditingIndex(null)}>Cancel</Button>

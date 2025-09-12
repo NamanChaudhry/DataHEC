@@ -1,15 +1,15 @@
 [
   {
     "rule": "Name and Address",
-    "description": "Matches using the name & address.",
+    "description": "Matches using the name and address.",
     "fuzzy_columns": [
       "Name",
       "Address"
     ],
     "exact_columns": [],
     "thresholds": {
-      "Name": 90,
-      "Address": 90
+      "Address": 85,
+      "Name": 90
     }
   },
   {
@@ -19,7 +19,7 @@
     "exact_columns": [
       "Capital IQ ID"
     ],
-    "thresholds" : {}
+    "thresholds": {}
   },
   {
     "rule": "Country and Tax Registration Number",
@@ -29,7 +29,7 @@
       "Country",
       "Tax Registration Number"
     ],
-    "thresholds" : {}
+    "thresholds": {}
   },
   {
     "rule": "Taxpayer ID",
@@ -38,7 +38,7 @@
     "exact_columns": [
       "Taxpayer ID"
     ],
-    "thresholds" : {}
+    "thresholds": {}
   },
   {
     "rule": "Bank Id",
@@ -47,55 +47,55 @@
     "exact_columns": [
       "Bank Id"
     ],
-    "thresholds":{}
+    "thresholds": {}
   },
   {
     "rule": "Email Domain & Name",
     "description": "Matches using the domain of the email and the entity's name.",
-    "fuzzy_columns":[
+    "fuzzy_columns": [
       "Name"
     ],
-    "exact_columns":[
+    "exact_columns": [
       "Email"
     ],
-    "thresholds":{
-      "Name":90
+    "thresholds": {
+      "Name": 85
     }
   },
   {
     "rule": "Phone Number and Name",
     "description": "Uses contact phone number and entity name for matching.",
-    "fuzzy_columns":[
+    "fuzzy_columns": [
       "Name"
     ],
-    "exact_columns":[
+    "exact_columns": [
       "Phone Number"
     ],
-    "thresholds":{
-      "Name":90
+    "thresholds": {
+      "Name": 90
     }
   },
   {
     "rule": "Manufacturer Name and ID",
     "description": "Matches based on the manufacturer's name along with their assigned ID.",
-    "fuzzy_columns":[
+    "fuzzy_columns": [
       "Manufacturer Name"
     ],
-    "exact_columns":[
+    "exact_columns": [
       "Manufacturer ID"
     ],
-    "thresholds":{
-      "Manufacturer Name":90
+    "thresholds": {
+      "Manufacturer Name": 90
     }
   },
   {
     "rule": "Manufacturer ID and Suppllier Ref ID",
     "description": "Matches using the manufacturer's ID and a reference ID from the supplier system.",
     "fuzzy_columns": [],
-    "exact_columns":[
+    "exact_columns": [
       "Manufacturer ID",
       "Supplier Ref ID"
     ],
-    "thresholds":{}
+    "thresholds": {}
   }
 ]

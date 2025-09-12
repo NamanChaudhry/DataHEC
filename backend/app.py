@@ -307,6 +307,7 @@ def add_match_rule():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/api/match-rules", methods=["PUT"])
 def update_match_rule():
     """Update an existing match rule"""
@@ -339,12 +340,22 @@ def update_match_rule():
                for i, r in enumerate(rules)):
             return jsonify({"error": "Rule already exists"}), 400
 
+        # Helper to clean column lists
+        def clean_columns(cols):
+            if not isinstance(cols, list):
+                return []
+            return [col.strip() for col in cols if isinstance(col, str) and col.strip()]
+
+        # Validate thresholds is dict
+        if not isinstance(thresholds, dict):
+            thresholds = {}
+
         # Update the rule
         rules[index] = {
             "rule": new_rule.strip(),
             "description": description.strip(),
-            "fuzzy_columns": fuzzy_columns,
-            "exact_columns": exact_columns,
+            "fuzzy_columns": clean_columns(fuzzy_columns),
+            "exact_columns": clean_columns(exact_columns),
             "thresholds": thresholds
         }
 
