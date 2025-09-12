@@ -135,8 +135,8 @@ const MatchRulePage = () => {
 
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
-            variant="contained"
-            sx={{ backgroundColor: "pink" }}
+            variant="white"
+            sx={{ backgroundColor: "#175c93ff" }}
             onClick={() => setAddDialogOpen(true)}
             disabled={addDialogOpen}
           >
@@ -152,8 +152,7 @@ const MatchRulePage = () => {
         maxWidth="lg"
         fullWidth
       >
-        <DialogTitle>Add New Match Rule
-        </DialogTitle>
+        <DialogTitle style={{ fontSize: '1.6rem' }}>Select Rule Configuration</DialogTitle>
         <DialogContent dividers sx={{ pt: 3, px: 3, pb: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
             {/* Rule Name & Description Fields */}
@@ -163,6 +162,7 @@ const MatchRulePage = () => {
                 variant="outlined"
                 value={newRule.rule}
                 onChange={(e) => setNewRule({ ...newRule, rule: e.target.value })}
+                placeholder="Enter rule name"
                 sx={{ minWidth: 250, flex: 1 }}
               />
               <TextField
@@ -172,14 +172,15 @@ const MatchRulePage = () => {
                 onChange={(e) => setNewRule({ ...newRule, description: e.target.value })}
                 multiline
                 rows={1}
-                sx={{ minWidth: 300, flex: 2 }}
+                placeholder="Enter rule description"
+                sx={{ minWidth: 250, flex: 2 }}
               />
             </Box>
           </Box>
 
           {/* File Info Chips */}
           <Box mt={3}>
-            <Typography variant="h6">Source System / File Name</Typography>
+            {/* <Typography variant="h6">Source System / File Name</Typography> */}
             <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
               <Chip size="small" label="filetype" color="default" />
               <Chip size="small" label={`Fuzzy: ${fuzzyColumns.length}`} variant="outlined" />
