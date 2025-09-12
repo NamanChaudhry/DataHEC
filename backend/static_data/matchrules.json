@@ -99,10 +99,19 @@
     "thresholds": {}
   },
   {
-    "rule": "Customer ID And Zip",
-    "description": "Test 1",
-    "fuzzy_columns": [],
-    "exact_columns": [],
-    "thresholds": {}
+    "rule": "Country, State and ZIP",
+    "description": "Fuzzy Match on Country and State, Exact Match on ZIP",
+    "fuzzy_columns": [
+      "County",
+      "State"
+    ],
+    "exact_columns": [
+      "City",
+      "Zip"
+    ],
+    "thresholds": {
+      "County": 90,
+      "State": 90
+    }
   }
 ]

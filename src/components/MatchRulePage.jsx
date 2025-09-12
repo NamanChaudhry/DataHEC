@@ -57,10 +57,17 @@ const MatchRulePage = () => {
 
   const handleAddSave = async () => {
     try {
+      const payload = {
+      rule: newRule.rule,
+      description: newRule.description,
+      fuzzy_columns: fuzzyColumns,
+      exact_columns: exactColumns,
+      thresholds: thresholds,
+      };
       const response = await fetch("http://localhost:5001/api/match-rules", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newRule),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -69,6 +76,9 @@ const MatchRulePage = () => {
         setRules(data.rules);
         setAddDialogOpen(false);
         setNewRule({ rule: "", description: "" });
+        setFuzzyColumns([]);
+        setExactColumns([]);
+        setThresholds({});
       } else {
         alert(data.error || "Failed to add rule");
       }
