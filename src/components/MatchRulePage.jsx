@@ -152,7 +152,7 @@ const MatchRulePage = () => {
         maxWidth="lg"
         fullWidth
       >
-        <DialogTitle style={{ fontSize: '1.6rem' }}>Select Rule Configuration</DialogTitle>
+        <DialogTitle style={{ fontSize: '1.5rem' }}>Select Rule Configuration</DialogTitle>
         <DialogContent dividers sx={{ pt: 3, px: 3, pb: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
             {/* Rule Name & Description Fields */}
