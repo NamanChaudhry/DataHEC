@@ -266,7 +266,6 @@ def get_match_rules():
         return jsonify(rules)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 @app.route("/api/match-rules", methods=["POST"])
 def add_match_rule():
     """Add a new match rule"""
@@ -274,6 +273,9 @@ def add_match_rule():
         data = request.json
         new_rule_name = data.get("rule")
         new_description = data.get("description", "")
+        fuzzy_columns = data.get("fuzzy_columns", [])
+        exact_columns = data.get("exact_columns", [])
+        thresholds = data.get("thresholds", {})
 
         if not new_rule_name:
             return jsonify({"error": "Rule name is required"}), 400
@@ -287,7 +289,10 @@ def add_match_rule():
         # Append new rule object
         rules.append({
             "rule": new_rule_name.strip(),
-            "description": new_description.strip()
+            "description": new_description.strip(),
+            "fuzzy_columns": fuzzy_columns,
+            "exact_columns": exact_columns,
+            "thresholds": thresholds
         })
 
         save_match_rules(rules)
@@ -304,10 +309,13 @@ def update_match_rule():
         data = request.json
         old_rule = data.get("oldRule")
         new_rule = data.get("rule")
-        description = data.get("description")
+        description = data.get("description", "")
+        fuzzy_columns = data.get("fuzzy_columns", [])
+        exact_columns = data.get("exact_columns", [])
+        thresholds = data.get("thresholds", {})
 
-        if not old_rule or not new_rule or not description:
-            return jsonify({"error": "oldRule, rule, and description are required"}), 400
+        if not old_rule or not new_rule:
+            return jsonify({"error": "oldRule and rule are required"}), 400
 
         rules = load_match_rules()
 
@@ -329,7 +337,10 @@ def update_match_rule():
         # Update the rule
         rules[index] = {
             "rule": new_rule.strip(),
-            "description": description.strip()
+            "description": description.strip(),
+            "fuzzy_columns": fuzzy_columns,
+            "exact_columns": exact_columns,
+            "thresholds": thresholds
         }
 
         save_match_rules(rules)
