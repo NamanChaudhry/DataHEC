@@ -277,20 +277,28 @@ def add_match_rule():
     """Add a new match rule"""
     try:
         data = request.json
-        new_rule = data.get("rule")
+        new_rule_name = data.get("rule")
+        new_description = data.get("description", "")
 
-        if not new_rule:
-            return jsonify({"error": "Rule is required"}), 400
+        if not new_rule_name:
+            return jsonify({"error": "Rule name is required"}), 400
 
         rules = load_match_rules()
 
-        if new_rule in rules:
+        # Check if rule name already exists (case insensitive)
+        if any(r["rule"].strip().lower() == new_rule_name.strip().lower() for r in rules):
             return jsonify({"error": "Rule already exists"}), 400
 
-        rules.append(new_rule)
+        # Append new rule object
+        rules.append({
+            "rule": new_rule_name.strip(),
+            "description": new_description.strip()
+        })
+
         save_match_rules(rules)
 
         return jsonify({"message": "Rule added successfully", "rules": rules})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -301,26 +309,40 @@ def update_match_rule():
         data = request.json
         old_rule = data.get("oldRule")
         new_rule = data.get("rule")
+        description = data.get("description")
 
-        if not old_rule or not new_rule:
-            return jsonify({"error": "Both oldRule and rule are required"}), 400
+        if not old_rule or not new_rule or not description:
+            return jsonify({"error": "oldRule, rule, and description are required"}), 400
 
         rules = load_match_rules()
 
-        if old_rule not in rules:
+        # Find index of the rule by matching rule name (case insensitive & trimmed)
+        index = next(
+            (i for i, r in enumerate(rules)
+             if r["rule"].strip().lower() == old_rule.strip().lower()),
+            None
+        )
+
+        if index is None:
             return jsonify({"error": "Rule not found"}), 404
 
-        if new_rule in rules and new_rule != old_rule:
+        # Check for name conflict with other rules
+        if any(r["rule"].strip().lower() == new_rule.strip().lower() and i != index
+               for i, r in enumerate(rules)):
             return jsonify({"error": "Rule already exists"}), 400
 
-        # replace old rule with new one
-        rules = [new_rule if r == old_rule else r for r in rules]
+        # Update the rule
+        rules[index] = {
+            "rule": new_rule.strip(),
+            "description": description.strip()
+        }
+
         save_match_rules(rules)
 
         return jsonify({"message": "Rule updated successfully", "rules": rules})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 
 @app.route('/api/entities', methods=['GET'])
 def get_entities():
