@@ -15,6 +15,7 @@
   {
     "rule": "Capital IQ ID",
     "description": "Uses the unique Capital IQ identifier to match entities.",
+    "fuzzy_columns": [],
     "exact_columns": [
       "Capital IQ ID"
     ],
@@ -23,6 +24,7 @@
   {
     "rule": "Country and Tax Registration Number",
     "description": "Matches entities using country information and official tax registration number.",
+    "fuzzy_columns": [],
     "exact_columns": [
       "Country",
       "Tax Registration Number"
@@ -32,6 +34,7 @@
   {
     "rule": "Taxpayer ID",
     "description": "Identifies matches using the entity's taxpayer identification number.",
+    "fuzzy_columns": [],
     "exact_columns": [
       "Taxpayer ID"
     ],
@@ -40,6 +43,7 @@
   {
     "rule": "Bank Id",
     "description": "Matches based on the banking institution's identifier assigned to the entity.",
+    "fuzzy_columns": [],
     "exact_columns": [
       "Bank Id"
     ],
@@ -87,6 +91,7 @@
   {
     "rule": "Manufacturer ID and Suppllier Ref ID",
     "description": "Matches using the manufacturer's ID and a reference ID from the supplier system.",
+    "fuzzy_columns": [],
     "exact_columns":[
       "Manufacturer ID",
       "Supplier Ref ID"

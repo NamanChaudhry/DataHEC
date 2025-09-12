@@ -113,12 +113,12 @@ const MatchRulePage = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Rule Name</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Description</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Fuzzy Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Exact Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Thresholds</TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>Action</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Rule Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Description</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Fuzzy Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Exact Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Thresholds</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold", fontSize:'0.9rem'}}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -156,7 +156,7 @@ const MatchRulePage = () => {
                       : "-"}
                   </TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
-                    <IconButton size="small" onClick={() => handleEdit(index)}>
+                      <IconButton size="small" onClick={() => handleEdit(index)} style={{color:'GrayText'}}>
                       <EditIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
