@@ -1,7 +1,10 @@
 [
   {
     "rule": "Name and Address",
-    "description": "Matches using the name & address."
+    "description": "Matches using the name & address.",
+    "fuzzy_columns": ["Name","Address"],
+    "exact_columns": [],
+    "thresholds": {"Name": 90, "Address": 90}
   },
   {
     "rule": "Capital IQ ID",
