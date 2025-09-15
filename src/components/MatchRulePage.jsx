@@ -211,13 +211,15 @@ const MatchRulePage = () => {
                         .join(", ")
                       : "-"}
                   </TableCell>
-                  <TableCell align="right" sx={{ py: 1 }} style={{display:'flex'}}>
+                  <TableCell align="right" sx={{ py: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                     <IconButton size="small" onClick={() => confirmDelete(ruleItem)} style={{ color: 'red' }}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                      <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
