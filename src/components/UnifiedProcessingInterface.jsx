@@ -215,7 +215,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       });
   };
 
-  const handleAddFile = () => {
+  const handleAddFile = (ruleConfig) => {
     if (!selectedSourceSystem || !selectedFile) {
       alert('Please select a source system and file first');
       return;
@@ -256,9 +256,12 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           fileType: selectedFileObj.type,
           displayName: selectedFileObj.displayName,
           columns: [...columnsResponse.data],
-          fuzzyColumns: [],
-          exactColumns: [],
-          thresholds: {}
+          // Use the rule config passed from FileSystemMappingItem
+          fuzzyColumns: ruleConfig?.fuzzyColumns || [],
+          exactColumns: ruleConfig?.exactColumns || [],
+          thresholds: ruleConfig?.thresholds || {},
+          selectedRule: ruleConfig?.selectedRule || "",
+          mergeRule: ruleConfig?.mergeRule || []
         };
 
         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);

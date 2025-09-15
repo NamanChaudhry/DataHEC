@@ -90,6 +90,24 @@ const FileSystemMappingItem = ({
     }
   }, [resetDropdowns]);
 
+  const handleProcess = () => {
+    // Find the selected rule object (assuming single selection)
+    const ruleObj = rules.find(r => r.rule === selectedRule[0]);
+    if (!ruleObj) {
+      alert("Selected rule not found!");
+      return;
+    }
+    // Pass the rule config to parent
+    onAddFile?.({
+      fuzzyColumns: ruleObj.fuzzy_columns || [],
+      exactColumns: ruleObj.exact_columns || [],
+      thresholds: ruleObj.thresholds || {},
+      selectedRule: selectedRule[0], // for reference
+      mergeRule,
+    });
+    setResetDropdowns(true);
+  };
+
   return (
     <Box sx={{ width: '100%', overflow: 'visible' }}>
       <Stack spacing={2}>
@@ -319,10 +337,7 @@ const FileSystemMappingItem = ({
             variant="contained"
             color="primary"
             startIcon={<AutorenewIcon />}
-            onClick={() => {
-              onAddFile?.();
-              setResetDropdowns(true);
-            }}
+            onClick={handleProcess}
             disabled={!selectedSourceSystem || !selectedFile || selectedRule.length === 0 || mergeRule.length === 0}
             size="large"
             sx={{

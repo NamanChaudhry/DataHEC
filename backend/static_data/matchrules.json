@@ -113,5 +113,18 @@
       "County": 90,
       "State": 90
     }
+  },
+  {
+    "rule": "test",
+    "description": "test",
+    "fuzzy_columns": [
+      "First_Name"
+    ],
+    "exact_columns": [
+      "Zip"
+    ],
+    "thresholds": {
+      "First_Name": 90
+    }
   }
 ]
