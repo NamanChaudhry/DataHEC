@@ -17,6 +17,8 @@ import MergeRuleSelector from './Mergeruleselector';
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import WorkingColumnMapping from './WorkingColumnMapping';
+import SelectedColumnsDisplay from './SelectedColumnsDisplay';
 
 
 const FileSystemMappingItem = ({
@@ -268,7 +270,6 @@ const FileSystemMappingItem = ({
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
             🎯 Match Rule
           </Typography>
-
           {/* Dropdown */}
           <FormControl fullWidth variant="outlined"
             sx={{
@@ -285,7 +286,6 @@ const FileSystemMappingItem = ({
             <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}>
               Select match rule
             </InputLabel>
-
             <Select
               labelId="match-rule-label"
               multiple
@@ -298,7 +298,24 @@ const FileSystemMappingItem = ({
                 )
               }
               label="Match Rule"
-              renderValue={(selected) => selected.join(", ")}
+              renderValue={(selected) => (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%',
+                    textAlign: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, color: '#0d47a1'}}>
+                    {selected.join(', ')}
+                  </Typography>
+                </Box>
+              )}
+
             >
               {rules.length === 0 ? (
                 <MenuItem disabled>
@@ -310,7 +327,6 @@ const FileSystemMappingItem = ({
                     <Checkbox checked={selectedRule.includes(ruleObj.rule)} />
                     <ListItemText
                       primary={ruleObj.rule}
-
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondaryTypographyProps={{ fontSize: 12, color: 'text.secondary' }}
                     />
@@ -318,11 +334,37 @@ const FileSystemMappingItem = ({
                 ))
               )}
             </Select>
-
           </FormControl>
+          <br></br>
 
-          {/* Button aligned to right, below dropdown */}
-          {/* Button row aligned to right, below dropdown */}
+          {/* Show selected fuzzy/exact columns below dropdown */}
+          {selectedRule.length > 0 && (() => {
+            // Aggregate fuzzy/exact columns and thresholds from all selected rules
+            let fuzzyColumns = [];
+            let exactColumns = [];
+            let thresholds = {};
+
+            selectedRule.forEach(ruleName => {
+              const ruleObj = rules.find(r => r.rule === ruleName);
+              if (ruleObj) {
+                fuzzyColumns = [...fuzzyColumns, ...(ruleObj.fuzzy_columns || [])];
+                exactColumns = [...exactColumns, ...(ruleObj.exact_columns || [])];
+                thresholds = { ...thresholds, ...(ruleObj.thresholds || {}) };
+              }
+            });
+
+            // Remove duplicates
+            fuzzyColumns = [...new Set(fuzzyColumns)];
+            exactColumns = [...new Set(exactColumns)];
+
+            return (
+              <SelectedColumnsDisplay
+                fuzzyColumns={fuzzyColumns}
+                exactColumns={exactColumns}
+                thresholds={thresholds}
+              />
+            );
+          })()}
         </Box>
 
         <MergeRuleSelector

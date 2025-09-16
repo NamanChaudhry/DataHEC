@@ -688,7 +688,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {fileConfigs.length > 0 && (
           <>
             <Typography variant="h5" gutterBottom>
-              Selected File Configurations ({fileConfigs.length})
+              Selected Configurations ({fileConfigs.length})
             </Typography>
             <Stack spacing={3} sx={{ mb: 3 }}>
               {fileConfigs.map((config) => (

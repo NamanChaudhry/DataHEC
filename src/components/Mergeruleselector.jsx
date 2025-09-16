@@ -86,7 +86,11 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
           value={mergeRule}
           onChange={handleChange}
           label="Merge Rule"
-          renderValue={(selected) => selected.join(', ')}
+          renderValue={(selected) => (
+            <Typography sx={{ color: '#0d47a1', fontWeight: 600 }}>
+              {selected.join(', ')}
+            </Typography>
+          )}
           MenuProps={{
             PaperProps: {
               sx: {
