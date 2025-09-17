@@ -168,7 +168,7 @@ const WorkingColumnMapping = ({
       </Accordion>
 
       {/* Exact Match Columns */}
-      <Accordion defaultExpanded sx={{ mb: 2, border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
+      <Accordion defaultExpanded sx={{ mb: 2, mt: 1,border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           sx={{ backgroundColor: '#f5f5f5', px: 2, py: 1 }}
