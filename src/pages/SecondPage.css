@@ -206,11 +206,12 @@
   color: #23233a;
 }
 
+
 /* Hide scrollbar for sidebar drawer */
 .MuiDrawer-paper {
   overflow-y: hidden !important;
-  scrollbar-width: none !important; /* Firefox */
+  scrollbar-width: none !important;
 }
 .MuiDrawer-paper::-webkit-scrollbar {
-  display: none !important; /* Chrome, Safari */
+  display: none !important;
 }
