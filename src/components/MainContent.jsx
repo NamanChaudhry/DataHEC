@@ -86,8 +86,8 @@ const MainContent = ({ setDownloads }) => {
         duplicate_groups: response.data.duplicate_groups || null,
         final_records: response.data.final_records || null,
         duplicates_found: response.data.duplicates_found || null,
-        fuzzy_columns: payload.fuzzy_columns || payload.global_fuzzy_columns || [],
-        exact_columns: payload.exact_columns || payload.global_exact_columns || [],
+        fuzzy_columns: response.data.fuzzy_columns || payload.fuzzy_columns || payload.global_fuzzy_columns || [],
+        exact_columns: response.data.exact_columns || payload.exact_columns || payload.global_exact_columns || [],
         files_processed: isCrossSystem ? payload.file_configs?.length : 1,
         file_size_mb: response.data.total_file_size_mb || response.data.file_size_mb || null,
         memory_used_mb: response.data.memory_used_mb || null,
@@ -106,18 +106,20 @@ const MainContent = ({ setDownloads }) => {
     } catch (error) {
       const endTime = Date.now();
       const totalTime = endTime - startTime;
-      
-      console.error("Processing error:", error);
-      console.log('Processing failed after:', totalTime, 'ms');
-      
-      setResultMessage("❌ Processing failed. Check console for details.");
+
+      let errorMsg = "❌ Processing failed. Check console for details.";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMsg = `❌ ${error.response.data.message}`;
+      }
+
+      setResultMessage(errorMsg);
       setResultType('error');
       setProcessingStats({
         frontend_time: totalTime,
         backend_time: null,
         error: true
       });
-      
+
       if (error.response && error.response.data) {
         console.error('Server error:', error.response.data);
       }
@@ -326,10 +328,10 @@ const MainContent = ({ setDownloads }) => {
                     <Grid item xs={12}>
                       <Typography variant="caption" color="text.secondary">Column Configuration</Typography>
                       <Typography variant="body2">
-                        Fuzzy: {processingStats.fuzzy_columns.length} columns ({processingStats.fuzzy_columns.join(', ') || 'none'})
+                        Fuzzy: {Array.isArray(processingStats.fuzzy_columns) ? processingStats.fuzzy_columns.length : 0} columns ({Array.isArray(processingStats.fuzzy_columns) && processingStats.fuzzy_columns.length > 0 ? processingStats.fuzzy_columns.join(', ') : 'none'})
                       </Typography>
                       <Typography variant="body2">
-                        Exact: {processingStats.exact_columns.length} columns ({processingStats.exact_columns.join(', ') || 'none'})
+                        Exact: {Array.isArray(processingStats.exact_columns) ? processingStats.exact_columns.length : 0} columns ({Array.isArray(processingStats.exact_columns) && processingStats.exact_columns.length > 0 ? processingStats.exact_columns.join(', ') : 'none'})
                       </Typography>
                     </Grid>
                     {processingStats.performance_stats && (

@@ -296,7 +296,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
   const handleSingleFileProcess = (config) => {
     // Basic validation
-    if (config.fuzzyColumns.length === 0 && config.exactColumns.length === 0) {
+    if (
+      !(Array.isArray(config.fuzzyColumns) && config.fuzzyColumns.length) &&
+      !(Array.isArray(config.exactColumns) && config.exactColumns.length)
+    ) {
       alert('Please set column mappings before processing');
       return;
     }
@@ -378,7 +381,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     console.log('Global exact columns:', globalExactColumns);
 
     // Basic validation
-    if (fileConfigs.length === 0) {
+    if (!Array.isArray(fileConfigs) || fileConfigs.length === 0) {
       alert('Please add at least one file configuration');
       return;
     }
@@ -395,7 +398,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       return;
     }
 
-    if (globalFuzzyColumns.length === 0 && globalExactColumns.length === 0) {
+    if (
+      !(Array.isArray(globalFuzzyColumns) && globalFuzzyColumns.length) &&
+      !(Array.isArray(globalExactColumns) && globalExactColumns.length)
+    ) {
       alert('Please set global column mappings for cross-system deduplication');
       return;
     }
@@ -407,14 +413,13 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         source_system: config.sourceSystem,
         filename: config.filename,
         file_type: config.fileType,
-        // No individual column configs for cross-system mode
         fuzzy_columns: [],
         exact_columns: [],
         thresholds: {}
       })),
-      global_fuzzy_columns: globalFuzzyColumns,
-      global_exact_columns: globalExactColumns,
-      global_thresholds: globalThresholds
+      global_fuzzy_columns: Array.isArray(globalFuzzyColumns) ? globalFuzzyColumns : [],
+      global_exact_columns: Array.isArray(globalExactColumns) ? globalExactColumns : [],
+      global_thresholds: globalThresholds || {}
     };
 
     console.log('Cross-system payload:', JSON.stringify(payload, null, 2));
@@ -591,7 +596,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                         </Typography>
                       </Box>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                        Columns: {config.columns.length}
+                        Columns: {Array.isArray(config.columns) ? config.columns.length : 0}
                       </Typography>
                     </Box>
                   </Paper>
@@ -623,10 +628,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                 {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
                   <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#f8f9fa' }}>
                     <Typography variant="h6" color="primary" gutterBottom>
-                      {sourceSystem} ({outputs.length} files)
+                      {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
                     </Typography>
                     <Grid container spacing={1}>
-                      {outputs.map((outputFile, index) => (
+                      {(outputs || []).map((outputFile, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
                           <Paper
                             elevation={1}
@@ -706,12 +711,12 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                         />
                         <Chip
                           size="small"
-                          label={`Fuzzy: ${config.fuzzyColumns.length}`}
+                          label={`Fuzzy: ${Array.isArray(config.fuzzyColumns) ? config.fuzzyColumns.length : 0}`}
                           variant="outlined"
                         />
                         <Chip
                           size="small"
-                          label={`Exact: ${config.exactColumns.length}`}
+                          label={`Exact: ${Array.isArray(config.exactColumns) ? config.exactColumns.length : 0}`}
                           variant="outlined"
                         />
                       </Box>
@@ -723,7 +728,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                           size="small"
                           color="success"
                           onClick={() => handleSingleFileProcess(config)}
-                          disabled={config.fuzzyColumns.length === 0 && config.exactColumns.length === 0}
+                          disabled={
+                            !(Array.isArray(config.fuzzyColumns) && config.fuzzyColumns.length) &&
+                            !(Array.isArray(config.exactColumns) && config.exactColumns.length)
+                          }
                         >
                           Process
                         </Button>
@@ -753,7 +761,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                   {crossSystemEnabled && (
                     <Box sx={{ p: 2, bgcolor: '#f0f7ff', borderRadius: 1 }}>
                       <Typography variant="body2" color="text.secondary">
-                        📋 Available columns: {config.columns.join(', ')}
+                        📋 Available columns: {(config.columns || []).join(', ')}
                       </Typography>
                       <Typography variant="caption" color="primary">
                         File type can be changed above. Column configuration will be set globally for all files.
@@ -774,7 +782,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               These settings will be used for the final cross-system deduplication across all selected files.
-              Available columns: {availableColumns.join(', ')}
+              Available columns: {(availableColumns || []).join(', ')}
             </Typography>
 
             <WorkingColumnMapping
