@@ -447,8 +447,6 @@ const MainContent = ({ setDownloads }) => {
           </Alert>
         </Collapse>
 
-
-
         {/* Main Processing Interface */}
         {selectedEntity && (
           <>
