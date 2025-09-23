@@ -10,7 +10,6 @@ from semantic_kernel.contents.utils.author_role import AuthorRole
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion, AzureChatPromptExecutionSettings
 
 load_dotenv()
-
 CANONICAL_HEADERS = {
     "SOURCE_SYSTEM": None,
     "CUSTOMER_NUMBER": None,
@@ -147,7 +146,6 @@ async def _ai_classify(
     except Exception as e:
         print(f"Error in AI classification: {e}")
         return {header: None for header in headers}
-
 
 async def main():
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
