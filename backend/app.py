@@ -7,6 +7,10 @@ import os
 import pandas as pd
 import json
 from datetime import datetime
+import asyncio
+from dotenv import load_dotenv
+import header_mapping 
+
 # Import your existing deduplication functions
 try:
     from your_existing_script import (
@@ -245,6 +249,22 @@ def process_output_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzz
     except Exception as e:
         print(f"Error in process_output_file_with_stats: {e}")
         raise
+
+@app.route('/api/header-mapping', methods=['GET'])
+def get_header_mapping():
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        mapping = loop.run_until_complete(header_mapping.main())
+        loop.close()
+
+        if mapping is None:
+            return jsonify({"error": "No mapping returned"}), 500
+
+        return jsonify(mapping)   # ✅ Now sends JSON to frontend
+    except Exception as e:
+        print(f"Error in /api/header-mapping: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # API Routes
 # --- MATCH RULES API ---
