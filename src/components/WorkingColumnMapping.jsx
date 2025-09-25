@@ -66,7 +66,7 @@ const WorkingColumnMapping = ({
       {(fuzzyColumns.length > 0 || exactColumns.length > 0) && (
         <Box sx={{ mb: 2 }}>
           {fuzzyColumns.length > 0 && (
-            <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: '#fffdf5' }}>
+            <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: '#2b2a26ff' }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
                 Selected Fuzzy Columns:
               </Typography>

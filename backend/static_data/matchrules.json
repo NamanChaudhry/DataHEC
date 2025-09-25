@@ -1,9 +1,9 @@
 [
   {
-    "rule": "Name and Address",
+    "rule": "Company_Name and Address",
     "description": "Matches using the name and address.",
     "fuzzy_columns": [
-      "Name",
+      "Company_Name",
       "Address"
     ],
     "exact_columns": [],

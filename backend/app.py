@@ -7,6 +7,8 @@ import os
 import pandas as pd
 import json
 from datetime import datetime
+from Profiling import integrated_profile_and_anomaly_with_charts
+from flask import send_from_directory
 # Import your existing deduplication functions
 try:
     from your_existing_script import (
@@ -30,9 +32,10 @@ DATA_DIR = 'data'
 STATIC_DIR = 'static_data'
 OUTPUT_DIR = 'outputs'
 PROCESSED_OUTPUTS_DIR = 'processed_outputs'
+REPORT_DIR = 'reports'
 
 # Ensure directories exist
-for directory in [DATA_DIR, STATIC_DIR, OUTPUT_DIR, PROCESSED_OUTPUTS_DIR]:
+for directory in [DATA_DIR, STATIC_DIR, OUTPUT_DIR, PROCESSED_OUTPUTS_DIR, REPORT_DIR]:
     os.makedirs(directory, exist_ok=True)
 
 
@@ -271,6 +274,23 @@ def get_match_rules():
         return jsonify(rules)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/profile', methods=['POST'])
+def profile_api():
+    data = request.json
+    filepath = data.get('filepath')
+    sheet_name = data.get('sheet_name')
+    column_name = data.get('column_name')
+    try:
+        result = profile_column(filepath, sheet_name, column_name)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+
+
+
 @app.route("/api/match-rules", methods=["POST"])
 def add_match_rule():
     """Add a new match rule"""
@@ -1172,6 +1192,39 @@ def get_file_info(entity, source_system, filename):
     except Exception as e:
         print(f"Error in get_file_info: {e}")
         return jsonify({"error": str(e)}), 500
+    
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def convert_types(obj):
+    if isinstance(obj, dict):
+        return {k: convert_types(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_types(x) for x in obj]
+    elif hasattr(obj, 'item'):
+        return obj.item()  # Handles numpy types like int64, float64
+    else:
+        return obj
+
+@app.route('/api/profile-upload', methods=['POST'])
+def profile_upload():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
+
+    profile_result = integrated_profile_and_anomaly_with_charts(filepath)
+    safe_result = convert_types(profile_result)
+    return jsonify(safe_result)
+
+#Serve charts to frontend 
+@app.route('/charts/<path:filename>')
+def serve_chart(filename):
+    return send_from_directory('charts', filename)
 
 @app.errorhandler(404)
 def not_found(error):

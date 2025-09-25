@@ -15,39 +15,42 @@ import {
   Typography,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import ProfilingPage from "./ProfilingPage";
 
-const menuConfig = [
-  {
-    label: "Configure",
-    children: [
-      { label: "Source" },
-      { label: "Data Domain" },
-      {
-        label: "Match Rule",
-        onClick: (setActiveContent) => setActiveContent("matchRulePage"),
-      },
-      { label: "Merge Rule" },
-    ],
-  },
-  {
-    label: "Extract",
-    children: [],
-  },
-  {
-    label: "Profile",
-    children: [],
-  },
-  {
-    label: "Harmonize",
-    onClick: (setActiveContent) => setActiveContent("thirdPage"),
-  },
-  {
-    label: "Reports",
-    children: [],
-  },
-];
+const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
+  const menuConfig = [
+    {
+      label: "Configure",
+      children: [
+        { label: "Source" },
+        { label: "Data Domain" },
+        {
+          label: "Match Rule",
+          onClick: (setActiveContent) => setActiveContent("matchRulePage"),
+        },
+        { label: "Merge Rule" },
+      ],
+    },
+    {
+      label: "Extract",
+      children: [],
+    },
+    {
+      label: "Profile",
+      onClick: (setActiveContent) => setActiveContent("profilePage"),
+      children: [],
+    },
 
-const Sidebar = ({ activeContent, setActiveContent }) => {
+    {
+      label: "Harmonize",
+      onClick: (setActiveContent) => setActiveContent("thirdPage"),
+    },
+    {
+      label: "Reports",
+      children: [],
+    },
+  ];
+
   const [openMenus, setOpenMenus] = useState({
     ENTITY: false,
     ACTIVITY: false,
@@ -177,9 +180,35 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
 const SecondPage = () => {
   const [activeContent, setActiveContent] = useState("default");
 
+  // Added states for profiling
+  const [profileData, setProfileData] = useState(null);
+  const [reportUrl, setReportUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Added handler for profiling API call
+  async function handleProfiling() {
+    console.log("Starting profiling fetch...");
+    try {
+      const response = await fetch('/api/profile', { /* your request options */ });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await response.json();
+      console.log("Profiling result:", result);
+      setProfileData(result.profileSummary);
+      setReportUrl(result.sweetvizReportUrl);
+      setActiveContent("profilePage");
+    } catch(e) {
+      console.error('Profiling API failed:', e);
+    }
+  }
+
+
   return (
     <div className="page-container">
-      <Sidebar activeContent={activeContent} setActiveContent={setActiveContent} />
+      <Sidebar
+        activeContent={activeContent}
+        setActiveContent={setActiveContent}
+        onProfileClick={handleProfiling} // Pass to Sidebar
+      />
 
       <div className={activeContent === "thirdPage" ? "content content-full" : "content"}>
         {activeContent === "default" && (
@@ -439,10 +468,13 @@ const SecondPage = () => {
         {activeContent === "thirdPage" && <MainContent />}
 
         {activeContent === "matchRulePage" && <MatchRulePage />}
+
+        {activeContent === "profilePage" && <ProfilingPage />}
       </div>
     </div>
   );
 };
 
 export default SecondPage;
+
 

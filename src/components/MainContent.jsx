@@ -326,10 +326,18 @@ const MainContent = ({ setDownloads }) => {
                     <Grid item xs={12}>
                       <Typography variant="caption" color="text.secondary">Column Configuration</Typography>
                       <Typography variant="body2">
-                        Fuzzy: {processingStats.fuzzy_columns.length} columns ({processingStats.fuzzy_columns.join(', ') || 'none'})
+                        Fuzzy: {(processingStats.fuzzy_columns?.length || 0)} columns (
+                        {(processingStats.fuzzy_columns && processingStats.fuzzy_columns.length > 0
+                          ? processingStats.fuzzy_columns.join(', ')
+                          : 'none')}
+                        )
                       </Typography>
                       <Typography variant="body2">
-                        Exact: {processingStats.exact_columns.length} columns ({processingStats.exact_columns.join(', ') || 'none'})
+                        Exact: {(processingStats.exact_columns?.length || 0)} columns (
+                        {(processingStats.exact_columns && processingStats.exact_columns.length > 0
+                          ? processingStats.exact_columns.join(', ')
+                          : 'none')}
+                        )
                       </Typography>
                     </Grid>
                     {processingStats.performance_stats && (
