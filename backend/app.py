@@ -9,19 +9,19 @@ import json
 from datetime import datetime
 
 # Import your existing deduplication functions
-try:
-    from your_existing_script import (
-        process_all_and_combine_final_sheets,
-        generate_cross_system_winner,
-        process_excel_file,
-        find_fuzzy_duplicates,
-        find_fuzzy_duplicates_multi_rules,
-        assign_winner
-    )
-    print("✅ Successfully imported deduplication functions")
-except ImportError as e:
-    print(f"⚠️ Warning: Could not import from your_existing_script.py: {e}")
-    print("Please ensure your_existing_script.py exists with the required functions")
+#try:
+from your_existing_script import (
+    process_all_and_combine_final_sheets,
+    generate_cross_system_winner,
+    process_excel_file,
+    find_fuzzy_duplicates,
+    find_fuzzy_duplicates_multi_rules,
+    assign_winner
+)
+print("✅ Successfully imported deduplication functions")
+# except ImportError as e:
+#     print(f"⚠️ Warning: Could not import from your_existing_script.py: {e}")
+#     print("Please ensure your_existing_script.py exists with the required functions")
 
 app = Flask(__name__)
 CORS(app)
@@ -97,7 +97,7 @@ def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy
         if rules:  # multi-rule mode
             df = find_fuzzy_duplicates_multi_rules(df, rules)
         else:      # single-rule mode (backward compatibility)
-            df = find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds)  
+            df = find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds)
         dup_time = time.time() - dup_start
         
         duplicate_rows = df[df.duplicated('group_id', keep=False)].copy()

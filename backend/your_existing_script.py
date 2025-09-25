@@ -21,7 +21,7 @@ import pandas as pd
 import re
 from itertools import combinations
 from collections import defaultdict
-import jellyfish
+#import jellyfish
 
 
 def generate_pair_chunks(idx_list, chunk_size=200_000):
@@ -357,6 +357,9 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
     for column in fuzzy_columns:
         df[f'{column}_fuzzy_match_percentage'] = 0.0
 
+    for column in exact_columns:
+        df[f'Exact_{column}_Score'] = 0.0
+
     # Store all matches for Union-Find processing
     all_matches = []
     # CASE 1: Only exact columns
@@ -369,6 +372,12 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
                 overall_score = 100.0
                 #all_matches.append((a, b, overall_score, {}, "Exact_Only"))
                 all_matches.append((a, b, overall_score, {}))
+
+
+                for col in exact_columns:
+                    df.at[a, f'Exact_{col}_Score'] = 100
+                    df.at[b, f'Exact_{col}_Score'] = 100
+
 
     # CASE 2: Only fuzzy columns
     # --- REPLACEMENT: Lossless, chunked, progress-aware all-pairs (plug into CASE 2) ---
@@ -427,6 +436,16 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
                 if all(match_scores[c] >= fuzzy_thresholds.get(c, 90) for c in fuzzy_columns):
                     overall_score = sum(match_scores.values()) / len(match_scores)
                     all_matches.append((a, b, overall_score, match_scores))
+
+
+                    for col in exact_columns:
+                        if df.at[a, col] == df.at[b, col]:
+                            df.at[a, f'Exact_{col}_Score'] = 100
+                            df.at[b, f'Exact_{col}_Score'] = 100
+                        else:
+                            df.at[a, f'Exact_{col}_Score'] = 0
+                            df.at[b, f'Exact_{col}_Score'] = 0
+
     print(f"Total candidate matches collected: {len(all_matches)}")
 
 
