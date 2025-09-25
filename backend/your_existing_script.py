@@ -444,7 +444,9 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
                             df.at[b, f'Exact_{col}_Score'] = 100
                         else:
                             df.at[a, f'Exact_{col}_Score'] = 0
-                            df.at[b, f'Exact_{col}_Score'] = 0
+                            df.at[b, f'Exact_{col}_Score'] = 0 
+                            
+                            #exact column
 
     print(f"Total candidate matches collected: {len(all_matches)}")
 
