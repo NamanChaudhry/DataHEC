@@ -45,10 +45,23 @@ const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
     <FormControl fullWidth sx={{ mt:1 }}>
       <InputLabel sx={{ color: '#90caf9', top: -8, left:5 }}>Entity</InputLabel>
       <CustomSelect
-        value={selectedEntity}
-        label="Entity"
-        onChange={(e) => onSelect(e.target.value)}
-      >
+  value={selectedEntity}
+  label="Entity"
+  onChange={(e) => onSelect(e.target.value)}
+  MenuProps={{
+    PaperProps: {
+      sx: {
+        bgcolor: '#263238',
+        paddingTop: 0,
+        paddingBottom: 0,
+        '& .MuiMenuItem-root': {
+          paddingTop: 1,
+          paddingBottom: 1,
+        },
+      },
+    },
+  }}
+>
         {entities.map(entity => (
           <CustomMenuItem key={entity} value={entity}>
             {entity}
