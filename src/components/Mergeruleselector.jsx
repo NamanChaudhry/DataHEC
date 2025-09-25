@@ -62,14 +62,14 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
 
   return (
     <Box>
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
-        🧩 Merge Rule
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'whitesmoke', mb: 1 }}>
+        🔀 Merge Rule
       </Typography>
       <FormControl fullWidth variant="outlined"
         sx={{
           '& .MuiOutlinedInput-root': {
             borderRadius: '12px',
-            backgroundColor: '#e3f2fd',
+            backgroundColor: '#272733',
             boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
             '& fieldset': { borderColor: '#90caf9' },
             '&:hover fieldset': { borderColor: '#42a5f5' },
@@ -77,7 +77,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
           },
         }}
       >
-        <InputLabel id="merge-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}>
+        <InputLabel id="merge-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
           Select merge rule
         </InputLabel>
         <Select
@@ -87,14 +87,14 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
           onChange={handleChange}
           label="Merge Rule"
           renderValue={(selected) => (
-            <Typography sx={{ color: '#0d47a1', fontWeight: 600 }}>
+            <Typography sx={{ color: '#a9a7a7ff', fontWeight: 600 }}>
               {selected.join(', ')}
             </Typography>
           )}
           MenuProps={{
             PaperProps: {
               sx: {
-                bgcolor: '#ffffff',
+                bgcolor: '#272733',
                 borderRadius: 2,
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 '& .MuiMenuItem-root': {
@@ -123,7 +123,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
               fontSize: '1rem',
               fontWeight: 500,
               color: '#0a2958ff',
-              backgroundColor: '#e3f2fd',
+              backgroundColor: '#272733',
               borderRadius: '12px',
             },
           }}

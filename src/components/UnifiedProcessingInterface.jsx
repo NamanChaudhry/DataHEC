@@ -427,13 +427,14 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
   };
 
   return (
-    <Box sx={{ width: '100%', mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+    <Box sx={{ width: '100%', mt: 4 }}> 
+      {/* <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#243347ff' }}> */}
+      <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#272733' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6">
+          <Typography variant="h6" sx={{ color: 'white' }}>
             Unified Processing Interface
             {crossSystemEnabled ?
-              <span style={{ color: '#1976d2', fontSize: '0.8em' }}> (Cross-System Mode)</span> :
+              <span style={{ color: '#1976d2', fontSize: '0.8em', }}> (Cross-System Mode)</span> :
               <span style={{ color: '#ed6c02', fontSize: '0.8em' }}> (Single File Mode)</span>
             }
           </Typography>
@@ -446,10 +447,24 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
               />
             }
             label="Cross-System Mode"
+            sx={{
+              '.MuiFormControlLabel-label': {
+                color: '#1976d2', // Blue color for the label
+                fontWeight: 500,
+              }
+            }}
           />
         </Box>
 
-        <Alert severity="info" sx={{ mb: 3 }}>
+        <Alert
+          severity="info"
+          sx={{
+            mb: 3,
+            bgcolor: '#263238', // Dark background
+            color: '#ffffff',    // White text
+            border: '1px solid #37474f' // Optional: subtle border
+          }}
+        >
           {crossSystemEnabled
             ? "Cross-system mode: Select multiple files (source files or processed outputs) from different source systems for global deduplication across all files."
             : "Single file mode: Process individual files and generate outputs that can be used later in cross-system mode."}
@@ -457,8 +472,8 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
         {/* REPLACE THE INLINE FILE SELECTION WITH FileSystemMappingItem COMPONENT */}
         {!crossSystemEnabled && (
-          <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#f9f9f9' }}>
-            <Typography variant="h6" gutterBottom>File Display</Typography>
+          <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#111c33ff' }}>
+            <Typography variant="h6" gutterBottom sx={{color:'whitesmoke'}}>File Display</Typography>
             <FileSystemMappingItem
               entity={entity}
               sourceSystems={sourceSystems}
@@ -503,8 +518,8 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
                     {/* Source Files Selection */}
                     {config.availableSourceFiles && config.availableSourceFiles.length > 0 && (
-                      <Box sx={{ mb: 1}}>
-                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1}}>
+                      <Box sx={{ mb: 1 }}>
+                        <Typography variant="body2" fontWeight="medium" color="text.secondary" sx={{ mb: 1 }}>
                           📤 Upload Source File
                         </Typography>
                         <FormControl fullWidth>
@@ -607,11 +622,11 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         )}
 
         {/* Processed Outputs Display Section */}
-        {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
+        {/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
           <>
-            <Divider sx={{ my: 3 }} />
+            <Divider sx={{ my: 3,color:'blue' }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h5">
+              <Typography variant="h5" sx={{color:'whitesmoke'}}>
                 Processed Outputs for {entity}
               </Typography>
               <Button
@@ -626,7 +641,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
             <Collapse in={showProcessedOutputs}>
               <Stack spacing={2}>
                 {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
-                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#f8f9fa' }}>
+                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#2d3a4aff' }}>
                     <Typography variant="h6" color="primary" gutterBottom>
                       {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
                     </Typography>
@@ -637,13 +652,13 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                             elevation={1}
                             sx={{
                               p: 1.5,
-                              bgcolor: '#fff',
-                              border: '1px solid #e0e0e0',
+                              bgcolor: '#4d5170ff',
+                              border: '0px solid #e0e0e0',
                               '&:hover': { boxShadow: 2 }
                             }}
                           >
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              <Typography variant="body2" fontWeight="medium">
+                              <Typography sx={{color:'#edba93ff'}} variant="body2" fontWeight="medium">
                                 📄 {outputFile}
                               </Typography>
                               <Box sx={{ display: 'flex', gap: 1 }}>
@@ -685,40 +700,43 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
               </Stack>
             </Collapse>
           </>
-        )}
+        )} */}
 
         <Divider sx={{ my: 3 }} />
 
         {/* File Configurations */}
         {fileConfigs.length > 0 && (
           <>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h5" gutterBottom sx={{color:'whitesmoke', mb: 2}}>
               Selected Configurations ({fileConfigs.length})
             </Typography>
             <Stack spacing={3} sx={{ mb: 3 }}>
               {fileConfigs.map((config) => (
-                <Paper key={config.id} elevation={2} sx={{ p: 2, borderRadius: 2 }}>
+                <Paper key={config.id} elevation={2} sx={{ p: 2, borderRadius: 2, bgcolor:'#263238' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Box>
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ color: '#1976d2' }}>
                         {config.sourceSystem} / {config.filename}
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                        <Chip
+                        {/* <Chip
+                          sx={{color:'whitesmoke', bgcolor:'#111c33ff'}}
                           size="small"
                           label={config.fileType}
                           color={config.fileType === 'output' ? 'success' : 'default'}
-                        />
-                        <Chip
+                        /> */}
+                        {/* <Chip
+                          sx={{color:'whitesmoke',bgcolor:'#111c33ff'}}
                           size="small"
                           label={`Fuzzy: ${Array.isArray(config.fuzzyColumns) ? config.fuzzyColumns.length : 0}`}
                           variant="outlined"
-                        />
-                        <Chip
+                        /> */}
+                        {/* <Chip
+                          sx={{color:'whitesmoke',bgcolor:'#111c33ff'}}
                           size="small"
                           label={`Exact: ${Array.isArray(config.exactColumns) ? config.exactColumns.length : 0}`}
                           variant="outlined"
-                        />
+                        /> */}
                       </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>

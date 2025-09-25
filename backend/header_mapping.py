@@ -112,8 +112,8 @@ async def _ai_classify(
     - Treat COUNTY and COUNTRY as the same → always map to COUNTRY.
     - Do NOT return COUNTY at all.
 
-    **EXAMPLE INPUT:** ["country", "county"]
-    **EXAMPLE OUTPUT:** {{"country": "COUNTRY", "county": "COUNTRY"}}
+    **EXAMPLE INPUT:** ["cust_id", "email", "phone1"]
+    **EXAMPLE OUTPUT:** {{"cust_id": "CUSTOMER_NUMBER", "email": "E_MAIL_ADDRESS", "phone1": "PHONE_NUMBER"}}
 
     Remember: Return ONLY the JSON dictionary, no other text.
     """
@@ -162,10 +162,11 @@ async def main():
         api_key=api_key,
     )
 
-    df = pd.read_excel("PS94_Customer.xlsx")
+    df = pd.read_excel("PS93_Customer.xlsx")
     headers = df.columns.tolist()
 
     result = await _ai_classify(headers, chat_completion)
+    print("Actual Excel headers:", headers)
 
     # Debug log
     print("Canonical Mapping:")

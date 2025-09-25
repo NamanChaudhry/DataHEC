@@ -197,46 +197,43 @@ const MainContent = ({ setDownloads }) => {
       component="main"
       sx={{
         mt: 1,
-        ml: { xs: 0, sm: '220px' },
-        mr: { xs: 0, sm: 3 },
-        // mb: 3,
-        px: 3,
-        // pb: 3,
-        Height: '100vh',                    // limits Paper width for a clean layout        // internal padding for space
-        background: "transparent",             // lighter background
-        // color: "#100808",
+        ml: '13rem',         
+        mr: 0,         
+        px: 0, 
+        width: '83%',
+        maxWidth: '100%',
+        background: "transparent",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center", // You can change this to "stretch" if needed
         justifyContent: "flex-start",
       }}
     >
-      <Paper
 
+      <Paper
         elevation={3}
         sx={{
-          width: "100%",
-          maxWidth: { xs: '95vw', sm: '900px' },  // Responsive, fills center, keeps space at edges
-          // maxHeight: 'calc(100vh - 64px)', 
-          height: "100%",  // Adjust if you need more/less vertical space
-          p: { xs: 2, sm: 4, md: 5 },        // Internal padding is necessary for aesthetics
+          width: '100%',
+          // maxWidth: { xs: '95vw', sm: '900px' }, ❌ REMOVE THIS LINE
+          height: '100%',
+          p: { xs: 2, sm: 4, md: 5 },
           borderRadius: 5,
-          background: "#eaf0fa",                // Card background
+          // background: "#1b2a45ff",
+          background: '#1a1a24',
           color: "#100808",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           boxShadow: 3,
-          // my: 2,
           overflowY: "auto",
         }}
       >
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h4" align="center" gutterBottom sx={{color:'white', fontFamily:'sans-serif'}}>
           EY Data Harmonization
         </Typography>
-        <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>
+        <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4,color:'white', fontFamily:'sans-serif' }}>
           Streamlining Data Harmonization
         </Typography>
 
@@ -267,7 +264,93 @@ const MainContent = ({ setDownloads }) => {
           </Box>
         )}
 
-        {/* Results Section */}
+        <Collapse in={!!resultMessage || resultDetails.length > 0}>
+          <Alert
+            severity={resultType}
+            icon={false}
+            sx={{ mb: 4 }}
+            onClose={() => {
+              setResultMessage(null);
+              setResultDetails([]);
+              setProcessingStats(null);
+            }}
+          >
+            {resultDetails.length > 0 ? (
+              <>
+                <Typography variant="subtitle2">Generated Files:</Typography>
+                <Box component="ul" sx={{ mt: 1, pl: 2 }}>
+                  {resultDetails.map((file, index) => (
+                    <li key={index}>
+                      <a
+                        href={`http://localhost:5001/api/download/${file}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: '#1976d2',
+                          textDecoration: 'none',
+                          fontWeight: 500,
+                        }}
+                      >
+                        📄 {file}
+                      </a>
+                    </li>
+                  ))}
+                </Box>
+              </>
+            ) : (
+              <Typography variant="body1">{resultMessage}</Typography>
+            )}
+          </Alert>
+        </Collapse>
+
+        {/* Main Processing Interface */}
+        {selectedEntity && (
+          <>
+            <UnifiedProcessingInterface
+              entity={selectedEntity}
+              sourceSystems={sourceSystems}
+              onProcess={handleProcess}
+            />
+
+            {/* Utility Actions */}
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+              <Button
+                variant="outlined"
+                color="info"
+                onClick={handleRefreshData}
+                size="small"
+              >
+                🔄 Refresh Data
+              </Button>
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={handleClearProcessedOutputs}
+                size="small"
+              >
+                🗑️ Clear All Outputs for {selectedEntity}
+              </Button>
+              <Button
+                variant="outlined"
+                color="info"
+                onClick={() => window.open('http://localhost:5001/api/health', '_blank')}
+                size="small"
+              >
+                ⚡ System Health
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
+    </Box>
+  );
+};
+
+export default MainContent;
+
+
+
+{/* Results Section */}
         {/* <Collapse in={!!resultMessage}>
           <Alert
             severity={resultType}
@@ -407,87 +490,3 @@ const MainContent = ({ setDownloads }) => {
             )}
           </Alert>
         </Collapse> */}
-
-        <Collapse in={!!resultMessage || resultDetails.length > 0}>
-          <Alert
-            severity={resultType}
-            icon={false} 
-            sx={{ mb: 4 }}
-            onClose={() => {
-              setResultMessage(null);
-              setResultDetails([]);
-              setProcessingStats(null);
-            }}
-          >
-            {resultDetails.length > 0 ? (
-              <>
-                <Typography variant="subtitle2">Generated Files:</Typography>
-                <Box component="ul" sx={{ mt: 1, pl: 2 }}>
-                  {resultDetails.map((file, index) => (
-                    <li key={index}>
-                      <a
-                        href={`http://localhost:5001/api/download/${file}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          color: '#1976d2',
-                          textDecoration: 'none',
-                          fontWeight: 500,
-                        }}
-                      >
-                        📄 {file}
-                      </a>
-                    </li>
-                  ))}
-                </Box>
-              </>
-            ) : (
-              <Typography variant="body1">{resultMessage}</Typography>
-            )}
-          </Alert>
-        </Collapse>
-
-        {/* Main Processing Interface */}
-        {selectedEntity && (
-          <>
-            <UnifiedProcessingInterface
-              entity={selectedEntity}
-              sourceSystems={sourceSystems}
-              onProcess={handleProcess}
-            />
-
-            {/* Utility Actions */}
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-              <Button
-                variant="outlined"
-                color="info"
-                onClick={handleRefreshData}
-                size="small"
-              >
-                🔄 Refresh Data
-              </Button>
-              <Button
-                variant="outlined"
-                color="warning"
-                onClick={handleClearProcessedOutputs}
-                size="small"
-              >
-                🗑️ Clear All Outputs for {selectedEntity}
-              </Button>
-              <Button
-                variant="outlined"
-                color="info"
-                onClick={() => window.open('http://localhost:5001/api/health', '_blank')}
-                size="small"
-              >
-                ⚡ System Health
-              </Button>
-            </Box>
-          </>
-        )}
-      </Paper>
-    </Box>
-  );
-};
-
-export default MainContent;

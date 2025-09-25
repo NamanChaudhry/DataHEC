@@ -72,7 +72,8 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
       variant="permanent"
       PaperProps={{
         sx: {
-          background: "#23233a",
+          // background: "#23233a",
+          background: '#272733',
           color: "#f9fafb",
           width: 180,
           borderRight: "20px solid #e0e0e0",

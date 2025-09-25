@@ -38,6 +38,7 @@ import axios from 'axios';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const WorkingColumnMapping = ({
+  editable = false,
   columns = [],
   fuzzyColumns = [],
   exactColumns = [],
@@ -77,8 +78,7 @@ const WorkingColumnMapping = ({
         const matchedEntry = Object.entries(mapping).find(
           ([key]) => key.toLowerCase().replace(/[_\s]+/g, "") === col.toLowerCase().replace(/[_\s]+/g, "")
         );
-
-        initialMapping[col] = matchedEntry ? matchedEntry[0] : "";
+        initialMapping[col] = matchedEntry ? matchedEntry[1] : ""; // <-- use value instead of key
       });
       setColumnMappings(initialMapping);
 
@@ -152,7 +152,7 @@ const WorkingColumnMapping = ({
       {/* Chips for selected columns */}
       {(fuzzyColumns.length > 0 || exactColumns.length > 0) && (
         <Box sx={{ mb: 2 }}>
-          {columns.length > 0 && (
+          {editable == false && columns.length > 0 && (
             <Box
               sx={{
                 mt: 4,
@@ -202,8 +202,8 @@ const WorkingColumnMapping = ({
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap" }}>Columns from File</TableCell>
-                    <TableCell>Mapped Columns</TableCell>
+                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap" }}>Source Columns</TableCell>
+                    <TableCell>Target Columns</TableCell>
                     <TableCell align="center" sx={{ width: "0%", whiteSpace: "nowrap" }}>
                       Actions
                     </TableCell>
@@ -215,8 +215,7 @@ const WorkingColumnMapping = ({
                     <TableRow key={`map-${col}`}>
                       <TableCell>{col}</TableCell>
                       <TableCell>
-                        {/* Show selected key, not mapped value */}
-                        <span>{aiMappedColumns[columnMappings[col]] || "—"}</span>
+                        <span>{columnMappings[col] || "—"}</span>
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
@@ -232,13 +231,11 @@ const WorkingColumnMapping = ({
                     </TableRow>
                   ))}
                 </TableBody>
-
-
               </Table>
             </Box>
           )}
 
-          {fuzzyColumns.length > 0 && (
+          {editable == true && fuzzyColumns.length > 0 && (
             <Paper elevation={1} sx={{ p: 2, mb: 2, mt: 2, backgroundColor: '#fffdf5' }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
                 Selected Fuzzy Columns:
@@ -275,7 +272,7 @@ const WorkingColumnMapping = ({
             </Paper>
           )}
 
-          {exactColumns.length > 0 && (
+          {editable == true && exactColumns.length > 0 && (
             <Paper elevation={1} sx={{ p: 2, mb: 2, backgroundColor: '#f4faff' }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
                 Selected Exact Columns:
@@ -296,94 +293,98 @@ const WorkingColumnMapping = ({
       )}
 
       {/* Fuzzy Match Columns */}
-      <Accordion defaultExpanded sx={{ mb: 2, border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          sx={{ backgroundColor: '#f5f5f5', px: 2, py: 1 }}
-        >
-          <Typography variant="h6" fontSize={15} fontWeight={600}>
-            Fuzzy Match Columns
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ px: 2, py: 2 }}>
-          <Grid container spacing={2}>
-            {columns.length === 0 ? (
-              <Typography>No columns available</Typography>
-            ) : (
-              columns.map((col) => (
-                <Grid item xs={6} sm={4} md={3} key={`fuzzy-${col}`}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={fuzzyColumns.includes(col)}
-                        onChange={() => handleFuzzyToggle(col)}
-                        size="small"
-                        sx={{
-                          color: '#FFCD00',
-                          '&.Mui-checked': {
-                            color: '#FFCD00'
-                          }
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography sx={{ fontSize: '13px', fontWeight: 500 }}>
-                        {col}
-                      </Typography>
-                    }
-                    sx={{ ml: 0 }}
-                  />
-                </Grid>
-              ))
-            )}
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+      {editable == true && (
+        <Accordion defaultExpanded sx={{ mb: 2, border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{ backgroundColor: '#f5f5f5', px: 2, py: 1 }}
+          >
+            <Typography variant="h6" fontSize={15} fontWeight={600}>
+              Fuzzy Match Columns
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ px: 2, py: 2 }}>
+            <Grid container spacing={2}>
+              {columns.length === 0 ? (
+                <Typography>No columns available</Typography>
+              ) : (
+                columns.map((col) => (
+                  <Grid item xs={6} sm={4} md={3} key={`fuzzy-${col}`}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={fuzzyColumns.includes(col)}
+                          onChange={() => handleFuzzyToggle(col)}
+                          size="small"
+                          sx={{
+                            color: '#FFCD00',
+                            '&.Mui-checked': {
+                              color: '#FFCD00'
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography sx={{ fontSize: '13px', fontWeight: 500 }}>
+                          {col}
+                        </Typography>
+                      }
+                      sx={{ ml: 0 }}
+                    />
+                  </Grid>
+                ))
+              )}
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
+      )}
 
       {/* Exact Match Columns */}
-      <Accordion defaultExpanded sx={{ mb: 2, mt: 1, border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          sx={{ backgroundColor: '#f5f5f5', px: 2, py: 1 }}
-        >
-          <Typography variant="h6" fontSize={15} fontWeight={600}>
-            Exact Match Columns
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ px: 2, py: 2 }}>
-          <Grid container spacing={2}>
-            {columns.length === 0 ? (
-              <Typography>No columns available</Typography>
-            ) : (
-              columns.map((col) => (
-                <Grid item xs={6} sm={4} md={3} key={`exact-${col}`}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={exactColumns.includes(col)}
-                        onChange={() => handleExactToggle(col)}
-                        size="small"
-                        sx={{
-                          color: '#FFCD00',
-                          '&.Mui-checked': {
-                            color: '#FFCD00'
-                          }
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography sx={{ fontSize: '13px', fontWeight: 500 }}>
-                        {col}
-                      </Typography>
-                    }
-                    sx={{ ml: 0 }}
-                  />
-                </Grid>
-              ))
-            )}
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+      {editable == true && (
+        <Accordion defaultExpanded sx={{ mb: 2, mt: 1, border: '1px solid #ddd', borderRadius: 2, boxShadow: 1 }}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{ backgroundColor: '#f5f5f5', px: 2, py: 1 }}
+          >
+            <Typography variant="h6" fontSize={15} fontWeight={600}>
+              Exact Match Columns
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ px: 2, py: 2 }}>
+            <Grid container spacing={2}>
+              {columns.length === 0 ? (
+                <Typography>No columns available</Typography>
+              ) : (
+                columns.map((col) => (
+                  <Grid item xs={6} sm={4} md={3} key={`exact-${col}`}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={exactColumns.includes(col)}
+                          onChange={() => handleExactToggle(col)}
+                          size="small"
+                          sx={{
+                            color: '#FFCD00',
+                            '&.Mui-checked': {
+                              color: '#FFCD00'
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography sx={{ fontSize: '13px', fontWeight: 500 }}>
+                          {col}
+                        </Typography>
+                      }
+                      sx={{ ml: 0 }}
+                    />
+                  </Grid>
+                ))
+              )}
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
+      )}
 
       <Dialog
         open={openDialog}

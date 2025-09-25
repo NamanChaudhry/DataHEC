@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Paper, Typography, Chip, TextField } from '@mui/material';
 
 const SelectedColumnsDisplay = ({
+  mainPage = false,
   fuzzyColumns = [],
   exactColumns = [],
   thresholds = {},
@@ -39,7 +40,7 @@ const SelectedColumnsDisplay = ({
                     />
                   </Box>
                 }
-                onDelete={() => handleFuzzyToggle(col)}
+                onDelete={mainPage == false  ? () => handleFuzzyToggle(col) : undefined}
                 sx={{ bgcolor: '#fff8e1', borderColor: '#ffcd00' }}
                 variant="outlined"
               />
@@ -58,7 +59,7 @@ const SelectedColumnsDisplay = ({
               <Chip
                 key={`exact-chip-${col}`}
                 label={`Exact: ${col}`}
-                onDelete={() => handleExactToggle(col)}
+                onDelete={mainPage==false ? () => handleExactToggle(col) : undefined}
                 sx={{ bgcolor: '#e3f2fd', fontSize: '12px' }}
               />
             ))}
