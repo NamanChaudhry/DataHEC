@@ -442,6 +442,7 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import SelectedColumnsDisplay from './SelectedColumnsDisplay';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloseIcon from '@mui/icons-material/Close';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const FileSystemMappingItem = ({
   entity,
@@ -500,7 +501,7 @@ const FileSystemMappingItem = ({
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Source System */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'white', mb: 1, }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1, }}>
               🗂️ Source System
             </Typography>
             <FormControl
@@ -534,22 +535,22 @@ const FileSystemMappingItem = ({
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      bgcolor: '#272733', // white background for dropdown
+                      bgcolor: '#272733',
                       borderRadius: 2,
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                       '& .MuiMenuItem-root': {
                         fontWeight: 500,
-                        color: '#000000', // black textF
-                        bgcolor: '#ffffff', // white background
+                        color: '#000000',
+                        bgcolor: '#ffffff',
                         '&:hover': {
-                          bgcolor: '#e3f2fd', // light blue on hover
+                          bgcolor: '#e3f2fd',
                           color: '#1976d2',
                         },
                         '&.Mui-selected': {
-                          bgcolor: '#1976d2', // blue background when selected
-                          color: '#ffffff', // white text when selected
+                          bgcolor: '#1976d2',
+                          color: '#ffffff',
                           '&:hover': {
-                            bgcolor: '#1565c0', // darker blue on hover
+                            bgcolor: '#1565c0',
                           },
                         },
                       },
@@ -561,9 +562,12 @@ const FileSystemMappingItem = ({
                     padding: '14px',
                     fontSize: '1rem',
                     fontWeight: 500,
-                    color: '#0d47a1',
+                    color: '#a9a7a7ff',
                     backgroundColor: '#272733',
                     borderRadius: '12px',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
                   },
                 }}
               >
@@ -576,12 +580,13 @@ const FileSystemMappingItem = ({
                   </MenuItem>
                 ))}
               </Select>
+
             </FormControl>
           </Box>
 
           {/* Upload File */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'whitesmoke', mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
               Upload File
             </Typography>
             <FormControl fullWidth>
@@ -672,7 +677,7 @@ const FileSystemMappingItem = ({
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Match Rule */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'whitesmoke', mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
               Match Rule
             </Typography>
             <FormControl
@@ -687,6 +692,9 @@ const FileSystemMappingItem = ({
                   '&:hover fieldset': { borderColor: '#42a5f5' },
                   '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
                 },
+                '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  },
               }}
             >
               <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
@@ -793,7 +801,7 @@ const FileSystemMappingItem = ({
                         py: 0.25,           // reduced vertical padding
                         border: '1px solid #fb8c00',
                         bgcolor: '#272733',
-                        color:'#a9a7a7ff',
+                        color: '#a9a7a7ff',
                         borderRadius: '12px', // smaller border radius
                         fontWeight: 500,
                         fontSize: '0.75rem',  // smaller font
@@ -802,7 +810,7 @@ const FileSystemMappingItem = ({
                       {rule}
                       <IconButton
                         size="small"
-                        sx={{ ml: 0.5, p: 0.25 }} // smaller spacing and padding
+                        sx={{ ml: 0.5, p: 0.25, color: '#a9a7a7ff' }} // smaller spacing and padding
                         onClick={() =>
                           setMergeRule((prev) => prev.filter((r) => r !== rule))
                         }

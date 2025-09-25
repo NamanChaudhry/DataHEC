@@ -62,8 +62,8 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
 
   return (
     <Box>
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'whitesmoke', mb: 1 }}>
-        🔀 Merge Rule
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
+        Merge Rule
       </Typography>
       <FormControl fullWidth variant="outlined"
         sx={{
@@ -74,6 +74,9 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
             '& fieldset': { borderColor: '#90caf9' },
             '&:hover fieldset': { borderColor: '#42a5f5' },
             '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'white',
           },
         }}
       >
@@ -99,7 +102,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 '& .MuiMenuItem-root': {
                   fontWeight: 500,
-                  fontSize: '0.85rem', // ✅ Smaller font size
+                  fontSize: '0.85rem',
                   color: '#000000',
                   bgcolor: '#ffffff',
                   '&:hover': {

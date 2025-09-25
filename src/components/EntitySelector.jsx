@@ -39,7 +39,7 @@ const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
 
 const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
   <div>
-    <Typography variant="h5" gutterBottom sx={{ color: 'white' }}>
+    <Typography variant="h5" gutterBottom sx={{ color: '#cfccccff' }}>
       Select Entity
     </Typography>
     <FormControl fullWidth sx={{ mt:1 }}>

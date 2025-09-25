@@ -133,17 +133,17 @@ const WorkingColumnMapping = ({
     const newThresholds = { ...thresholds, [column]: parseInt(value) || 90 };
     onMappingChange(fuzzyColumns, exactColumns, newThresholds);
   };
-  const handleColumnMappingChange = (col, selectedKey) => {
-    setColumnMappings((prev) => ({
-      ...prev,
-      [col]: selectedKey
-    }));
+
+  const handleColumnMappingChange = (col, selectedCanonicalValue) => {
+    const updatedMapping = {
+      ...columnMappings,
+      [col]: selectedCanonicalValue
+    };
+
+    setColumnMappings(updatedMapping);
 
     if (onColumnMappingChange) {
-      onColumnMappingChange({
-        ...columnMappings,
-        [col]: selectedKey
-      });
+      onColumnMappingChange(updatedMapping);
     }
   };
 
@@ -157,10 +157,10 @@ const WorkingColumnMapping = ({
               sx={{
                 mt: 4,
                 px: 4,
-                py: 4,
+                py: 2,
                 borderRadius: 3,
-                backgroundColor: '#f9fafc',
-                border: '1px solid #e3e8ef',
+                backgroundColor: '#272733',
+                border: '0px solid #e3e8ef',
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
               }}
             >
@@ -168,9 +168,9 @@ const WorkingColumnMapping = ({
                 variant="h6"
                 fontWeight={600}
                 sx={{
-                  mb: 3,
+                  mb: 1,
                   fontSize: '1.3rem',
-                  color: '#1a1a1a',
+                  color: '#cfccccff',
                   letterSpacing: '0.3px'
                 }}
               >
@@ -182,29 +182,29 @@ const WorkingColumnMapping = ({
                 sx={{
                   width: "100%",
                   borderCollapse: "separate",
-                  borderSpacing: "10px 10px",
+                  borderSpacing: "5px 10px",
                   "& th": {
                     fontSize: "13px",
                     fontWeight: 700,
-                    color: "#555",
+                    color: "#b3b2b2ff",
                     textTransform: "uppercase",
                     paddingBottom: 1
                   },
                   "& td": {
                     fontSize: "14px",
-                    padding: "7px 7px",
-                    backgroundColor: "#ffffff",
+                    padding: "5px 3px",
+                    //backgroundColor: "#736363ff",
                     borderRadius: "8px",
-                    border: "1px solid #e0e0e0",
-                    color: "#333"
+                    border: "0px solid #e0e0e0",
+                    color: "#e8e0e0ff"
                   }
                 }}
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap" }}>Source Columns</TableCell>
-                    <TableCell>Target Columns</TableCell>
-                    <TableCell align="center" sx={{ width: "0%", whiteSpace: "nowrap" }}>
+                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap", color: "#cfccccff" }}>Source Columns</TableCell>
+                    <TableCell sx={{ color: "#cfccccff" }}>Target Columns</TableCell>
+                    <TableCell align="center" sx={{ width: "0%", whiteSpace: "nowrap", color: "#cfccccff" }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -215,11 +215,12 @@ const WorkingColumnMapping = ({
                     <TableRow key={`map-${col}`}>
                       <TableCell>{col}</TableCell>
                       <TableCell>
-                        <span>{columnMappings[col] || "—"}</span>
+                        <span>{aiMappedColumns[columnMappings[col]] || "—"}</span>
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
                           size="small"
+                          sx={{ color: '#739883ff' }}
                           onClick={() => {
                             setCurrentEditingColumn(col);
                             setOpenDialog(true);

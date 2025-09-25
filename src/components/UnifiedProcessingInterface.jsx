@@ -431,7 +431,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       {/* <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#243347ff' }}> */}
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#272733' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" sx={{ color: 'white' }}>
+          <Typography variant="h6" sx={{ color: '#cfccccff' }}>
             Unified Processing Interface
             {crossSystemEnabled ?
               <span style={{ color: '#1976d2', fontSize: '0.8em', }}> (Cross-System Mode)</span> :
@@ -461,7 +461,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           sx={{
             mb: 3,
             bgcolor: '#263238', // Dark background
-            color: '#ffffff',    // White text
+            color: '#d9d7d7ff',    // White text
             border: '1px solid #37474f' // Optional: subtle border
           }}
         >
@@ -473,7 +473,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {/* REPLACE THE INLINE FILE SELECTION WITH FileSystemMappingItem COMPONENT */}
         {!crossSystemEnabled && (
           <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#111c33ff' }}>
-            <Typography variant="h6" gutterBottom sx={{color:'whitesmoke'}}>File Display</Typography>
+            <Typography variant="h6" gutterBottom sx={{color:'#cfccccff'}}>File Display</Typography>
             <FileSystemMappingItem
               entity={entity}
               sourceSystems={sourceSystems}
@@ -707,7 +707,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {/* File Configurations */}
         {fileConfigs.length > 0 && (
           <>
-            <Typography variant="h5" gutterBottom sx={{color:'whitesmoke', mb: 2}}>
+            <Typography variant="h5" gutterBottom sx={{color:'#cfccccff', mb: 2}}>
               Selected Configurations ({fileConfigs.length})
             </Typography>
             <Stack spacing={3} sx={{ mb: 3 }}>
