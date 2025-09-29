@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 
 const CustomSelect = styled(Select)(({ theme }) => ({
-  backgroundColor: '#263238',   // dropdown background
+  backgroundColor: '#2d284a',
   color: '#ffffff',             // text color
   height: 40,                   // control height to remove gaps
   padding: '0px 0px',          // inner padding
@@ -23,10 +23,11 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 }));
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
-  backgroundColor: '#263238',
-  color: '#ffffff',
+  // backgroundColor: '#2d284a',
+  color: 'black',
   '&:hover': {
     backgroundColor: '#37474f',
+    color: 'white',
   },
   '&.Mui-selected': {
     backgroundColor: '#90caf9',
@@ -39,29 +40,39 @@ const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
 
 const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
   <div>
-    <Typography variant="h5" gutterBottom sx={{ color: '#cfccccff' }}>
+    <Typography variant="h5" gutterBottom sx={{ color: 'black' }}>
       Select Entity
     </Typography>
-    <FormControl fullWidth sx={{ mt:1 }}>
-      <InputLabel sx={{ color: '#90caf9', top: -8, left:5 }}>Entity</InputLabel>
+    <FormControl fullWidth sx={{ mt: 1 }}>
+      {!selectedEntity && (
+        <InputLabel
+          sx={{
+            color: 'white',
+            top: -8,
+            left: 5,
+            fontSize: 14,
+          }}
+        >
+          Entity
+        </InputLabel>
+      )}
       <CustomSelect
-  value={selectedEntity}
-  label="Entity"
-  onChange={(e) => onSelect(e.target.value)}
-  MenuProps={{
-    PaperProps: {
-      sx: {
-        bgcolor: '#263238',
-        paddingTop: 0,
-        paddingBottom: 0,
-        '& .MuiMenuItem-root': {
-          paddingTop: 1,
-          paddingBottom: 1,
-        },
-      },
-    },
-  }}
->
+        value={selectedEntity}
+        label="Entity"
+        onChange={(e) => onSelect(e.target.value)}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              paddingTop: 0,
+              paddingBottom: 0,
+              '& .MuiMenuItem-root': {
+                paddingTop: 1,
+                paddingBottom: 1,
+              },
+            },
+          },
+        }}
+      >
         {entities.map(entity => (
           <CustomMenuItem key={entity} value={entity}>
             {entity}

@@ -36,9 +36,9 @@ const SidebarSecondPage = () => {
         <div>
           <button
             className="w-full flex justify-between items-center px-4 py-2 text-left hover:bg-gray-700"
-            onClick={() => toggleMenu("activity")}
+            onClick={() => toggleMenu("activitys")}
           >
-            <span className="font-medium">Activity</span>
+            <span className="font-medium">Activity</span>s
             {/* Dropdown indicator can be added later */}
           </button>
           {openMenu === "activity" && (

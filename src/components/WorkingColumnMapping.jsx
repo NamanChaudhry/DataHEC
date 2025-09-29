@@ -78,10 +78,9 @@ const WorkingColumnMapping = ({
         const matchedEntry = Object.entries(mapping).find(
           ([key]) => key.toLowerCase().replace(/[_\s]+/g, "") === col.toLowerCase().replace(/[_\s]+/g, "")
         );
-        initialMapping[col] = matchedEntry ? matchedEntry[1] : ""; // <-- use value instead of key
+        initialMapping[col] = matchedEntry ? matchedEntry[0] : ""; // <-- FIX: use key here, not value
       });
       setColumnMappings(initialMapping);
-
 
       console.log("Header Mapping API response:", mapping);
       console.log(mapping);
@@ -159,8 +158,8 @@ const WorkingColumnMapping = ({
                 px: 4,
                 py: 2,
                 borderRadius: 3,
-                backgroundColor: '#272733',
-                border: '0px solid #e3e8ef',
+                backgroundColor: '#f7f7f7ff',
+                border: '1px solid #e3e8ef',
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
               }}
             >
@@ -169,8 +168,9 @@ const WorkingColumnMapping = ({
                 fontWeight={600}
                 sx={{
                   mb: 1,
-                  fontSize: '1.3rem',
-                  color: '#cfccccff',
+                  fontSize: '1.4rem',
+                  fontWeight:500,
+                  color: '#1976d2',
                   letterSpacing: '0.3px'
                 }}
               >
@@ -186,7 +186,7 @@ const WorkingColumnMapping = ({
                   "& th": {
                     fontSize: "13px",
                     fontWeight: 700,
-                    color: "#b3b2b2ff",
+                    color: "black",
                     textTransform: "uppercase",
                     paddingBottom: 1
                   },
@@ -196,15 +196,15 @@ const WorkingColumnMapping = ({
                     //backgroundColor: "#736363ff",
                     borderRadius: "8px",
                     border: "0px solid #e0e0e0",
-                    color: "#e8e0e0ff"
+                    color: "black"
                   }
                 }}
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap", color: "#cfccccff" }}>Source Columns</TableCell>
-                    <TableCell sx={{ color: "#cfccccff" }}>Target Columns</TableCell>
-                    <TableCell align="center" sx={{ width: "0%", whiteSpace: "nowrap", color: "#cfccccff" }}>
+                    <TableCell sx={{ width: "38%", whiteSpace: "nowrap", color: "black" }}>Source Columns</TableCell>
+                    <TableCell sx={{ color: "black" }}>Target Columns</TableCell>
+                    <TableCell align="center" sx={{ width: "0%", whiteSpace: "nowrap", color: "black" }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -220,7 +220,7 @@ const WorkingColumnMapping = ({
                       <TableCell align="center">
                         <IconButton
                           size="small"
-                          sx={{ color: '#739883ff' }}
+                          sx={{ color: 'black' }}
                           onClick={() => {
                             setCurrentEditingColumn(col);
                             setOpenDialog(true);
@@ -431,4 +431,3 @@ const WorkingColumnMapping = ({
 };
 
 export default WorkingColumnMapping;
-

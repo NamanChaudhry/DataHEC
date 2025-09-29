@@ -197,9 +197,9 @@ const MainContent = ({ setDownloads }) => {
       component="main"
       sx={{
         mt: 1,
-        ml: '13rem',         
-        mr: 0,         
-        px: 0, 
+        ml: '13rem',
+        mr: 0,
+        px: 0,
         width: '83%',
         maxWidth: '100%',
         background: "transparent",
@@ -215,12 +215,10 @@ const MainContent = ({ setDownloads }) => {
         elevation={3}
         sx={{
           width: '100%',
-          // maxWidth: { xs: '95vw', sm: '900px' }, ❌ REMOVE THIS LINE
           height: '100%',
           p: { xs: 2, sm: 4, md: 5 },
           borderRadius: 5,
-          // background: "#1b2a45ff",
-          background: '#1a1a24',
+          background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
           color: "#100808",
           boxSizing: "border-box",
           display: "flex",
@@ -230,10 +228,10 @@ const MainContent = ({ setDownloads }) => {
           overflowY: "auto",
         }}
       >
-        <Typography variant="h4" align="center" gutterBottom sx={{color:'white', fontFamily:'sans-serif'}}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ color: 'black', fontFamily: 'sans-serif' }}>
           EY Data Harmonization
         </Typography>
-        <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4,color:'white', fontFamily:'sans-serif' }}>
+        <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4, color: 'black', fontFamily: 'sans-serif' }}>
           Streamlining Data Harmonization
         </Typography>
 
@@ -350,8 +348,8 @@ export default MainContent;
 
 
 
-{/* Results Section */}
-        {/* <Collapse in={!!resultMessage}>
+{/* Results Section */ }
+{/* <Collapse in={!!resultMessage}>
           <Alert
             severity={resultType}
             sx={{ mb: 4 }}
@@ -369,8 +367,8 @@ export default MainContent;
           >
             <Typography variant="body1">{resultMessage}</Typography> */}
 
-        {/* Processing Statistics */}
-        {/* {processingStats && (
+{/* Processing Statistics */ }
+{/* {processingStats && (
               <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>⏱️ Processing Statistics</Typography>
                 <Grid container spacing={2}>

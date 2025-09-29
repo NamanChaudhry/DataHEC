@@ -62,14 +62,14 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
 
   return (
     <Box>
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
         Merge Rule
       </Typography>
       <FormControl fullWidth variant="outlined"
         sx={{
           '& .MuiOutlinedInput-root': {
             borderRadius: '12px',
-            backgroundColor: '#272733',
+            // backgroundColor: '#272733',
             boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
             '& fieldset': { borderColor: '#90caf9' },
             '&:hover fieldset': { borderColor: '#42a5f5' },
@@ -97,7 +97,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
           MenuProps={{
             PaperProps: {
               sx: {
-                bgcolor: '#272733',
+                // bgcolor: '#272733',
                 borderRadius: 2,
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 '& .MuiMenuItem-root': {
@@ -126,7 +126,7 @@ const MergeRuleSelector = ({ isCrossSystem, mergeRule, onChange }) => {
               fontSize: '1rem',
               fontWeight: 500,
               color: '#0a2958ff',
-              backgroundColor: '#272733',
+              backgroundColor: '#2d284a',
               borderRadius: '12px',
             },
           }}

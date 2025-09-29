@@ -433,6 +433,7 @@ import {
   Divider,
   CircularProgress,
   IconButton,
+  Paper
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import MergeRuleSelector from './Mergeruleselector';
@@ -501,8 +502,8 @@ const FileSystemMappingItem = ({
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Source System */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1, }}>
-              🗂️ Source System
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1, }}>
+              Source System
             </Typography>
             <FormControl
               fullWidth
@@ -510,7 +511,7 @@ const FileSystemMappingItem = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
-                  backgroundColor: '#272733',
+                  backgroundColor: '#2d284a',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                   '& fieldset': { borderColor: '#90caf9' },
                   '&:hover fieldset': { borderColor: '#42a5f5' },
@@ -535,7 +536,7 @@ const FileSystemMappingItem = ({
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      bgcolor: '#272733',
+                      // bgcolor: '#2d284a',
                       borderRadius: 2,
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                       '& .MuiMenuItem-root': {
@@ -563,7 +564,7 @@ const FileSystemMappingItem = ({
                     fontSize: '1rem',
                     fontWeight: 500,
                     color: '#a9a7a7ff',
-                    backgroundColor: '#272733',
+                    backgroundColor: '#2d284a',
                     borderRadius: '12px',
                   },
                   '& .MuiSvgIcon-root': {
@@ -586,7 +587,7 @@ const FileSystemMappingItem = ({
 
           {/* Upload File */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
               Upload File
             </Typography>
             <FormControl fullWidth>
@@ -598,7 +599,7 @@ const FileSystemMappingItem = ({
                 sx={{
                   padding: '12px 18px',
                   border: '2px dashed #90caf9',
-                  backgroundColor: '#272733', // dark background
+                    backgroundColor: '#2d284a',
                   color: '#FFA500', // bright orange text
                   '& .MuiButton-label': {
                     color: '#FFA500', // ensure label text is orange
@@ -640,14 +641,14 @@ const FileSystemMappingItem = ({
                   p: 1,                  // keep padding small
                   display: 'flex',
                   alignItems: 'center',
-                  bgcolor: 'background.paper', // keep original color
+                  bgcolor: '#cacbccff', // keep original color
                   borderRadius: 2,            // slightly rounded
                   boxShadow: '0 2px 6px rgba(33, 150, 243, 0.1)',
                   border: '1px solid #90caf9',
                   ml: 'auto',                 // align to right
                 }}
               >
-                <InsertDriveFileIcon sx={{ fontSize: 28, color: '#acc1d7ff', mr: 1.5 }} />
+                <InsertDriveFileIcon sx={{ fontSize: 28, color: '#527cb4ff', mr: 1.5 }} />
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography
                     variant="body2"
@@ -677,7 +678,7 @@ const FileSystemMappingItem = ({
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Match Rule */}
           <Box flex={1}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#cfccccff', mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
               Match Rule
             </Typography>
             <FormControl
@@ -686,7 +687,7 @@ const FileSystemMappingItem = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
-                  backgroundColor: '#272733',
+                    backgroundColor: '#2d284a',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                   '& fieldset': { borderColor: '#90caf9' },
                   '&:hover fieldset': { borderColor: '#42a5f5' },
@@ -775,18 +776,19 @@ const FileSystemMappingItem = ({
             />
 
             {mergeRule.length > 0 && (
-              <Box
+              <Paper
                 sx={{
-                  mt: 1.5,          // slightly smaller margin
+                  mt: 1.5,
+                  elevation: 1,
                   p: 1,             // reduced padding
-                  bgcolor: '#272733',
+                  bgcolor: '#f4faff',
                   borderRadius: 1.5, // slightly smaller radius
-                  border: '1px solid #ffcc80',
+                  border: '0px solid #ffcc80',
                 }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: 600, color: '#ef6c00', mb: 0.5, fontSize: '0.8rem' }}
+                  sx={{ fontWeight: 600, color: 'black', mb: 0.5, fontSize: '0.8rem' }}
                 >
                   Selected Merge Rule(s):
                 </Typography>
@@ -797,14 +799,15 @@ const FileSystemMappingItem = ({
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        px: 1.5,            // reduced horizontal padding
-                        py: 0.25,           // reduced vertical padding
+                        px: 1,   
+                        m:1,         
+                        py: 0.25,          
                         border: '1px solid #fb8c00',
-                        bgcolor: '#272733',
-                        color: '#a9a7a7ff',
-                        borderRadius: '12px', // smaller border radius
+                        bgcolor: '#fff8e1',
+                        color: 'black',
+                        borderRadius: '12px',
                         fontWeight: 500,
-                        fontSize: '0.75rem',  // smaller font
+                        fontSize: '0.75rem',
                       }}
                     >
                       {rule}
@@ -820,7 +823,7 @@ const FileSystemMappingItem = ({
                     </Box>
                   ))}
                 </Box>
-              </Box>
+              </Paper>
             )}
 
           </Box>

@@ -427,10 +427,12 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
   };
 
   return (
-    <Box sx={{ width: '100%', mt: 4 }}> 
+    <Box sx={{ width: '100%', mt: 2 }}>
       {/* <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#243347ff' }}> */}
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 2, bgcolor: '#272733' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Paper elevation={3} sx={{
+        p: 2, borderRadius: 2, background: "#fdfbfbff"
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, p: 1.4, borderRadius: 2, background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)' }}>
           <Typography variant="h6" sx={{ color: '#cfccccff' }}>
             Unified Processing Interface
             {crossSystemEnabled ?
@@ -460,8 +462,9 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           severity="info"
           sx={{
             mb: 3,
-            bgcolor: '#263238', // Dark background
-            color: '#d9d7d7ff',    // White text
+            mt: 2,
+            // bgcolor: '#263238', // Dark background
+            // color: '#d9d7d7ff',    // White text
             border: '1px solid #37474f' // Optional: subtle border
           }}
         >
@@ -472,8 +475,13 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
         {/* REPLACE THE INLINE FILE SELECTION WITH FileSystemMappingItem COMPONENT */}
         {!crossSystemEnabled && (
-          <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: '#111c33ff' }}>
-            <Typography variant="h6" gutterBottom sx={{color:'#cfccccff'}}>File Display</Typography>
+          <Paper elevation={0} sx={{
+            p: 2, mb: 3,
+            background: "#f7f7f7ff",
+            border: '1px solid #cfd5deff',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
+          }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>File Display</Typography>
             <FileSystemMappingItem
               entity={entity}
               sourceSystems={sourceSystems}
@@ -707,37 +715,24 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         {/* File Configurations */}
         {fileConfigs.length > 0 && (
           <>
-            <Typography variant="h5" gutterBottom sx={{color:'#cfccccff', mb: 2}}>
+            {/* <Typography variant="h5" gutterBottom sx={{color:'#cfccccff', mb: 2}}>
               Selected Configurations ({fileConfigs.length})
-            </Typography>
+            </Typography> */}
             <Stack spacing={3} sx={{ mb: 3 }}>
               {fileConfigs.map((config) => (
-                <Paper key={config.id} elevation={2} sx={{ p: 2, borderRadius: 2, bgcolor:'#263238' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Paper key={config.id} elevation={2} sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(255, 255, 255, 0.08)'
+                }}>
+                  <Box sx={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2,
+                    background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)'
+                  }}>
                     <Box>
-                      <Typography variant="h6" sx={{ color: '#1976d2' }}>
+                      <Typography variant="h6" sx={{ color: '#cfccccff' }}>
                         {config.sourceSystem} / {config.filename}
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                        {/* <Chip
-                          sx={{color:'whitesmoke', bgcolor:'#111c33ff'}}
-                          size="small"
-                          label={config.fileType}
-                          color={config.fileType === 'output' ? 'success' : 'default'}
-                        /> */}
-                        {/* <Chip
-                          sx={{color:'whitesmoke',bgcolor:'#111c33ff'}}
-                          size="small"
-                          label={`Fuzzy: ${Array.isArray(config.fuzzyColumns) ? config.fuzzyColumns.length : 0}`}
-                          variant="outlined"
-                        /> */}
-                        {/* <Chip
-                          sx={{color:'whitesmoke',bgcolor:'#111c33ff'}}
-                          size="small"
-                          label={`Exact: ${Array.isArray(config.exactColumns) ? config.exactColumns.length : 0}`}
-                          variant="outlined"
-                        /> */}
-                      </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       {!crossSystemEnabled && (
@@ -754,13 +749,15 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                           Process
                         </Button>
                       )}
-                      <IconButton
-                        color="error"
-                        onClick={() => handleRemoveConfig(config.id)}
-                        aria-label="delete configuration"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+                      <Box sx={{ backgroundColor: '#d2cdcdff', borderRadius: 1 }}>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRemoveConfig(config.id)}
+                          aria-label="delete configuration"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     </Box>
                   </Box>
 
@@ -833,7 +830,11 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
         )}
 
         {!crossSystemEnabled && fileConfigs.length > 0 && (
-          <Alert severity="success" sx={{ mt: 3 }}>
+          <Alert severity="success" sx={{
+            mt: 3,
+
+
+          }}>
             <Typography variant="body2">
               In single file mode, configure fuzzy/exact columns for each file and process them individually using the "Process" button.
               Processed outputs will be available for cross-system mode.
@@ -859,7 +860,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           </Alert>
         )}
       </Paper>
-    </Box>
+    </Box >
   );
 };
 
