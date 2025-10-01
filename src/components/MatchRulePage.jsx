@@ -58,11 +58,11 @@ const MatchRulePage = () => {
   const handleAddSave = async () => {
     try {
       const payload = {
-      rule: newRule.rule,
-      description: newRule.description,
-      fuzzy_columns: fuzzyColumns,
-      exact_columns: exactColumns,
-      thresholds: thresholds,
+        rule: newRule.rule,
+        description: newRule.description,
+        fuzzy_columns: fuzzyColumns,
+        exact_columns: exactColumns,
+        thresholds: thresholds,
       };
       const response = await fetch("http://localhost:5001/api/match-rules", {
         method: "POST",
@@ -149,18 +149,28 @@ const MatchRulePage = () => {
   };
 
   return (
-    <Box sx={{ mx: "auto" }}>
-      <h1 style={{ fontSize: '1.5rem' }}>Match Rules</h1>
-      <Divider />
-
-      <Box mt={1.5}>
+    <Box>
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)',
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          p: 2,
+        }}
+      >
+        <h1 style={{ fontSize: '1.5rem', fontFamily: 'Segoe UI', color: 'white', margin: 0 }}>
+          Match Rules
+        </h1>
+      </Box>
+      <Divider sx={{ backgroundColor: 'rgba(255,255,255,0.3)', mt: 1 }} />
+      <Box mt={1.5} >
         <TableContainer
           component={Paper}
           sx={{
             mt: 1,
             mx: 0,
             boxShadow: 1,
-            border: "1px solid #ddd",
+            border: "0px solid #ddd",
             width: "100%",
             maxWidth: "100%",
             p: 1.2
@@ -169,12 +179,12 @@ const MatchRulePage = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Rule Name</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Description</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Fuzzy Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Exact Columns</TableCell>
-                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Thresholds</TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold", fontSize: '0.9rem' }}>Actions</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Rule Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Description</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Fuzzy Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Exact Columns</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Thresholds</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold", fontSize: '0.9rem', fontFamily: 'Arial' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -184,27 +194,29 @@ const MatchRulePage = () => {
                     py: 1.1,
                     maxWidth: 180,
                     whiteSpace: "normal",
-                    wordBreak: "break-word"
+                    wordBreak: "break-word",
+                    fontFamily: 'sans-serif'
                   }}>{ruleItem.rule}</TableCell>
                   <TableCell
                     sx={{
                       py: 1.1,
                       maxWidth: 300,
                       whiteSpace: "normal",
-                      wordBreak: "break-word"
+                      wordBreak: "break-word",
+                      fontFamily: 'sans-serif'
                     }}
                     title={ruleItem.description}
                   >
                     {ruleItem.description}
                   </TableCell>
 
-                  <TableCell sx={{ py: 1.1 }}>
+                  <TableCell sx={{ py: 1.1, fontFamily: 'sans-serif' }}>
                     {ruleItem.fuzzy_columns?.join(", ") || "-"}
                   </TableCell>
-                  <TableCell sx={{ py: 1.1 }}>
+                  <TableCell sx={{ py: 1.1, fontFamily: 'sans-serif' }}>
                     {ruleItem.exact_columns?.join(", ") || "-"}
                   </TableCell>
-                  <TableCell sx={{ py: 1.1 }}>
+                  <TableCell sx={{ py: 1.1, fontFamily: 'sans-serif' }}>
                     {ruleItem.thresholds
                       ? Object.entries(ruleItem.thresholds)
                         .map(([key, value]) => `${key}: ${value}`)
@@ -213,12 +225,12 @@ const MatchRulePage = () => {
                   </TableCell>
                   <TableCell align="right" sx={{ py: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <IconButton size="small" onClick={() => confirmDelete(ruleItem)} style={{ color: 'red' }}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                     <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
+                      <IconButton size="small" onClick={() => confirmDelete(ruleItem)} style={{ color: 'red' }}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleEdit(index)} style={{ color: 'GrayText' }}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -230,7 +242,7 @@ const MatchRulePage = () => {
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
             variant="white"
-            sx={{ backgroundColor: "#175c93ff" }}
+            sx={{ backgroundColor: "#0e304cff" }}
             onClick={() => setAddDialogOpen(true)}
             disabled={addDialogOpen}
           >
@@ -302,6 +314,7 @@ const MatchRulePage = () => {
           {!crossSystemEnabled && (
             <Box mt={3}>
               <WorkingColumnMapping
+                editable={true}
                 columns={staticColumns}
                 fuzzyColumns={fuzzyColumns}
                 exactColumns={exactColumns}
@@ -389,6 +402,7 @@ const MatchRulePage = () => {
           {!crossSystemEnabled && (
             <Box mt={3}>
               <WorkingColumnMapping
+                editable={true}
                 columns={staticColumns}
                 fuzzyColumns={fuzzyColumns}
                 exactColumns={exactColumns}
@@ -428,7 +442,7 @@ const MatchRulePage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Box >
   );
 };
 

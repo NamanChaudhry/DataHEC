@@ -1,23 +1,86 @@
-  // src/components/EntitySelector.jsx
-  import React from 'react';
-  import Typography from '@mui/material/Typography';
-  import FormControl from '@mui/material/FormControl';
-  import InputLabel from '@mui/material/InputLabel';
-  import Select from '@mui/material/Select';
-  import MenuItem from '@mui/material/MenuItem';
+import React from 'react';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import { styled } from '@mui/material/styles';
 
-  const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
-    <div>
-      <Typography variant="h5" gutterBottom>Select Entity</Typography>
-      <FormControl fullWidth>
-        <InputLabel>Entity</InputLabel>
-        <Select value={selectedEntity} label="Entity" onChange={(e) => onSelect(e.target.value)}>
-          {entities.map(entity => (
-            <MenuItem key={entity} value={entity}>{entity}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
-  );
+const CustomSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: '#2d284a',
+  color: '#ffffff',             // text color
+  height: 40,                   // control height to remove gaps
+  padding: '0px 0px',          // inner padding
+  '& .MuiSelect-icon': {
+    color: '#90caf9',
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#90caf9',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#64b5f6',
+  },
+}));
 
-  export default EntitySelector;
+const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
+  // backgroundColor: '#2d284a',
+  color: 'black',
+  '&:hover': {
+    backgroundColor: '#37474f',
+    color: 'white',
+  },
+  '&.Mui-selected': {
+    backgroundColor: '#90caf9',
+    color: '#263238',
+    '&:hover': {
+      backgroundColor: '#64b5f6',
+    },
+  },
+}));
+
+const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
+  <div>
+    <Typography variant="h5" gutterBottom sx={{ color: 'black' }}>
+      Select Entity
+    </Typography>
+    <FormControl fullWidth sx={{ mt: 1 }}>
+      {!selectedEntity && (
+        <InputLabel
+          sx={{
+            color: 'white',
+            top: -8,
+            left: 5,
+            fontSize: 14,
+          }}
+        >
+          Entity
+        </InputLabel>
+      )}
+      <CustomSelect
+        value={selectedEntity}
+        label="Entity"
+        onChange={(e) => onSelect(e.target.value)}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              paddingTop: 0,
+              paddingBottom: 0,
+              '& .MuiMenuItem-root': {
+                paddingTop: 1,
+                paddingBottom: 1,
+              },
+            },
+          },
+        }}
+      >
+        {entities.map(entity => (
+          <CustomMenuItem key={entity} value={entity}>
+            {entity}
+          </CustomMenuItem>
+        ))}
+      </CustomSelect>
+    </FormControl>
+  </div>
+);
+
+export default EntitySelector;

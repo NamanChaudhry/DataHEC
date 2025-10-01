@@ -75,16 +75,17 @@ const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
       variant="permanent"
       PaperProps={{
         sx: {
-          background: "#23233a",
+          // background: '#272733',
+          background: "linear-gradient(135deg, #0d3965 0%, #205988 100%)",
           color: "#f9fafb",
-          width: 180,
-          borderRight: "20px solid #e0e0e0",
-          boxSizing: "border-box",
+          // width: 180,
+          borderRight: "0px solid #e0e0e0",
+          // boxSizing: "border-box",
           padding: 2,
-          margin: 1,
-          height: "calc(100vh - 16px)",
-          border: "1px solid #e0e0e0",
-          borderRadius: "16px",
+          margin: 0,
+          // height: "calc(100vh - 16px)",
+          border: "0px solid #e0e0e0",
+          borderRadius: "0px",
         },
       }}
     >
@@ -116,7 +117,7 @@ const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
                   borderRadius: 2,
                   mb: 3,
                   mx: 0,
-                  background: "#2d284a",
+                 // background: "#2d284a",
                   color: "#fff",
                   mt: 1,
                   ":hover": {
@@ -203,12 +204,10 @@ const SecondPage = () => {
 
 
   return (
-    <div className="page-container">
-      <Sidebar
-        activeContent={activeContent}
-        setActiveContent={setActiveContent}
-        onProfileClick={handleProfiling} // Pass to Sidebar
-      />
+    <div className="page-container" sx={{
+      background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
+    }}>
+      <Sidebar activeContent={activeContent} setActiveContent={setActiveContent} />
 
       <div className={activeContent === "thirdPage" ? "content content-full" : "content"}>
         {activeContent === "default" && (
