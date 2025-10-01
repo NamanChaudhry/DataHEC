@@ -5,6 +5,7 @@ import MatchRulePage from "../components/MatchRulePage";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ProfilingPage from "./ProfilingPage";
+import MappingPage from "./MappingPage";
 
 import {
   Drawer,
@@ -31,7 +32,8 @@ const menuConfig = [
     ],
   },
   {
-    label: "Extract",
+    label: "Map",
+    onClick: (setActiveContent) => setActiveContent("mappingpage"),
     children: [],
   },
   {
@@ -116,7 +118,7 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
                   borderRadius: 2,
                   mb: 3,
                   mx: 0,
-                 // background: "#2d284a",
+                  // background: "#2d284a",
                   color: "#fff",
                   mt: 1,
                   ":hover": {
@@ -446,6 +448,9 @@ const SecondPage = () => {
         {activeContent === "matchRulePage" && <MatchRulePage />}
 
         {activeContent === "profilePage" && <ProfilingPage />}
+
+        {activeContent === "mappingpage" && <MappingPage />}
+
       </div>
     </div>
   );

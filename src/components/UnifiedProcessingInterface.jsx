@@ -629,87 +629,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           </Paper>
         )}
 
-        {/* Processed Outputs Display Section */}
-        {/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
-          <>
-            <Divider sx={{ my: 3,color:'blue' }} />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h5" sx={{color:'whitesmoke'}}>
-                Processed Outputs for {entity}
-              </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setShowProcessedOutputs(!showProcessedOutputs)}
-              >
-                {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
-              </Button>
-            </Box>
-
-            <Collapse in={showProcessedOutputs}>
-              <Stack spacing={2}>
-                {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
-                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#2d3a4aff' }}>
-                    <Typography variant="h6" color="primary" gutterBottom>
-                      {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
-                    </Typography>
-                    <Grid container spacing={1}>
-                      {(outputs || []).map((outputFile, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
-                          <Paper
-                            elevation={1}
-                            sx={{
-                              p: 1.5,
-                              bgcolor: '#4d5170ff',
-                              border: '0px solid #e0e0e0',
-                              '&:hover': { boxShadow: 2 }
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              <Typography sx={{color:'#edba93ff'}} variant="body2" fontWeight="medium">
-                                📄 {outputFile}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  href={`http://localhost:5001/api/download/${outputFile}`}
-                                  target="_blank"
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  📥 Download
-                                </Button>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="success"
-                                  onClick={() => handleUseInCrossSystem(sourceSystem, outputFile)}
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  ➕ Add to Cross-System
-                                </Button>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="error"
-                                  onClick={() => handleDeleteSpecificOutput(sourceSystem, outputFile)}
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  🗑️ Delete
-                                </Button>
-                              </Box>
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Paper>
-                ))}
-              </Stack>
-            </Collapse>
-          </>
-        )} */}
-
+        
         <Divider sx={{ my: 3 }} />
 
         {/* File Configurations */}
@@ -865,3 +785,86 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 };
 
 export default UnifiedProcessingInterface;
+
+
+
+{/* Processed Outputs Display Section */}
+        {/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
+          <>
+            <Divider sx={{ my: 3,color:'blue' }} />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" sx={{color:'whitesmoke'}}>
+                Processed Outputs for {entity}
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setShowProcessedOutputs(!showProcessedOutputs)}
+              >
+                {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
+              </Button>
+            </Box>
+
+            <Collapse in={showProcessedOutputs}>
+              <Stack spacing={2}>
+                {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
+                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#2d3a4aff' }}>
+                    <Typography variant="h6" color="primary" gutterBottom>
+                      {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
+                    </Typography>
+                    <Grid container spacing={1}>
+                      {(outputs || []).map((outputFile, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                          <Paper
+                            elevation={1}
+                            sx={{
+                              p: 1.5,
+                              bgcolor: '#4d5170ff',
+                              border: '0px solid #e0e0e0',
+                              '&:hover': { boxShadow: 2 }
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              <Typography sx={{color:'#edba93ff'}} variant="body2" fontWeight="medium">
+                                📄 {outputFile}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  href={`http://localhost:5001/api/download/${outputFile}`}
+                                  target="_blank"
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  📥 Download
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="success"
+                                  onClick={() => handleUseInCrossSystem(sourceSystem, outputFile)}
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  ➕ Add to Cross-System
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  onClick={() => handleDeleteSpecificOutput(sourceSystem, outputFile)}
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  🗑️ Delete
+                                </Button>
+                              </Box>
+                            </Box>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Paper>
+                ))}
+              </Stack>
+            </Collapse>
+          </>
+        )} */}
