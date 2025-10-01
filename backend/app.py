@@ -10,6 +10,14 @@ from datetime import datetime
 import asyncio
 from dotenv import load_dotenv
 import header_mapping 
+from Profiling import integrated_profile_and_anomaly_with_charts
+from flask import send_from_directory
+import header_mapping
+import asyncio
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
+
 
 # Import your existing deduplication functions
 try:
@@ -25,6 +33,7 @@ try:
 except ImportError as e:
     print(f"⚠️ Warning: Could not import from your_existing_script.py: {e}")
     print("Please ensure your_existing_script.py exists with the required functions")
+
 
 app = Flask(__name__)
 CORS(app)
@@ -265,6 +274,40 @@ def get_header_mapping():
     except Exception as e:
         print(f"Error in /api/header-mapping: {e}")
         return jsonify({"error": str(e)}), 500
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+@app.route('/api/profile-upload', methods=['POST'])
+def profile_upload():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+ 
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
+ 
+    # You may optionally support multi-sheet uploads
+    profile_result = integrated_profile_and_anomaly_with_charts(filepath)
+ 
+    # Make sure all values are serializable for jsonify
+    def convert_types(obj):
+        if isinstance(obj, (float, int, str, bool)):
+            return obj
+        if isinstance(obj, dict):
+            return {k: convert_types(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [convert_types(v) for v in obj]
+        return str(obj)
+    safe_result = convert_types(profile_result)
+ 
+    return jsonify(safe_result)
+ 
+# Serve charts to frontend
+@app.route('/charts/<path:filename>')
+def serve_chart(filename):
+    return send_from_directory('charts', filename)
+ 
 
 # API Routes
 # --- MATCH RULES API ---

@@ -4,6 +4,7 @@ import MainContent from "../components/MainContent";
 import MatchRulePage from "../components/MatchRulePage";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ProfilingPage from "./ProfilingPage";
 
 import {
   Drawer,
@@ -35,6 +36,7 @@ const menuConfig = [
   },
   {
     label: "Profile",
+    onClick: (setActiveContent) => setActiveContent("profilePage"),
     children: [],
   },
   {
@@ -442,6 +444,8 @@ const SecondPage = () => {
         {activeContent === "thirdPage" && <MainContent />}
 
         {activeContent === "matchRulePage" && <MatchRulePage />}
+
+        {activeContent === "profilePage" && <ProfilingPage />}
       </div>
     </div>
   );
