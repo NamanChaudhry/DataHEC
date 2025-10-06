@@ -216,47 +216,48 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
   };
 
   const handleAddFile = (ruleConfig) => {
-    if (!selectedSourceSystem || !selectedFile) {
-      alert('Please select a source system and file first');
+    if (!selectedSourceSystem) {
+      alert('Please select a source system first');
       return;
     }
 
-    const selectedFileObj = availableFiles.find(f => f.name === selectedFile);
-    if (!selectedFileObj) {
-      alert('Selected file not found');
-      return;
-    }
-
+    // Check if the source system is already added
     const exists = fileConfigs.some(
-      config => config.sourceSystem === selectedSourceSystem && config.filename === selectedFile
+      config => config.sourceSystem === selectedSourceSystem
     );
     if (exists) {
-      alert(`Configuration for ${selectedSourceSystem}/${selectedFile} already exists`);
+      alert(`Configuration for ${selectedSourceSystem} already exists`);
       return;
     }
 
-    let apiUrl;
-    if (selectedFileObj.type === 'source') {
-      apiUrl = `http://localhost:5001/api/columns/${entity}/${selectedSourceSystem}/${selectedFile}`;
-    } else {
-      apiUrl = `http://localhost:5001/api/output-columns/${selectedFile}`;
+    // Determine default file (source or processed output) for this source system
+    const sourceFiles = availableFiles.filter(f => f.type === 'source');
+    const outputFiles = availableFiles.filter(f => f.type === 'output');
+    const defaultFileObj = sourceFiles[0] || outputFiles[0];
+
+    if (!defaultFileObj) {
+      alert(`No files available for source system: ${selectedSourceSystem}`);
+      return;
     }
+
+    const apiUrl = defaultFileObj.type === 'source'
+      ? `http://localhost:5001/api/columns/${entity}/${selectedSourceSystem}/${defaultFileObj.name}`
+      : `http://localhost:5001/api/output-columns/${defaultFileObj.name}`;
 
     axios.get(apiUrl)
       .then(columnsResponse => {
         if (!columnsResponse.data || columnsResponse.data.length === 0) {
-          alert(`No columns found for file: ${selectedFile}`);
+          alert(`No columns found for source system: ${selectedSourceSystem}`);
           return;
         }
 
         const newConfig = {
-          id: `${selectedSourceSystem}-${selectedFile}-${Date.now()}`,
+          id: `${selectedSourceSystem}-${Date.now()}`,
           sourceSystem: selectedSourceSystem,
-          filename: selectedFile,
-          fileType: selectedFileObj.type,
-          displayName: selectedFileObj.displayName,
+          filename: defaultFileObj.name,
+          fileType: defaultFileObj.type,
+          displayName: defaultFileObj.displayName,
           columns: [...columnsResponse.data],
-          // Use the rule config passed from FileSystemMappingItem
           fuzzyColumns: ruleConfig?.fuzzyColumns || [],
           exactColumns: ruleConfig?.exactColumns || [],
           thresholds: ruleConfig?.thresholds || {},
@@ -266,7 +267,6 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 
         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);
         setSelectedSourceSystem('');
-        setSelectedFile('');
         setAvailableFiles([]);
       })
       .catch(error => {
@@ -629,7 +629,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           </Paper>
         )}
 
-        
+
         <Divider sx={{ my: 3 }} />
 
         {/* File Configurations */}
@@ -690,6 +690,10 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                       onMappingChange={(newFuzzy, newExact, newThresholds) => {
                         updateConfigMapping(config.id, newFuzzy, newExact, newThresholds);
                       }}
+                      sourceSystem={sourceSystems}
+                      entity={entity}
+                      selectedSourceSystem={selectedSourceSystem}
+                      setSelectedSourceSystem={setSelectedSourceSystem}
                     />
                   )}
 
@@ -788,8 +792,8 @@ export default UnifiedProcessingInterface;
 
 
 
-{/* Processed Outputs Display Section */}
-        {/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
+{/* Processed Outputs Display Section */ }
+{/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
           <>
             <Divider sx={{ my: 3,color:'blue' }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

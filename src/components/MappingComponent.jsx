@@ -14,6 +14,7 @@ const MappingComponent = ({ entity, sourceSystems }) => {
   const [selectedFile, setSelectedFile] = useState('');
   const [availableFiles, setAvailableFiles] = useState([]);
 
+
   const handleAddFileConfig = (newConfig) => {
     const id = `${newConfig.sourceSystem}-${Date.now()}`;
     setFileConfigs(prev => [...prev, { ...newConfig, id, displayName: newConfig.filename || 'Unnamed File' }]);
@@ -66,7 +67,6 @@ const MappingComponent = ({ entity, sourceSystems }) => {
             onAddFile={(ruleConfig) => handleAddFileConfig(ruleConfig)}
           />
         </Paper>
-
       </Paper>
     </Box>
   );

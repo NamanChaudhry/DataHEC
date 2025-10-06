@@ -24,6 +24,7 @@ import SelectedColumnsDisplay from './SelectedColumnsDisplay';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 
 const FileSystemMappingItem = ({
   entity,
@@ -41,6 +42,8 @@ const FileSystemMappingItem = ({
   const [selectedRule, setSelectedRule] = useState([]);
   const [mergeRule, setMergeRule] = useState([]);
   const [resetDropdowns, setResetDropdowns] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
+
 
   useEffect(() => {
     fetch('http://localhost:5001/api/match-rules')
@@ -53,25 +56,56 @@ const FileSystemMappingItem = ({
     if (resetDropdowns) {
       setSelectedRule([]);
       setMergeRule([]);
+      setSelectedCategory('');
       setResetDropdowns(false);
     }
   }, [resetDropdowns]);
 
+  // const handleProcess = () => {
+  //   const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
+  //   if (!ruleObj) {
+  //     alert('Selected rule not found!');
+  //     return;
+  //   }
+  //   onAddFile?.({
+  //     fuzzyColumns: ruleObj.fuzzy_columns || [],
+  //     exactColumns: ruleObj.exact_columns || [],
+  //     thresholds: ruleObj.thresholds || {},
+  //     selectedRule: selectedRule[0],
+  //     mergeRule,
+  //   });
+  //   setResetDropdowns(true);
+  // };
+
   const handleProcess = () => {
-    const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
-    if (!ruleObj) {
-      alert('Selected rule not found!');
-      return;
-    }
-    onAddFile?.({
-      fuzzyColumns: ruleObj.fuzzy_columns || [],
-      exactColumns: ruleObj.exact_columns || [],
-      thresholds: ruleObj.thresholds || {},
-      selectedRule: selectedRule[0],
-      mergeRule,
-    });
-    setResetDropdowns(true);
-  };
+  if (!selectedSourceSystem) {
+    alert("Please select a source system first");
+    return;
+  }
+  if (!selectedCategory) {
+    alert("Please select a category first");
+    return;
+  }
+  if (selectedRule.length === 0) {
+    alert("Please select at least one match rule");
+    return;
+  }
+  if (mergeRule.length === 0) {
+    alert("Please select at least one merge rule");
+    return;
+  }
+
+  const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
+  onAddFile?.({
+    fuzzyColumns: ruleObj.fuzzy_columns || [],
+    exactColumns: ruleObj.exact_columns || [],
+    thresholds: ruleObj.thresholds || {},
+    selectedRule: selectedRule[0],
+    mergeRule,
+  });
+  setResetDropdowns(true);
+};
+
 
   return (
     <Box sx={{ width: '100%', overflow: 'visible' }}>
@@ -166,7 +200,7 @@ const FileSystemMappingItem = ({
           </Box>
 
           {/* Upload File */}
-          <Box flex={1}>
+          {/* <Box flex={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
               Upload File
             </Typography>
@@ -251,7 +285,79 @@ const FileSystemMappingItem = ({
               </Box>
             )}
 
+          </Box> */}
+
+          <Box flex={1}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
+              Category
+            </Typography>
+            <FormControl
+              fullWidth
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  backgroundColor: '#2d284a',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  '& fieldset': { borderColor: '#90caf9' },
+                  '&:hover fieldset': { borderColor: '#42a5f5' },
+                  '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
+                },
+                '& .MuiSelect-select': {
+                  padding: '14px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  color: '#a9a7a7ff', 
+                },
+                '& .MuiSvgIcon-root': { color: 'white' },
+              }}
+            >
+              <InputLabel sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
+                Select category
+              </InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                label="Select category..."
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      borderRadius: 2,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      '& .MuiMenuItem-root': {
+                        fontWeight: 500,
+                        fontSize: 15,
+                        color: '#000000',
+                        bgcolor: '#ffffff',
+                        '&:hover': {
+                          bgcolor: '#e3f2fd',
+                          color: '#1976d2',
+                        },
+                        '&.Mui-selected': {
+                          bgcolor: '#1976d2',
+                          color: '#ffffff',
+                          '&:hover': {
+                            bgcolor: '#1565c0',
+                          },
+                        },
+                      },
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="">
+                  <em>Select category...</em>
+                </MenuItem>
+                {['Header', 'Address', 'Contact'].map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
+
+
         </Stack>
 
         {/* Row: Match Rule + Merge Rule */}
@@ -267,15 +373,15 @@ const FileSystemMappingItem = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
-                    backgroundColor: '#2d284a',
+                  backgroundColor: '#2d284a',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                   '& fieldset': { borderColor: '#90caf9' },
                   '&:hover fieldset': { borderColor: '#42a5f5' },
                   '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
                 },
                 '& .MuiSvgIcon-root': {
-                    color: 'white',
-                  },
+                  color: 'white',
+                },
               }}
             >
               <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
@@ -379,9 +485,9 @@ const FileSystemMappingItem = ({
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        px: 1,   
-                        m:1,         
-                        py: 0.25,          
+                        px: 1,
+                        m: 1,
+                        py: 0.25,
                         border: '1px solid #fb8c00',
                         bgcolor: '#fff8e1',
                         color: 'black',
@@ -413,14 +519,14 @@ const FileSystemMappingItem = ({
         <Box>
           <Button
             variant="contained"
-            startIcon={<AutorenewIcon />}
+            startIcon={<PlaylistAddCheckIcon />}
             onClick={handleProcess}
-            disabled={!selectedSourceSystem || !selectedFile || selectedRule.length === 0 || mergeRule.length === 0}
+            disabled={!selectedSourceSystem || !selectedCategory || selectedRule.length === 0 || mergeRule.length === 0}
             sx={{
-              bgcolor: '#123f6cff',      // Dark blue background
-              color: '#ffffff',         // White text
+              bgcolor: '#123f6cff',      
+              color: '#ffffff', 
               '&:hover': {
-                bgcolor: '#1565c0',    // Darker blue on hover
+                bgcolor: '#1565c0',
               },
               '&.Mui-disabled': {
                 bgcolor: '#1c3951ff',    // Lighter blue when disabled
@@ -428,7 +534,7 @@ const FileSystemMappingItem = ({
               },
             }}
           >
-            Process
+            Select Cleanse Rules
           </Button>
         </Box>
 

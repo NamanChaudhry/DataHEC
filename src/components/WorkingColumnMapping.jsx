@@ -2,12 +2,14 @@
 import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
   Box,
   FormControlLabel,
   Checkbox,
   TextField,
   Accordion,
+  FormControl,
   AccordionSummary,
   AccordionDetails,
   Grid,
@@ -21,6 +23,8 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
+import InputLabel from "@mui/material/InputLabel";
+
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -44,13 +48,68 @@ const WorkingColumnMapping = ({
   exactColumns = [],
   thresholds = {},
   onMappingChange,
-  onColumnMappingChange
+  onColumnMappingChange,
+  sourceSystem,
+  entity,
+  selectedSourceSystem,
+  setSelectedSourceSystem
 }) => {
   const [aiMappedColumns, setAiMappedColumns] = useState({});
   const [columnMappings, setColumnMappings] = useState({});
   const [availableKeys, setAvailableKeys] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [currentEditingColumn, setCurrentEditingColumn] = useState(null);
+  const [showTable, setShowTable] = useState(false);
+  const [targetColumnsMapping, setTargetColumnsMapping] = useState({});
+  const [categoriesMapping, setCategoriesMapping] = useState({});
+  const [tableRows, setTableRows] = useState([{ id: 1 }]);
+
+  const targetOptions = [
+    "Source System",
+    "Customer Number",
+    "Customer Name",
+    "Customer Source Reference",
+    "Taxpayer ID",
+    "Taxpayer Registration Number",
+    "Account Number",
+    "Account Source Reference",
+    "Account Type",
+    "Account Description",
+    "Account Established Date",
+    "Customer Profile Class",
+    "Capital IQ ID",
+    "Transaction Activity Date",
+    "Site Number",
+    "Site Name",
+    "Site Source Reference",
+    "Account Address Set",
+    "Location Source Reference",
+    "Address Line 1",
+    "Address Line 2",
+    "Address Line 3",
+    "Address Line 4",
+    "City",
+    "State",
+    "Province",
+    "Postal Code",
+    "County",
+    "Country",
+    "Purpose",
+    "Person Number",
+    "Person Source Reference",
+    "Salutary Introduction",
+    "First Name",
+    "Middle Name",
+    "Last Name",
+    "Job Title",
+    "Responsibility Type",
+    "Phone Number",
+    "Phone Extension",
+    "E-Mail Address",
+    "Web URL"
+  ];
+
+  const categoryOptions = ["LTRIM", "RTRIM", "LOWER", "UPPER"];
 
 
   async function fetchMapping() {
@@ -78,7 +137,7 @@ const WorkingColumnMapping = ({
         const matchedEntry = Object.entries(mapping).find(
           ([key]) => key.toLowerCase().replace(/[_\s]+/g, "") === col.toLowerCase().replace(/[_\s]+/g, "")
         );
-        initialMapping[col] = matchedEntry ? matchedEntry[0] : ""; // <-- FIX: use key here, not value
+        initialMapping[col] = matchedEntry ? matchedEntry[0] : "";
       });
       setColumnMappings(initialMapping);
 
@@ -111,6 +170,8 @@ const WorkingColumnMapping = ({
 
     onMappingChange(newFuzzy, newExact, newThresholds);
   };
+
+
 
   const handleExactToggle = (column) => {
     let newExact = [...exactColumns];
@@ -146,12 +207,13 @@ const WorkingColumnMapping = ({
     }
   };
 
+
   return (
     <Box>
       {/* Chips for selected columns */}
       {(fuzzyColumns.length > 0 || exactColumns.length > 0) && (
         <Box sx={{ mb: 2 }}>
-          {editable == false && columns.length > 0 && (
+          {/* {editable == false && columns.length > 0 && (
             <Box
               sx={{
                 mt: 4,
@@ -234,6 +296,181 @@ const WorkingColumnMapping = ({
                 </TableBody>
               </Table>
             </Box>
+          )} */}
+
+
+          {editable === false && columns.length > 0 && (
+            <>
+              <Box
+                sx={{
+                  mt: 6,
+                  px: 5,
+                  py: 3,
+                  borderRadius: 3,
+                  backgroundColor: '#f7f7f7ff',
+                  border: '1px solid #e3e8ef',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  sx={{
+                    mb: 1,
+                    fontSize: '1.4rem',
+                    fontWeight: 500,
+                    color: '#1976d2',
+                    letterSpacing: '0.3px'
+                  }}
+                >
+                  Cleanse Section
+                </Typography>
+                
+                <Table
+                  sx={{
+                    mt: 2,
+                    
+                    width: '100%',
+                    borderCollapse: 'separate',
+                    borderSpacing: 0,
+                    border: '1px solid #90caf9',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <TableHead>
+                    <TableRow
+                      sx={{
+                        background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)',
+                        '& th': {
+                          color: '#fff',
+                          fontWeight: 700,
+                          fontSize: '0.95rem',
+                          borderBottom: '1px solid #90caf9',
+                          textTransform: 'uppercase',
+                          
+                        },
+                      }}
+                    >
+                      <TableCell>Target Columns</TableCell>
+                      <TableCell>Rules</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {tableRows.map((row, index) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#e3f2fd',
+                          '&:hover': { backgroundColor: '#cce4ff' },
+                        }}
+                      >
+                        {/* Target Column Dropdown */}
+                        <TableCell sx={{ padding: '10px 10px' }}>
+                          <FormControl sx={{ width: '70%' }} size="small">
+                            <Select
+                              value={targetColumnsMapping[row.id] || ''}
+                              onChange={(e) =>
+                                setTargetColumnsMapping((prev) => ({
+                                  ...prev,
+                                  [row.id]: e.target.value,
+                                }))
+                              }
+                              displayEmpty
+                            >
+                              <MenuItem value="">
+                                <em>Select target column...</em>
+                              </MenuItem>
+                              {targetOptions.map((opt) => (
+                                <MenuItem key={opt} value={opt}>
+                                  {opt}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+
+                        {/* Category Dropdown */}
+                        <TableCell
+                          sx={{
+                            padding: '10px 10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <FormControl sx={{ width: '85%' }} size="small">
+                            <Select
+                              value={categoriesMapping[row.id] || ''}
+                              onChange={(e) =>
+                                setCategoriesMapping((prev) => ({
+                                  ...prev,
+                                  [row.id]: e.target.value,
+                                }))
+                              }
+                              displayEmpty
+                            >
+                              <MenuItem value="">
+                                <em>Select rule...</em>
+                              </MenuItem>
+                              {categoryOptions.map((opt) => (
+                                <MenuItem key={opt} value={opt}>
+                                  {opt}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+
+                          {/* Styled Remove Icon */}
+                          <IconButton
+                            size=""
+                            onClick={() =>
+                              setTableRows((prev) => prev.filter((r) => r.id !== row.id))
+                            }
+                            sx={{
+
+                              bgcolor: '#e8d4d7ff',
+                              color: '#b02c22ff',
+                              '&:hover': {
+                                bgcolor: '#ffcdd2',
+                              },
+                            }}
+                          >
+                            <DeleteOutlineIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+
+                      </TableRow>
+                    ))}
+                  </TableBody>
+
+
+                </Table>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    mt: 2
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() =>
+                      setTableRows((prev) => [...prev, { id: prev.length + 1 }])
+                    }
+                    sx={{
+                      background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)',
+                      color: '#fff',
+                      '&:hover': { background: '#1565c0' },
+                    }}
+                  >
+                    Add New Rule
+                  </Button>
+                </Box>
+              </Box>
+            </>
           )}
 
           {editable == true && fuzzyColumns.length > 0 && (
