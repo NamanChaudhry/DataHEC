@@ -325,11 +325,11 @@ const WorkingColumnMapping = ({
                 >
                   Cleanse Section
                 </Typography>
-                
+
                 <Table
                   sx={{
                     mt: 2,
-                    
+
                     width: '100%',
                     borderCollapse: 'separate',
                     borderSpacing: 0,
@@ -348,7 +348,7 @@ const WorkingColumnMapping = ({
                           fontSize: '0.95rem',
                           borderBottom: '1px solid #90caf9',
                           textTransform: 'uppercase',
-                          
+
                         },
                       }}
                     >
@@ -368,7 +368,7 @@ const WorkingColumnMapping = ({
                       >
                         {/* Target Column Dropdown */}
                         <TableCell sx={{ padding: '10px 10px' }}>
-                          <FormControl sx={{ width: '70%' }} size="small">
+                          <FormControl sx={{ width: '80%' }} size="small">
                             <Select
                               value={targetColumnsMapping[row.id] || ''}
                               onChange={(e) =>
@@ -400,23 +400,32 @@ const WorkingColumnMapping = ({
                             justifyContent: 'space-between'
                           }}
                         >
-                          <FormControl sx={{ width: '85%' }} size="small">
+                          <FormControl sx={{ width: '90%' }} size="small">
                             <Select
-                              value={categoriesMapping[row.id] || ''}
+                              multiple
+                              displayEmpty
+                              value={categoriesMapping[row.id] || []}
+                              
                               onChange={(e) =>
                                 setCategoriesMapping((prev) => ({
                                   ...prev,
                                   [row.id]: e.target.value,
                                 }))
                               }
-                              displayEmpty
+                              renderValue={(selected) => {
+                                if (selected.length === 0) {
+                                  return <em>Select rule...</em>;
+                                }
+                                return selected.join(', ');
+                              }}
                             >
-                              <MenuItem value="">
+                              <MenuItem disabled value="">
                                 <em>Select rule...</em>
                               </MenuItem>
                               {categoryOptions.map((opt) => (
                                 <MenuItem key={opt} value={opt}>
-                                  {opt}
+                                  <Checkbox checked={(categoriesMapping[row.id] || []).indexOf(opt) > -1} />
+                                  <Typography variant="body2">{opt}</Typography>
                                 </MenuItem>
                               ))}
                             </Select>
@@ -424,12 +433,8 @@ const WorkingColumnMapping = ({
 
                           {/* Styled Remove Icon */}
                           <IconButton
-                            size=""
-                            onClick={() =>
-                              setTableRows((prev) => prev.filter((r) => r.id !== row.id))
-                            }
+                            onClick={() => setTableRows((prev) => prev.filter((r) => r.id !== row.id))}
                             sx={{
-
                               bgcolor: '#e8d4d7ff',
                               color: '#b02c22ff',
                               '&:hover': {
@@ -440,7 +445,6 @@ const WorkingColumnMapping = ({
                             <DeleteOutlineIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
-
                       </TableRow>
                     ))}
                   </TableBody>
