@@ -450,7 +450,7 @@ const WorkingColumnMapping = ({
                                 return selected.join(', ');
                               }}
                             >
-                              <MenuItem disabled value="">
+                              <MenuItem value="">
                                 <em>Select rule...</em>
                               </MenuItem>
                               {categoryOptions.map((opt) => (
