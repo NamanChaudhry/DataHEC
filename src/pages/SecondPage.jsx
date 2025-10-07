@@ -4,6 +4,8 @@ import MainContent from "../components/MainContent";
 import MatchRulePage from "../components/MatchRulePage";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MappingPage from "./MappingPage";
+import ReportPage from "./ReportPage";
 
 import {
   Drawer,
@@ -32,7 +34,8 @@ const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
       ],
     },
     {
-      label: "Extract",
+      label: "Map",
+      onClick: (setActiveContent) => setActiveContent("mappingpage"),
       children: [],
     },
     {
@@ -47,8 +50,10 @@ const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
     },
     {
       label: "Reports",
+      onClick: (setActiveContent) => setActiveContent("reportpage"),
       children: [],
-    },
+    }
+
   ];
 
   const [openMenus, setOpenMenus] = useState({
@@ -469,6 +474,10 @@ const SecondPage = () => {
         {activeContent === "matchRulePage" && <MatchRulePage />}
 
         {activeContent === "profilePage" && <ProfilingPage />}
+
+        {activeContent === "mappingpage" && <MappingPage />}
+
+        {activeContent === "reportpage" && <ReportPage />}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 # app.py - Complete Flask Backend (Full Version)
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 import time
 import psutil
@@ -9,6 +9,22 @@ import json
 from datetime import datetime
 from Profiling import integrated_profile_and_anomaly_with_charts
 from flask import send_from_directory
+import header_mapping
+import asyncio
+# import dash
+# from dash import Dash, dcc, html, Input, Output
+# import plotly.express as px
+# import glob
+# from dash import dash
+
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+CORS(app)
+
+
 # Import your existing deduplication functions
 try:
     from your_existing_script import (
@@ -24,8 +40,6 @@ except ImportError as e:
     print(f"⚠️ Warning: Could not import from your_existing_script.py: {e}")
     print("Please ensure your_existing_script.py exists with the required functions")
 
-app = Flask(__name__)
-CORS(app)
 
 # Configuration
 DATA_DIR = 'data'
@@ -37,6 +51,48 @@ REPORT_DIR = 'reports'
 # Ensure directories exist
 for directory in [DATA_DIR, STATIC_DIR, OUTPUT_DIR, PROCESSED_OUTPUTS_DIR, REPORT_DIR]:
     os.makedirs(directory, exist_ok=True)
+
+# Utility to find the latest .xlsx file in a folder
+# def get_latest_file(folder):
+#     files = glob.glob(os.path.join(folder, "*.xlsx"))
+#     return max(files, key=os.path.getmtime) if files else None
+
+# def charts_for_df(df):
+#     figs = []
+#     if 'Company_Name' in df.columns:
+#         figs.append(dcc.Graph(figure=px.bar(df['Company_Name'].value_counts().head(10).reset_index(),
+#             x='index', y='Company_Name', title='Top Companies')))
+#     # Add more charts as needed based on column presence
+#     return figs if figs else [html.Div("No relevant columns for charts.")]
+
+# # Integrate Dash into Flask, mounted at /reports
+# dash_app = Dash(
+#     __name__,
+#     server=app,
+#     url_base_pathname='/reports/'
+# )
+
+# dash_app.layout = html.Div([
+#     html.H2("Customer Deduplication Reports", style={'textAlign': 'center'}),
+#     html.Div(id='dash-content')
+# ])
+
+# @dash_app.callback(Output('dash-content', 'children'), [Input('dash-content', 'id')])
+# def update_report(_):
+#     file_path = get_latest_file('outputs')  # Use 'uploads' or 'outputs' folder as needed
+#     if not file_path:
+#         return html.Div("No output files found.")
+#     df = pd.read_excel(file_path)
+#     return charts_for_df(df)
+
+# @app.route('/')
+# def home():
+#     return "Welcome to the main Flask app!"
+
+# if __name__ == '__main__':
+#     app.run(debug=True, port=5001)
+
+
 
 
 # Registry management functions
@@ -249,6 +305,22 @@ def process_output_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzz
         print(f"Error in process_output_file_with_stats: {e}")
         raise
 
+@app.route('/api/header-mapping', methods=['GET'])
+def get_header_mapping():
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        mapping = loop.run_until_complete(header_mapping.main())
+        loop.close()
+
+        if mapping is None:
+            return jsonify({"error": "No mapping returned"}), 500
+
+        return jsonify(mapping)   # ✅ Now sends JSON to frontend
+    except Exception as e:
+        print(f"Error in /api/header-mapping: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # API Routes
 # --- MATCH RULES API ---
 MATCH_RULES_FILE = os.path.join(STATIC_DIR, "matchrules.json")
@@ -275,6 +347,76 @@ def get_match_rules():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@app.route('/api/map_headers', methods=['POST'])
+def map_headers():
+    print("Request files:", request.files)
+    print("Request form keys:", list(request.form.keys()))
+    print("column_mapping_str:", request.form.get('column_mapping'))
+    print("categories_mapping_str:", request.form.get('categories_mapping'))
+    print("source_system:", request.form.get('source_system'))
+    file = request.files.get('excel_file')
+    column_mapping_str = request.form.get('column_mapping')
+    categories_mapping_str = request.form.get('categories_mapping')  # JSON string of {sourceCol: category}
+
+    # Additional param example - source system for file naming
+    source_system = request.form.get('source_system', 'PS9.1')
+
+    if not file or not column_mapping_str or not categories_mapping_str:
+        return jsonify({'message': 'Missing file, column mapping or categories mapping'}), 400
+
+    try:
+        column_mapping = json.loads(column_mapping_str)
+        categories_mapping = json.loads(categories_mapping_str)
+    except json.JSONDecodeError:
+        return jsonify({'message': 'Invalid JSON in mapping data'}), 400
+
+    try:
+        df = pd.read_excel(file)
+    except Exception as e:
+        return jsonify({'message': f'Failed to read Excel file: {str(e)}'}), 400
+
+    # Apply column renames
+    df.rename(columns=column_mapping, inplace=True)
+
+    column_mapping = {k.strip(): v.strip() for k, v in column_mapping.items()}
+
+    # Validate Cust_Id exists after mapping
+    required_id_col = column_mapping.get('Cust_Id', 'Cust_Id')  # fallback to 'Cust_Id' if not mapped
+    if required_id_col not in df.columns:
+        return jsonify({'message': f"Required ID column '{required_id_col}' missing after mapping"}), 400
+
+
+    # Invert categories_mapping to category -> columns dict
+    category_columns = {}
+    for source_col, category in categories_mapping.items():
+        target_col = column_mapping.get(source_col)
+        if not target_col:
+            continue
+        if category not in category_columns:
+            category_columns[category] = []
+        category_columns[category].append(target_col)
+
+    saved_files = []
+    for category, cols in category_columns.items():
+        # Always include the mapped identity column
+        # Prevent duplicates in the case that required_id_col is already in cols
+        out_cols = [required_id_col] + [col for col in cols if col != required_id_col]
+        df_cat = df[out_cols]
+        file_name = f"{source_system}_{category.lower()}.xlsx"
+        save_path = os.path.join(UPLOAD_FOLDER, file_name)
+        df_cat.to_excel(save_path, index=False)
+        saved_files.append(file_name)
+
+    
+
+
+    return jsonify({
+        'message': 'Files saved successfully.',
+        'files': saved_files
+    })
+
+
+    
 
 @app.route('/api/profile', methods=['POST'])
 def profile_api():
@@ -283,7 +425,7 @@ def profile_api():
     sheet_name = data.get('sheet_name')
     column_name = data.get('column_name')
     try:
-        result = profile_column(filepath, sheet_name, column_name)
+        result = integrated_profile_and_anomaly_with_charts(filepath, sheet_name, column_name)
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -622,6 +764,44 @@ def process_single_file():
             "processing_time_ms": int(total_time * 1000),
             "failed": True
         }), 500
+
+
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+@app.route('/api/profile-upload', methods=['POST'])
+def profile_upload():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
+
+    # You may optionally support multi-sheet uploads
+    profile_result = integrated_profile_and_anomaly_with_charts(filepath)
+
+    # Make sure all values are serializable for jsonify
+    def convert_types(obj):
+        if isinstance(obj, (float, int, str, bool)):
+            return obj
+        if isinstance(obj, dict):
+            return {k: convert_types(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [convert_types(v) for v in obj]
+        return str(obj)
+    safe_result = convert_types(profile_result)
+
+    return jsonify(safe_result)
+
+# Serve charts to frontend
+@app.route('/charts/<path:filename>')
+def serve_chart(filename):
+    return send_from_directory('charts', filename)
+
+
+
 
 @app.route('/api/process-cross-system', methods=['POST'])
 def process_cross_system():
@@ -1192,39 +1372,6 @@ def get_file_info(entity, source_system, filename):
     except Exception as e:
         print(f"Error in get_file_info: {e}")
         return jsonify({"error": str(e)}), 500
-    
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def convert_types(obj):
-    if isinstance(obj, dict):
-        return {k: convert_types(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [convert_types(x) for x in obj]
-    elif hasattr(obj, 'item'):
-        return obj.item()  # Handles numpy types like int64, float64
-    else:
-        return obj
-
-@app.route('/api/profile-upload', methods=['POST'])
-def profile_upload():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(filepath)
-
-    profile_result = integrated_profile_and_anomaly_with_charts(filepath)
-    safe_result = convert_types(profile_result)
-    return jsonify(safe_result)
-
-#Serve charts to frontend 
-@app.route('/charts/<path:filename>')
-def serve_chart(filename):
-    return send_from_directory('charts', filename)
 
 @app.errorhandler(404)
 def not_found(error):
