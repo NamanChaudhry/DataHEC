@@ -378,16 +378,40 @@ const WorkingColumnMapping = ({
                                 }))
                               }
                               displayEmpty
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: {
+                                    background: "linear-gradient(135deg, #0d3965 0%, #205988 100%)",
+                                    color: 'white',
+                                  },
+                                },
+                              }}
                             >
                               <MenuItem value="">
                                 <em>Select target column...</em>
                               </MenuItem>
                               {targetOptions.map((opt) => (
-                                <MenuItem key={opt} value={opt}>
+                                <MenuItem
+                                  key={opt}
+                                  value={opt}
+                                  sx={{
+                                    '&.Mui-selected': {
+                                      backgroundColor: '#1976d2',
+                                      color: '#fff',
+                                    },
+                                    '&.Mui-selected:hover': {
+                                      backgroundColor: '#1565c0',
+                                    },
+                                    '&:hover': {
+                                      backgroundColor: '#1e4d7b',
+                                    },
+                                  }}
+                                >
                                   {opt}
                                 </MenuItem>
                               ))}
                             </Select>
+
                           </FormControl>
                         </TableCell>
 
@@ -400,12 +424,19 @@ const WorkingColumnMapping = ({
                             justifyContent: 'space-between'
                           }}
                         >
-                          <FormControl sx={{ width: '90%' }} size="small">
+                          <FormControl sx={{ width: '85%' }} size="small">
                             <Select
                               multiple
                               displayEmpty
                               value={categoriesMapping[row.id] || []}
-                              
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: {
+                                    background: "linear-gradient(135deg, #0d3965 0%, #205988 100%)",
+                                    color: 'white',
+                                  },
+                                },
+                              }}
                               onChange={(e) =>
                                 setCategoriesMapping((prev) => ({
                                   ...prev,
@@ -423,8 +454,28 @@ const WorkingColumnMapping = ({
                                 <em>Select rule...</em>
                               </MenuItem>
                               {categoryOptions.map((opt) => (
-                                <MenuItem key={opt} value={opt}>
-                                  <Checkbox checked={(categoriesMapping[row.id] || []).indexOf(opt) > -1} />
+                                <MenuItem key={opt} value={opt}
+                                  sx={{
+                                    '&.Mui-selected': {
+                                      backgroundColor: '#1976d2',
+                                      color: '#fff',
+                                    },
+                                    '&.Mui-selected:hover': {
+                                      backgroundColor: '#1565c0',
+                                    },
+                                    '&:hover': {
+                                      backgroundColor: '#1e4d7b',
+                                    },
+                                  }}>
+                                  <Checkbox
+                                    checked={(categoriesMapping[row.id] || []).indexOf(opt) > -1}
+                                    sx={{
+                                      color: '#90caf9',
+                                      '&.Mui-checked': {
+                                        color: '#00e5ff',
+                                      },
+                                    }}
+                                  />
                                   <Typography variant="body2">{opt}</Typography>
                                 </MenuItem>
                               ))}
