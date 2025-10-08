@@ -587,14 +587,23 @@ def process_single_file():
         # File loading phase
         file_load_start = time.time()
         
-        # Determine file path based on type
+        # # Determine file path based on type
+        # if file_type == 'source':
+        #     filepath = os.path.join(DATA_DIR, entity, source_system, filename)
+        # else:  # output
+        #     filepath = os.path.join(OUTPUT_DIR, filename)
+        
+        # if not os.path.exists(filepath):
+        #     return jsonify({"error": f"File not found: {filepath}"}), 404
+
         if file_type == 'source':
+            # Check if the file exists in DATA_DIR first, fallback to UPLOAD_FOLDER
             filepath = os.path.join(DATA_DIR, entity, source_system, filename)
+            if not os.path.exists(filepath):
+                # fallback to uploaded files
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
         else:  # output
             filepath = os.path.join(OUTPUT_DIR, filename)
-        
-        if not os.path.exists(filepath):
-            return jsonify({"error": f"File not found: {filepath}"}), 404
 
         # Get file size
         file_size_mb = os.path.getsize(filepath) / 1024 / 1024
