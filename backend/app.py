@@ -428,6 +428,14 @@ def update_match_rule():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@app.route('/api/uploads', methods=['GET'])
+def list_uploaded_files():
+    import os
+    UPLOAD_FOLDER = "uploads"
+    files = [f for f in os.listdir(UPLOAD_FOLDER)]
+    return jsonify(files)
+
+
 @app.route("/api/match-rules", methods=["DELETE"])
 def delete_match_rule():
     """Delete a match rule"""

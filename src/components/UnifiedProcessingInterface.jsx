@@ -651,7 +651,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                   }}>
                     <Box>
                       <Typography variant="h6" sx={{ color: '#cfccccff' }}>
-                        {config.sourceSystem} / {config.filename}
+                        {config.sourceSystem} / {"PeopleSoft9.1_header.xlsx"}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
