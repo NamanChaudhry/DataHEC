@@ -16,14 +16,58 @@ const MatchRulePage = () => {
   const [newRule, setNewRule] = useState({ rule: "", description: "" });
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
 
-  // 🔹 Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState(null);
 
+  // const staticColumns = [
+  //   'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
+  //   'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
+  //   'Phone2', 'Email', 'Web', 'Transaction_Date'
+  // ];
+
   const staticColumns = [
-    'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
-    'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
-    'Phone2', 'Email', 'Web', 'Transaction_Date'
+    "Source System",
+    "Customer Number",
+    "Customer Name",
+    "Customer Source Reference",
+    "Taxpayer ID",
+    "Taxpayer Registration Number",
+    "Account Number",
+    "Account Source Reference",
+    "Account Type",
+    "Account Description",
+    "Account Established Date",
+    "Customer Profile Class",
+    "Capital IQ ID",
+    "Transaction Activity Date",
+    "Site Number",
+    "Site Name",
+    "Site Source Reference",
+    "Account Address Set",
+    "Location Source Reference",
+    "Address Line 1",
+    "Address Line 2",
+    "Address Line 3",
+    "Address Line 4",
+    "City",
+    "State",
+    "Province",
+    "Postal Code",
+    "County",
+    "Country",
+    "Purpose",
+    "Person Number",
+    "Person Source Reference",
+    "Salutary Introduction",
+    "First Name",
+    "Middle Name",
+    "Last Name",
+    "Job Title",
+    "Responsibility Type",
+    "Phone Number",
+    "Phone Extension",
+    "E-Mail Address",
+    "Web URL"
   ];
 
   const [fuzzyColumns, setFuzzyColumns] = useState([]);

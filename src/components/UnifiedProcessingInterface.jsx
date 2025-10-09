@@ -294,39 +294,17 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     );
   }, []);
 
-  const handleSingleFileProcess = (config) => {
-    // Basic validation
-    if (
-      !(Array.isArray(config.fuzzyColumns) && config.fuzzyColumns.length) &&
-      !(Array.isArray(config.exactColumns) && config.exactColumns.length)
-    ) {
-      alert('Please set column mappings before processing');
-      return;
-    }
-
-    const payload = {
-      entity,
-      source_system: config.sourceSystem,
-      filename: config.filename,
-      file_type: config.fileType,
-      fuzzy_columns: config.fuzzyColumns,
-      exact_columns: config.exactColumns,
-      thresholds: config.thresholds
-    };
-
-    console.log('Processing single file:', payload);
-
-    axios.post('http://localhost:5001/api/process-single', payload)
+  const handleSingleFileProcess = () => {
+    axios.post('http://localhost:5001/api/process-single', {})
       .then(response => {
         alert(`✅ File processed successfully! Output: ${response.data.output_file}`);
-        // Refresh processed outputs
-        loadProcessedOutputs();
       })
       .catch(error => {
-        console.error("Error processing file:", error);
+        console.error("Error processing file:", error.response?.data || error.message);
         alert("❌ Failed to process file. Check backend connection.");
       });
   };
+
 
   const handleUseInCrossSystem = (sourceSystem, outputFile) => {
     // Switch to cross-system mode and add this file
@@ -641,12 +619,27 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
             <Stack spacing={3} sx={{ mb: 3 }}>
               {fileConfigs.map((config) => (
                 <Paper key={config.id} elevation={2} sx={{
-                  p: 2,
+                  p:2,
                   borderRadius: 2,
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(255, 255, 255, 0.08)'
                 }}>
+                  {!crossSystemEnabled && (
+                    <WorkingColumnMapping
+                      columns={config.columns}
+                      fuzzyColumns={config.fuzzyColumns}
+                      exactColumns={config.exactColumns}
+                      thresholds={config.thresholds}
+                      onMappingChange={(newFuzzy, newExact, newThresholds) => {
+                        updateConfigMapping(config.id, newFuzzy, newExact, newThresholds);
+                      }}
+                      sourceSystem={sourceSystems}
+                      entity={entity}
+                      selectedSourceSystem={selectedSourceSystem}
+                      setSelectedSourceSystem={setSelectedSourceSystem}
+                    />
+                  )}
                   <Box sx={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2,
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2, mb: 1,mt:3,
                     background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)'
                   }}>
                     <Box>
@@ -680,7 +673,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                       </Box>
                     </Box>
                   </Box>
-
+{/* 
                   {!crossSystemEnabled && (
                     <WorkingColumnMapping
                       columns={config.columns}
@@ -695,7 +688,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                       selectedSourceSystem={selectedSourceSystem}
                       setSelectedSourceSystem={setSelectedSourceSystem}
                     />
-                  )}
+                  )} */}
 
                   {crossSystemEnabled && (
                     <Box sx={{ p: 2, bgcolor: '#f0f7ff', borderRadius: 1 }}>

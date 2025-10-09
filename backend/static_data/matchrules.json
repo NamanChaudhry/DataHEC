@@ -3,23 +3,27 @@
     "rule": "Name and Address",
     "description": "Matches using the name and address.",
     "fuzzy_columns": [
-      "Name",
-      "Address"
+      "Customer Name",
+      "Capital IQ ID"
     ],
     "exact_columns": [],
     "thresholds": {
-      "Address": 85,
-      "Name": 90
+      "Customer Name": 85,
+      "Capital IQ ID": 100
     }
   },
   {
     "rule": "Capital IQ ID",
     "description": "Uses the unique Capital IQ identifier to match entities.",
-    "fuzzy_columns": [],
+    "fuzzy_columns": [
+      "Account Type"
+    ],
     "exact_columns": [
       "Capital IQ ID"
     ],
-    "thresholds": {}
+    "thresholds": {
+      "Account Type": 85
+    }
   },
   {
     "rule": "Country and Tax Registration Number",
@@ -112,19 +116,6 @@
     "thresholds": {
       "County": 90,
       "State": 90
-    }
-  },
-  {
-    "rule": "test",
-    "description": "test",
-    "fuzzy_columns": [
-      "First_Name"
-    ],
-    "exact_columns": [
-      "Zip"
-    ],
-    "thresholds": {
-      "First_Name": 90
     }
   }
 ]

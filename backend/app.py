@@ -126,7 +126,7 @@ def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy
         winner_start = time.time()
         if len(duplicate_rows) > 0:
             duplicate_rows = assign_winner(duplicate_rows, source_system_rule, rulebook, is_cross_system=False)
-            winner_rows = duplicate_rows[duplicate_rows['Cust_Id'] == duplicate_rows['winner']].copy()
+            winner_rows = duplicate_rows[duplicate_rows['Customer Name'] == duplicate_rows['winner']].copy()
         else:
             winner_rows = pd.DataFrame(columns=original_columns)
         
@@ -212,7 +212,7 @@ def process_output_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzz
         winner_start = time.time()
         if len(duplicate_rows) > 0:
             duplicate_rows = assign_winner(duplicate_rows, source_system, rulebook, is_cross_system=False)
-            winner_rows = duplicate_rows[duplicate_rows['Cust_Id'] == duplicate_rows['winner']].copy()
+            winner_rows = duplicate_rows[duplicate_rows['Customer Name'] == duplicate_rows['winner']].copy()
         else:
             winner_rows = pd.DataFrame(columns=original_columns)
         
@@ -551,130 +551,78 @@ def get_output_columns(filename):
     except Exception as e:
         print(f"Error in get_output_columns: {e}")
         return jsonify({"error": str(e)}), 500
-
+    
+    
 @app.route('/api/process-single', methods=['POST'])
 def process_single_file():
-    """Process a single file with detailed timing and statistics"""
+    """Process a single file with hardcoded path"""
     start_time = time.time()
     start_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
-    
+
     try:
         print(f"\n=== SINGLE FILE PROCESSING START: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===")
-        data = request.json
         
-        # Extract parameters
-        entity = data.get('entity')
-        source_system = data.get('source_system')
-        filename = data.get('filename')
-        file_type = data.get('file_type', 'source')
-        fuzzy_columns = data.get('fuzzy_columns', [])
-        exact_columns = data.get('exact_columns', [])
-        thresholds = data.get('thresholds', {})
-        rules = data.get('rules', [])
+        # === HARDCODED FILE DETAILS ===
+        entity = "Customer"  # Change this to your entity
+        source_system = "People_Soft9.1"  # Change this to your source system
+        filename = "PeopleSoft9.1_header.xlsx"  # Change this to your file
+        file_type = "source"
+        fuzzy_columns = ["Customer Name","Capital IQ ID"]  # Example fuzzy columns
+        exact_columns = []      # Example exact columns
+        thresholds = {}           # Example threshold
+        rules = []                           # Example rules
 
-        # Validation
-        if not all([entity, source_system, filename]):
-            return jsonify({"error": "Missing required parameters: entity, source_system, filename"}), 400
-
-        print(f"Entity: {entity}")
-        print(f"Source System: {source_system}")
-        print(f"Filename: {filename}")
-        print(f"File Type: {file_type}")
-        print(f"Fuzzy Columns: {fuzzy_columns}")
-        print(f"Exact Columns: {exact_columns}")
-        print(f"Thresholds: {thresholds}")
-
-        # File loading phase
-        file_load_start = time.time()
-        
-        # # Determine file path based on type
-        # if file_type == 'source':
-        #     filepath = os.path.join(DATA_DIR, entity, source_system, filename)
-        # else:  # output
-        #     filepath = os.path.join(OUTPUT_DIR, filename)
-        
-        # if not os.path.exists(filepath):
-        #     return jsonify({"error": f"File not found: {filepath}"}), 404
-
+        # File loading
         if file_type == 'source':
-            # Check if the file exists in DATA_DIR first, fallback to UPLOAD_FOLDER
             filepath = os.path.join(DATA_DIR, entity, source_system, filename)
             if not os.path.exists(filepath):
-                # fallback to uploaded files
                 filepath = os.path.join(UPLOAD_FOLDER, filename)
-        else:  # output
+        else:
             filepath = os.path.join(OUTPUT_DIR, filename)
 
-        # Get file size
+        if not os.path.exists(filepath):
+            return jsonify({"error": f"File not found: {filepath}"}), 404
+
         file_size_mb = os.path.getsize(filepath) / 1024 / 1024
-        print(f"File size: {file_size_mb:.2f} MB")
+        print(f"Processing file: {filepath} ({file_size_mb:.2f} MB)")
 
         # Load rulebook
         rulebook_path = os.path.join(STATIC_DIR, 'Rulebook.xlsx')
         if not os.path.exists(rulebook_path):
-            return jsonify({"error": "Rulebook.xlsx not found in static_data directory"}), 404
-
+            return jsonify({"error": "Rulebook.xlsx not found"}), 404
         rulebook = pd.read_excel(rulebook_path)
-        file_load_time = time.time() - file_load_start
-        print(f"File loading time: {file_load_time:.3f} seconds")
 
-        # Processing phase
-        processing_start = time.time()
-        
-        # Process based on file type
-        if file_type == 'output':
-            output_file, processing_stats = process_output_file_with_stats(
-                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR, source_system
-            )
-        else:
-            output_file, processing_stats = process_excel_file_with_stats(
-                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR,rules=rules
-            )
+        # Processing
+        output_file, processing_stats = process_excel_file_with_stats(
+            filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR, rules=rules
+        )
 
-        processing_time = time.time() - processing_start
-        print(f"Processing time: {processing_time:.3f} seconds")
-
-        # Add to processed outputs registry
+        # Register output
         output_filename = os.path.basename(output_file)
         add_to_processed_outputs(entity, source_system, output_filename)
 
-        # Calculate final statistics
+        # Timing & memory stats
         end_time = time.time()
-        end_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+        end_memory = psutil.Process().memory_info().rss / 1024 / 1024
         total_time = end_time - start_time
         memory_used = max(0, end_memory - start_memory)
-
-        print(f"=== PROCESSING COMPLETE ===")
-        print(f"Total time: {total_time:.3f} seconds")
-        print(f"Memory used: {memory_used:.2f} MB")
-        if processing_stats.get('total_records', 0) > 0:
-            print(f"Records per second: {processing_stats.get('total_records', 0) / total_time:.0f}")
 
         return jsonify({
             "message": f"✅ Processing complete! Output file: {output_filename}",
             "output_file": output_filename,
             "download_link": f"/api/download/{output_filename}",
             "processing_time_ms": int(total_time * 1000),
-            "file_load_time_ms": int(file_load_time * 1000),
-            "processing_only_time_ms": int(processing_time * 1000),
             "memory_used_mb": round(memory_used, 2),
             "file_size_mb": round(file_size_mb, 2),
             "total_records": processing_stats.get('total_records', 0),
             "duplicate_groups": processing_stats.get('duplicate_groups', 0),
             "final_records": processing_stats.get('final_records', 0),
             "duplicates_found": processing_stats.get('duplicates_found', 0),
-            "performance_stats": {
-                "records_per_second": round(processing_stats.get('total_records', 0) / max(total_time, 0.001), 0),
-                "mb_per_second": round(file_size_mb / max(total_time, 0.001), 2),
-                "fuzzy_columns_count": len(fuzzy_columns),
-                "exact_columns_count": len(exact_columns)
-            }
         })
 
     except Exception as e:
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"Error in process_single_file after {total_time:.3f}s: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -1790,7 +1738,7 @@ def find_fuzzy_duplicates(df, fuzzy_columns, exact_columns, fuzzy_thresholds, ex
             df.at[idx_a, 'match_percentage'] = float(overall_score)
             df.at[idx_b, 'match_percentage'] = float(overall_score)
             
-            # Update individual fuzzy match percentages
+            # Update individual fuzzy match percentages``
             for column in fuzzy_columns:
                 if column in match_scores:
                     df.at[idx_a, f'{column}_fuzzy_match_percentage'] = match_scores[column]
@@ -1848,9 +1796,9 @@ def assign_winner(df, source_system, rulebook, is_cross_system=False, source_sys
         for group_id, group in df.groupby('group_id'):
             try:
                 if winning_criteria == 'latest_transaction_date':
-                    winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Cust_Id']
+                    winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Customer Name']
                 elif winning_criteria == 'earliest_transaction_date':
-                    winner_id = group.sort_values(by=transaction_date_col, ascending=True).iloc[0]['Cust_Id']
+                    winner_id = group.sort_values(by=transaction_date_col, ascending=True).iloc[0]['Customer Name']
                 elif winning_criteria == 'largest_name':
                     # Handle different possible name column names
                     name_col = None
@@ -1860,12 +1808,12 @@ def assign_winner(df, source_system, rulebook, is_cross_system=False, source_sys
                             break
                     
                     if name_col:
-                        winner_id = group.loc[group[name_col].str.len().idxmax()]['Cust_Id']
+                        winner_id = group.loc[group[name_col].str.len().idxmax()]['Customer Name']
                     else:
                         print(f"⚠️ No name column found for 'largest_name' criteria, using latest date")
-                        winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Cust_Id']
+                        winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Customer Name']
                 else:
-                    winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Cust_Id']
+                    winner_id = group.sort_values(by=transaction_date_col, ascending=False).iloc[0]['Customer Name']
                 
                 df.loc[df['group_id'] == group_id, 'winner'] = winner_id
             except Exception as e:
@@ -1875,11 +1823,11 @@ def assign_winner(df, source_system, rulebook, is_cross_system=False, source_sys
         df['winner_source'] = None
         for group_id, group in df.groupby('group_id'):
             try:
-                group_priorities = group[['Cust_Id', 'Source_System']].rename(columns={'Source_System': 'source_system'}) \
+                group_priorities = group[['Customer Name', 'Source_System']].rename(columns={'Source_System': 'source_system'}) \
                     .merge(source_system_main_file, on='source_system', how='left')
 
                 group_priorities = group_priorities.sort_values(by='precedence')
-                winner_id = group_priorities.iloc[0]['Cust_Id']
+                winner_id = group_priorities.iloc[0]['Customer Name']
                 winner_source = group_priorities.iloc[0]['source_system']
 
                 df.loc[df['group_id'] == group_id, 'winner'] = winner_id
@@ -1919,7 +1867,7 @@ def process_excel_file(file_path, fuzzy_columns, exact_columns, fuzzy_thresholds
     print(f"Duplicate rows: {len(duplicate_rows)}, Unique rows: {len(unique_rows)}")
 
     duplicate_rows = assign_winner(duplicate_rows, source_system_rule, rulebook, is_cross_system=False)
-    winner_rows = duplicate_rows[duplicate_rows['Cust_Id'] == duplicate_rows['winner']].copy()
+    winner_rows = duplicate_rows[duplicate_rows['Customer Name'] == duplicate_rows['winner']].copy()
 
     final_rows = pd.concat([winner_rows[original_columns], unique_rows[original_columns]], ignore_index=True)
     print(f"Final rows count: {len(final_rows)}")

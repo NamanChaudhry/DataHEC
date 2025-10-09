@@ -303,7 +303,7 @@ const WorkingColumnMapping = ({
             <>
               <Box
                 sx={{
-                  mt: 6,
+                  mt: 0,
                   px: 5,
                   py: 3,
                   borderRadius: 3,
