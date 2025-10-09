@@ -1,424 +1,3 @@
-// // src/components/FileSystemMappingItem.jsx
-// import React, { useEffect, useState } from 'react';
-// import {
-//   Box,
-//   Stack,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   MenuItem,
-//   Button,
-//   Typography,
-//   Divider,
-//   CircularProgress,
-//   IconButton,
-// } from '@mui/material';
-// import UploadFileIcon from '@mui/icons-material/UploadFile';
-// import MergeRuleSelector from './Mergeruleselector';
-// import Checkbox from '@mui/material/Checkbox';
-// import ListItemText from '@mui/material/ListItemText';
-// import AutorenewIcon from '@mui/icons-material/Autorenew';
-// import SelectedColumnsDisplay from './SelectedColumnsDisplay';
-// import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-// import CloseIcon from '@mui/icons-material/Close';
-
-// const FileSystemMappingItem = ({
-//   entity,
-//   sourceSystems,
-//   selectedSourceSystem,
-//   setSelectedSourceSystem,
-//   files,
-//   selectedFile,
-//   setSelectedFile,
-//   availableFiles,
-//   setAvailableFiles,
-//   onAddFile,
-// }) => {
-//   console.log('FileSystemMappingItem rendered with files:', files);
-
-//   const [rules, setRules] = useState([]);
-//   const [selectedRule, setSelectedRule] = useState([]);
-//   const [mergeRule, setMergeRule] = useState([]);
-//   const [resetDropdowns, setResetDropdowns] = useState(false);
-
-//   useEffect(() => {
-//     fetch('http://localhost:5001/api/match-rules')
-//       .then((res) => res.json())
-//       .then((data) => setRules(data))
-//       .catch((err) => console.error('Error loading match rules:', err));
-//   }, []);
-
-//   useEffect(() => {
-//     if (resetDropdowns) {
-//       setSelectedRule([]);
-//       setMergeRule([]);
-//       setResetDropdowns(false);
-//     }
-//   }, [resetDropdowns]);
-
-//   const handleAddRule = async () => {
-//     const newRule = prompt('Enter new match rule:');
-//     if (!newRule) return;
-
-//     try {
-//       const response = await fetch('http://localhost:5001/api/match-rules', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ rule: newRule }),
-//       });
-
-//       const data = await response.json();
-//       if (response.ok) {
-//         setRules(data.rules); // update rules state
-//       } else {
-//         alert(data.error || 'Failed to add rule');
-//       }
-//     } catch (err) {
-//       console.error('Error adding rule:', err);
-//     }
-//   };
-
-//   const handleProcess = () => {
-//     // Find the selected rule object (assuming single selection)
-//     const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
-//     if (!ruleObj) {
-//       alert('Selected rule not found!');
-//       return;
-//     }
-//     // Pass the rule config to parent
-//     onAddFile?.({
-//       fuzzyColumns: ruleObj.fuzzy_columns || [],
-//       exactColumns: ruleObj.exact_columns || [],
-//       thresholds: ruleObj.thresholds || {},
-//       selectedRule: selectedRule[0], // for reference
-//       mergeRule,
-//     });
-//     setResetDropdowns(true);
-//   };
-
-//   return (
-//     <Box sx={{ width: '100%', overflow: 'visible' }}>
-//       <Stack spacing={2}>
-//         <Divider />
-//         {/* Source System Row */}
-//         <Box>
-//           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
-//             🗂️ Source System
-//           </Typography>
-// <FormControl
-//   fullWidth
-//   variant="outlined"
-//   sx={{
-//     '& .MuiOutlinedInput-root': {
-//       borderRadius: '12px',
-//       backgroundColor: '#e3f2fd',
-//       boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-//       '& fieldset': { borderColor: '#90caf9' },
-//       '&:hover fieldset': { borderColor: '#42a5f5' },
-//       '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
-//     },
-//     '& .MuiSelect-select': {
-//       padding: '14px',
-//       fontSize: '1rem',
-//       fontWeight: 500,
-//       color: '#0d47a1',
-//     },
-//   }}
-// >
-//   <InputLabel sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}>
-//     Select source system
-//   </InputLabel>
-//   <Select
-//     value={selectedSourceSystem}
-//     onChange={(e) => setSelectedSourceSystem(e.target.value)}
-//     disabled={!entity}
-//     label="Select source system..."
-//     MenuProps={{
-//       PaperProps: {
-//         sx: {
-//           bgcolor: '#ffffff', // white background for dropdown
-//           borderRadius: 2,
-//           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-//           '& .MuiMenuItem-root': {
-//             fontWeight: 500,
-//             color: '#000000', // black textF
-//             bgcolor: '#ffffff', // white background
-//             '&:hover': {
-//               bgcolor: '#e3f2fd', // light blue on hover
-//               color: '#1976d2',
-//             },
-//             '&.Mui-selected': {
-//               bgcolor: '#1976d2', // blue background when selected
-//               color: '#ffffff', // white text when selected
-//               '&:hover': {
-//                 bgcolor: '#1565c0', // darker blue on hover
-//               },
-//             },
-//           },
-//         },
-//       },
-//     }}
-//     sx={{
-//       '& .MuiSelect-select': {
-//         padding: '14px',
-//         fontSize: '1rem',
-//         fontWeight: 500,
-//         color: '#0d47a1',
-//         backgroundColor: '#e3f2fd',
-//         borderRadius: '12px',
-//       },
-//     }}
-//   >
-//     <MenuItem value="">
-//       <em>Select source system...</em>
-//     </MenuItem>
-//     {sourceSystems.map((system) => (
-//       <MenuItem key={system} value={system}>
-//         {system}
-//       </MenuItem>
-//     ))}
-//   </Select>
-// </FormControl>
-//         </Box>
-
-//         {/* File Row - Enhanced for better visibility */}
-//         <Box>
-//           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
-//             📤 Upload File
-//           </Typography>
-//           <FormControl fullWidth>
-//             <Button
-//               variant="outlined"
-//               component="label"
-//               startIcon={<UploadFileIcon />}
-//               disabled={!selectedSourceSystem}
-//               sx={{
-//                 padding: '12px 18px',
-//                 border: '2px dashed #90caf9',
-//                 backgroundColor: '#f1f8e9',
-//                 color: '#558b2f',
-//                 '&:hover': {
-//                   backgroundColor: '#dcedc8',
-//                   borderColor: '#7cb342',
-//                 },
-//               }}
-//             >
-//               {selectedSourceSystem ? `Upload File for ${selectedSourceSystem}` : 'Upload File'}
-//               <input
-//                 type="file"
-//                 hidden
-//                 onChange={(e) => {
-//                   const file = e.target.files[0];
-//                   if (file) {
-//                     setSelectedFile(file.name);
-//                     console.log('Selected file:', file.name);
-
-//                     setAvailableFiles((prev) => [
-//                       ...prev,
-//                       {
-//                         name: file.name,
-//                         type: file.name.includes('_Output') ? 'output' : 'source',
-//                         displayName: file.name,
-//                       },
-//                     ]);
-//                   }
-//                 }}
-//                 accept=".csv,.xlsx,.json"
-//               />
-//             </Button>
-//           </FormControl>
-
-//           {/* Modern Styled Selected File Display */}
-//           {selectedFile && (
-//             <Box
-//               sx={{
-//                 mt: 3,
-//                 p: 2,
-//                 display: 'flex',
-//                 alignItems: 'center',
-//                 bgcolor: 'background.paper',
-//                 borderRadius: 3,
-//                 boxShadow: '0 4px 12px rgba(33, 150, 243, 0.15)',
-//                 border: '1.5px solid #90caf9',
-//                 transition: 'box-shadow 0.3s ease',
-//                 '&:hover': {
-//                   boxShadow: '0 6px 20px rgba(33, 150, 243, 0.3)',
-//                 },
-//               }}
-//             >
-//               <InsertDriveFileIcon sx={{ fontSize: 40, color: '#1976d2', mr: 2 }} />
-//               <Box sx={{ flexGrow: 1 }}>
-//                 <Typography variant="subtitle2" sx={{ color: '#0d47a1', fontWeight: '600' }}>
-//                   Selected File
-//                 </Typography>
-//                 <Typography
-//                   variant="body1"
-//                   sx={{
-//                     fontWeight: 500,
-//                     wordBreak: 'break-word',
-//                     mt: 0.5,
-//                     color: '#1565c0',
-//                     maxWidth: '100%',
-//                     whiteSpace: 'nowrap',
-//                     overflow: 'hidden',
-//                     textOverflow: 'ellipsis',
-//                   }}
-//                   title={selectedFile}
-//                 >
-//                   {selectedFile}
-//                 </Typography>
-//               </Box>
-//               <IconButton
-//                 size="small"
-//                 color="primary"
-//                 onClick={() => setSelectedFile('')}
-//                 aria-label="Clear selected file"
-//                 sx={{
-//                   ml: 1,
-//                   bgcolor: '#e3f2fd',
-//                   '&:hover': { bgcolor: '#bbdefb' },
-//                 }}
-//               >
-//                 <CloseIcon fontSize="small" />
-//               </IconButton>
-//             </Box>
-//           )}
-//         </Box>
-
-//         <Box>
-//           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#37474f', mb: 1 }}>
-//             🎯 Match Rule
-//           </Typography>
-//           {/* Dropdown */}
-//           <FormControl
-//             fullWidth
-//             variant="outlined"
-//             sx={{
-//               '& .MuiOutlinedInput-root': {
-//                 borderRadius: '12px',
-//                 backgroundColor: '#e3f2fd',
-//                 boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-//                 '& fieldset': { borderColor: '#90caf9' },
-//                 '&:hover fieldset': { borderColor: '#42a5f5' },
-//                 '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
-//               },
-//             }}
-//           >
-//             <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#1976d2' }}>
-//               Select match rule
-//             </InputLabel>
-//             <Select
-//               labelId="match-rule-label"
-//               multiple
-//               value={selectedRule}
-//               onChange={(e) =>
-//                 setSelectedRule(
-//                   typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value
-//                 )
-//               }
-//               label="Match Rule"
-//               renderValue={(selected) => (
-//                 <Box
-//                   sx={{
-//                     display: 'flex',
-//                     justifyContent: 'center',
-//                     alignItems: 'center',
-//                     height: '100%',
-//                     width: '100%',
-//                     textAlign: 'center',
-//                     flexWrap: 'wrap',
-//                   }}
-//                 >
-//                   <Typography sx={{ fontWeight: 600, color: '#0d47a1' }}>{selected.join(', ')}</Typography>
-//                 </Box>
-//               )}
-//             >
-//               {rules.length === 0 ? (
-//                 <MenuItem disabled>
-//                   <CircularProgress size={20} sx={{ mr: 1 }} /> Loading rules...
-//                 </MenuItem>
-//               ) : (
-//                 rules.map((ruleObj, index) => (
-//                   <MenuItem key={index} value={ruleObj.rule}>
-//                     <Checkbox checked={selectedRule.includes(ruleObj.rule)} />
-//                     <ListItemText
-//                       primary={ruleObj.rule}
-//                       primaryTypographyProps={{ fontWeight: 500 }}
-//                       secondaryTypographyProps={{ fontSize: 12, color: 'text.secondary' }}
-//                     />
-//                   </MenuItem>
-//                 ))
-//               )}
-//             </Select>
-//           </FormControl>
-//           <br />
-
-//           {/* Show selected fuzzy/exact columns below dropdown */}
-//           {selectedRule.length > 0 &&
-//             (() => {
-//               // Aggregate fuzzy/exact columns and thresholds from all selected rules
-//               let fuzzyColumns = [];
-//               let exactColumns = [];
-//               let thresholds = {};
-
-//               selectedRule.forEach((ruleName) => {
-//                 const ruleObj = rules.find((r) => r.rule === ruleName);
-//                 if (ruleObj) {
-//                   fuzzyColumns = [...fuzzyColumns, ...(ruleObj.fuzzy_columns || [])];
-//                   exactColumns = [...exactColumns, ...(ruleObj.exact_columns || [])];
-//                   thresholds = { ...thresholds, ...(ruleObj.thresholds || {}) };
-//                 }
-//               });
-
-//               // Remove duplicates
-//               fuzzyColumns = [...new Set(fuzzyColumns)];
-//               exactColumns = [...new Set(exactColumns)];
-
-//               return (
-//                 <SelectedColumnsDisplay
-//                   fuzzyColumns={fuzzyColumns}
-//                   exactColumns={exactColumns}
-//                   thresholds={thresholds}
-//                 />
-//               );
-//             })()}
-//         </Box>
-
-//         <MergeRuleSelector isCrossSystem={false} mergeRule={mergeRule} onChange={setMergeRule} />
-
-//         {/* Button Row */}
-//         <Box sx={{ pt: 1 }}>
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             startIcon={<AutorenewIcon />}
-//             onClick={handleProcess}
-//             disabled={!selectedSourceSystem || !selectedFile || selectedRule.length === 0 || mergeRule.length === 0}
-//             size="large"
-//             sx={{
-//               width: 'fit-content',
-//               minWidth: '130px',
-//               padding: '3px 8px',
-//               fontSize: '0.9rem',
-//               borderRadius: '10px',
-//               background: 'linear-gradient(45deg, #42a5f5 30%, #1e88e5 90%)',
-//               color: '#fff',
-//               boxShadow: '0 3px 5px 2px rgba(33, 150, 243, .3)',
-//               '&:hover': {
-//                 background: 'linear-gradient(45deg, #1e88e5 30%, #1565c0 90%)',
-//               },
-//             }}
-//           >
-//             Process
-//           </Button>
-//         </Box>
-//       </Stack>
-//     </Box>
-//   );
-// };
-
-// export default FileSystemMappingItem;
-
 // src/components/FileSystemMappingItem.jsx
 import React, { useEffect, useState } from 'react';
 import {
@@ -435,6 +14,7 @@ import {
   IconButton,
   Paper
 } from '@mui/material';
+import * as XLSX from 'xlsx';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import MergeRuleSelector from './Mergeruleselector';
 import Checkbox from '@mui/material/Checkbox';
@@ -444,7 +24,8 @@ import SelectedColumnsDisplay from './SelectedColumnsDisplay';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+ 
 const FileSystemMappingItem = ({
   entity,
   sourceSystems,
@@ -461,43 +42,135 @@ const FileSystemMappingItem = ({
   const [selectedRule, setSelectedRule] = useState([]);
   const [mergeRule, setMergeRule] = useState([]);
   const [resetDropdowns, setResetDropdowns] = useState(false);
-
+  const [selectedCategory, setSelectedCategory] = useState('');
+ 
+ 
   useEffect(() => {
     fetch('http://localhost:5001/api/match-rules')
       .then((res) => res.json())
       .then((data) => setRules(data))
       .catch((err) => console.error('Error loading match rules:', err));
   }, []);
-
+ 
   useEffect(() => {
     if (resetDropdowns) {
       setSelectedRule([]);
       setMergeRule([]);
+      setSelectedCategory('');
       setResetDropdowns(false);
     }
   }, [resetDropdowns]);
-
-  const handleProcess = () => {
-    const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
-    if (!ruleObj) {
-      alert('Selected rule not found!');
+ 
+ 
+  // useEffect(() => {
+  //   if (selectedCategory.toLowerCase() === "header" && selectedSourceSystem) {
+  //     // Build expected filename based on selected source system
+  //     const expectedFileName = `${selectedSourceSystem.replace(/\./g, '')}_header`;
+ 
+  //     // Fetch from backend uploads folder
+  //     fetch("http://localhost:5001/api/uploads")
+  //       .then((res) => res.json())
+  //       .then((files) => {
+  //         // Find matching file (case-insensitive)
+  //         const matchedFile = files.find(
+  //           (f) => f.toLowerCase().includes(expectedFileName.toLowerCase())
+  //         );
+ 
+  //         if (matchedFile) {
+  //           setSelectedFile(matchedFile);
+  //         } else {
+  //           setSelectedFile("");
+  //         }
+  //       })
+  //       .catch((err) => console.error("Error fetching uploaded files:", err));
+  //   } else {
+  //     setSelectedFile("");
+  //   }
+  // }, [selectedCategory, selectedSourceSystem]);
+ 
+  useEffect(() => {
+    if (!selectedCategory) {
+      setSelectedFile("");
       return;
     }
+ 
+    const sourceKey = selectedSourceSystem
+      ? selectedSourceSystem.replace(/\s|\.|_/g, "").toLowerCase()
+      : null;
+    const categoryKey = selectedCategory.toLowerCase();
+ 
+    fetch("http://localhost:5001/api/uploads")
+      .then(res => res.json())
+      .then(files => {
+        // Match files that contain the category and optionally the source system
+        const matchedFile = files.find(file => {
+          const cleanName = file.replace(/\s|\.|_/g, "").toLowerCase();
+          if (sourceKey) {
+            return cleanName.includes(categoryKey) && cleanName.includes(sourceKey);
+          }
+          return cleanName.includes(categoryKey);
+        });
+ 
+        if (matchedFile) {
+          setSelectedFile(matchedFile);
+        } else {
+          setSelectedFile("");
+        }
+      })
+      .catch(err => console.error("Error fetching uploaded files:", err));
+  }, [selectedSourceSystem, selectedCategory]);
+ 
+ 
+  // const handleProcess = () => {
+  //   const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
+  //   if (!ruleObj) {
+  //     alert('Selected rule not found!');
+  //     return;
+  //   }
+  //   onAddFile?.({
+  //     fuzzyColumns: ruleObj.fuzzy_columns || [],
+  //     exactColumns: ruleObj.exact_columns || [],
+  //     thresholds: ruleObj.thresholds || {},
+  //     selectedRule: selectedRule[0],
+  //     mergeRule,
+  //   });
+  //   setResetDropdowns(true);
+  // };
+ 
+  const handleProcess = () => {
+    if (!selectedSourceSystem) {
+      alert("Please select a source system first");
+      return;
+    }
+    if (!selectedCategory) {
+      alert("Please select a category first");
+      return;
+    }
+    if (selectedRule.length === 0) {
+      alert("Please select at least one match rule");
+      return;
+    }
+    if (mergeRule.length === 0) {
+      alert("Please select at least one merge rule");
+      return;
+    }
+ 
+    const ruleObj = rules.find((r) => r.rule === selectedRule[0]);
     onAddFile?.({
       fuzzyColumns: ruleObj.fuzzy_columns || [],
       exactColumns: ruleObj.exact_columns || [],
       thresholds: ruleObj.thresholds || {},
       selectedRule: selectedRule[0],
-      mergeRule,
+      mergeRule
     });
     setResetDropdowns(true);
   };
-
+ 
   return (
     <Box sx={{ width: '100%', overflow: 'visible' }}>
       <Stack spacing={3}>
         <Divider />
-
+ 
         {/* Row: Source System + Upload File */}
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Source System */}
@@ -581,12 +254,12 @@ const FileSystemMappingItem = ({
                   </MenuItem>
                 ))}
               </Select>
-
+ 
             </FormControl>
           </Box>
-
+ 
           {/* Upload File */}
-          <Box flex={1}>
+          {/* <Box flex={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
               Upload File
             </Typography>
@@ -595,7 +268,7 @@ const FileSystemMappingItem = ({
                 variant="outlined"
                 component="label"
                 startIcon={<UploadFileIcon sx={{ color: '#FFA500' }} />} // orange icon
-                // disabled={!selectedSourceSystem}   
+                // disabled={!selectedSourceSystem}  
                 sx={{
                   padding: '12px 18px',
                   border: '2px dashed #90caf9',
@@ -632,7 +305,7 @@ const FileSystemMappingItem = ({
                 />
               </Button>
             </FormControl>
-
+ 
             {selectedFile && (
               <Box
                 sx={{
@@ -670,10 +343,127 @@ const FileSystemMappingItem = ({
                 </IconButton>
               </Box>
             )}
-
+ 
+          </Box> */}
+ 
+          <Box flex={1}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1976d2', mb: 1 }}>
+              Category
+            </Typography>
+            <FormControl
+              fullWidth
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  backgroundColor: '#2d284a',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  '& fieldset': { borderColor: '#90caf9' },
+                  '&:hover fieldset': { borderColor: '#42a5f5' },
+                  '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
+                },
+                '& .MuiSelect-select': {
+                  padding: '14px',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  color: '#a9a7a7ff',
+                },
+                '& .MuiSvgIcon-root': { color: 'white' },
+              }}
+            >
+              <InputLabel sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
+                Select category
+              </InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                label="Select category..."
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      borderRadius: 2,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      '& .MuiMenuItem-root': {
+                        fontWeight: 500,
+                        fontSize: 15,
+                        color: '#000000',
+                        bgcolor: '#ffffff',
+                        '&:hover': {
+                          bgcolor: '#e3f2fd',
+                          color: '#1976d2',
+                        },
+                        '&.Mui-selected': {
+                          bgcolor: '#1976d2',
+                          color: '#ffffff',
+                          '&:hover': {
+                            bgcolor: '#1565c0',
+                          },
+                        },
+                      },
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="">
+                  <em>Select category...</em>
+                </MenuItem>
+                {['Header', 'Address', 'Contact'].map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {selectedFile && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  mt: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    p: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    bgcolor: "#cacbccff",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 6px rgba(33, 150, 243, 0.1)",
+                    border: "1px solid #90caf9",
+                    width: "70%",
+                  }}
+                >
+                  <InsertDriveFileIcon sx={{ fontSize: 24, color: "#527cb4ff", mr: 1.5 }} />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 500,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        color: "#1565c0",
+                        fontSize: "1rem",
+                      }}
+                      title={selectedFile}
+                    >
+                      {selectedFile}
+                    </Typography>
+                  </Box>
+                  <IconButton size="small" sx={{ p: 0.5 }} onClick={() => setSelectedFile("")}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            )}
+ 
+ 
           </Box>
         </Stack>
-
+ 
+ 
+ 
         {/* Row: Match Rule + Merge Rule */}
         <Stack direction="row" spacing={3} alignItems="flex-start">
           {/* Match Rule */}
@@ -687,15 +477,15 @@ const FileSystemMappingItem = ({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
-                    backgroundColor: '#2d284a',
+                  backgroundColor: '#2d284a',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                   '& fieldset': { borderColor: '#90caf9' },
                   '&:hover fieldset': { borderColor: '#42a5f5' },
                   '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
                 },
                 '& .MuiSvgIcon-root': {
-                    color: 'white',
-                  },
+                  color: 'white',
+                },
               }}
             >
               <InputLabel id="match-rule-label" sx={{ fontWeight: 500, fontSize: 12, color: '#acc1d7ff' }}>
@@ -728,12 +518,14 @@ const FileSystemMappingItem = ({
                   </Box>
                 )}
               >
-                {rules.length === 0 ? (
+                
+
+                {Array.isArray(rules) && rules.length === 0 ? (
                   <MenuItem disabled>
                     <CircularProgress size={20} sx={{ mr: 1 }} /> Loading rules...
                   </MenuItem>
                 ) : (
-                  rules.map((ruleObj, index) => (
+                  Array.isArray(rules) && rules.map((ruleObj, index) => (
                     <MenuItem key={index} value={ruleObj.rule}>
                       <Checkbox checked={selectedRule.includes(ruleObj.rule)} />
                       <ListItemText
@@ -744,9 +536,10 @@ const FileSystemMappingItem = ({
                     </MenuItem>
                   ))
                 )}
+
               </Select>
             </FormControl>
-
+ 
             {selectedRule.length > 0 && (() => {
               let fuzzyColumns = [], exactColumns = [], thresholds = {};
               selectedRule.forEach((ruleName) => {
@@ -766,7 +559,7 @@ const FileSystemMappingItem = ({
                 thresholds={thresholds} />;
             })()}
           </Box>
-
+ 
           {/* Merge Rule */}
           <Box flex={1}>
             <MergeRuleSelector
@@ -774,7 +567,7 @@ const FileSystemMappingItem = ({
               mergeRule={mergeRule}
               onChange={setMergeRule}
             />
-
+ 
             {mergeRule.length > 0 && (
               <Paper
                 sx={{
@@ -799,9 +592,9 @@ const FileSystemMappingItem = ({
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        px: 1,   
-                        m:1,         
-                        py: 0.25,          
+                        px: 1,
+                        m: 1,
+                        py: 0.25,
                         border: '1px solid #fb8c00',
                         bgcolor: '#fff8e1',
                         color: 'black',
@@ -825,36 +618,36 @@ const FileSystemMappingItem = ({
                 </Box>
               </Paper>
             )}
-
+ 
           </Box>
         </Stack>
-
+ 
         {/* Process Button */}
         <Box>
           <Button
             variant="contained"
-            startIcon={<AutorenewIcon />}
+            startIcon={<PlaylistAddCheckIcon />}
             onClick={handleProcess}
-            disabled={!selectedSourceSystem || !selectedFile || selectedRule.length === 0 || mergeRule.length === 0}
+            disabled={!selectedSourceSystem || !selectedCategory || selectedRule.length === 0 || mergeRule.length === 0}
             sx={{
-              bgcolor: '#123f6cff',      // Dark blue background
-              color: '#ffffff',         // White text
+              bgcolor: '#123f6cff',
+              color: '#ffffff',
               '&:hover': {
-                bgcolor: '#1565c0',    // Darker blue on hover
+                bgcolor: '#1565c0',
               },
               '&.Mui-disabled': {
-                bgcolor: '#1c3951ff',    // Lighter blue when disabled
+                bgcolor: '#1c3951ff',
                 color: '#ffffff',
               },
             }}
           >
-            Process
+            Select Cleanse Rules
           </Button>
         </Box>
-
+ 
       </Stack>
     </Box>
   );
 };
-
+ 
 export default FileSystemMappingItem;

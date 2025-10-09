@@ -7,7 +7,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import WorkingColumnMapping from "./WorkingColumnMapping";
-
+ 
 const MatchRulePage = () => {
   const [rules, setRules] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -15,34 +15,78 @@ const MatchRulePage = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newRule, setNewRule] = useState({ rule: "", description: "" });
   const [crossSystemEnabled, setCrossSystemEnabled] = useState(false);
-
-  // 🔹 Delete dialog state
+ 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState(null);
-
+ 
+  // const staticColumns = [
+  //   'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
+  //   'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
+  //   'Phone2', 'Email', 'Web', 'Transaction_Date'
+  // ];
+ 
   const staticColumns = [
-    'Cust_Id', 'Source_System', 'First_Name', 'Last_Name', 'Company_Name',
-    'Address', 'City', 'County', 'State', 'Zip', 'Phone1',
-    'Phone2', 'Email', 'Web', 'Transaction_Date'
+    "Source System",
+    "Customer Number",
+    "Customer Name",
+    "Customer Source Reference",
+    "Taxpayer ID",
+    "Taxpayer Registration Number",
+    "Account Number",
+    "Account Source Reference",
+    "Account Type",
+    "Account Description",
+    "Account Established Date",
+    "Customer Profile Class",
+    "Capital IQ ID",
+    "Transaction Activity Date",
+    "Site Number",
+    "Site Name",
+    "Site Source Reference",
+    "Account Address Set",
+    "Location Source Reference",
+    "Address Line 1",
+    "Address Line 2",
+    "Address Line 3",
+    "Address Line 4",
+    "City",
+    "State",
+    "Province",
+    "Postal Code",
+    "County",
+    "Country",
+    "Purpose",
+    "Person Number",
+    "Person Source Reference",
+    "Salutary Introduction",
+    "First Name",
+    "Middle Name",
+    "Last Name",
+    "Job Title",
+    "Responsibility Type",
+    "Phone Number",
+    "Phone Extension",
+    "E-Mail Address",
+    "Web URL"
   ];
-
+ 
   const [fuzzyColumns, setFuzzyColumns] = useState([]);
   const [exactColumns, setExactColumns] = useState([]);
   const [thresholds, setThresholds] = useState({});
-
+ 
   const handleMappingChange = (newFuzzy, newExact, newThresholds) => {
     setFuzzyColumns(newFuzzy);
     setExactColumns(newExact);
     setThresholds(newThresholds);
   };
-
+ 
   useEffect(() => {
     fetch("http://localhost:5001/api/match-rules")
       .then((res) => res.json())
       .then((data) => setRules(data))
       .catch((err) => console.error("Error loading match rules:", err));
   }, []);
-
+ 
   const handleEdit = (index) => {
     const selectedRule = rules[index];
     setEditingIndex(index);
@@ -54,7 +98,7 @@ const MatchRulePage = () => {
     setExactColumns(selectedRule.exact_columns || []);
     setThresholds(selectedRule.thresholds || {});
   };
-
+ 
   const handleAddSave = async () => {
     try {
       const payload = {
@@ -69,9 +113,9 @@ const MatchRulePage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
+ 
       const data = await response.json();
-
+ 
       if (response.ok) {
         setRules(data.rules);
         setAddDialogOpen(false);
@@ -86,7 +130,7 @@ const MatchRulePage = () => {
       console.error("Error adding rule:", err);
     }
   };
-
+ 
   const handleSave = async () => {
     try {
       const oldRuleName = rules[editingIndex].rule;
@@ -102,7 +146,7 @@ const MatchRulePage = () => {
           thresholds: thresholds,
         }),
       });
-
+ 
       const data = await response.json();
       if (response.ok) {
         setRules(data.rules);
@@ -118,13 +162,13 @@ const MatchRulePage = () => {
       console.error("Error updating rule:", err);
     }
   };
-
+ 
   // 🔹 Confirm delete (open dialog)
   const confirmDelete = (rule) => {
     setRuleToDelete(rule);
     setDeleteDialogOpen(true);
   };
-
+ 
   // 🔹 Perform delete
   const handleDelete = async () => {
     if (!ruleToDelete) return;
@@ -134,7 +178,7 @@ const MatchRulePage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rule: ruleToDelete.rule }),
       });
-
+ 
       const data = await response.json();
       if (response.ok) {
         setRules(data.rules);
@@ -147,7 +191,7 @@ const MatchRulePage = () => {
       console.error("Error deleting rule:", err);
     }
   };
-
+ 
   return (
     <Box>
       <Box
@@ -209,7 +253,7 @@ const MatchRulePage = () => {
                   >
                     {ruleItem.description}
                   </TableCell>
-
+ 
                   <TableCell sx={{ py: 1.1, fontFamily: 'sans-serif' }}>
                     {ruleItem.fuzzy_columns?.join(", ") || "-"}
                   </TableCell>
@@ -238,7 +282,7 @@ const MatchRulePage = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
+ 
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
             variant="white"
@@ -250,7 +294,7 @@ const MatchRulePage = () => {
           </Button>
         </Box>
       </Box>
-
+ 
       {/* 🔹 Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
@@ -299,7 +343,7 @@ const MatchRulePage = () => {
               />
             </Box>
           </Box>
-
+ 
           {/* File Info Chips */}
           <Box mt={3}>
             {/* <Typography variant="h6">Source System / File Name</Typography> */}
@@ -309,7 +353,7 @@ const MatchRulePage = () => {
               <Chip size="small" label={`Exact: ${exactColumns.length}`} variant="outlined" />
             </Box>
           </Box>
-
+ 
           {/* Column Mapping Component */}
           {!crossSystemEnabled && (
             <Box mt={3}>
@@ -323,7 +367,7 @@ const MatchRulePage = () => {
               />
             </Box>
           )}
-
+ 
           {/* Info Note */}
           <Box
             sx={{
@@ -345,7 +389,7 @@ const MatchRulePage = () => {
               File type can be changed above. Column configuration will be set globally for all files.
             </Typography>
           </Box>
-
+ 
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddDialogOpen(false)} variant="" color="secondary">
@@ -356,7 +400,7 @@ const MatchRulePage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
+ 
       {/* Edit Rule Dialog */}
       <Dialog
         open={editingIndex !== null}
@@ -397,7 +441,7 @@ const MatchRulePage = () => {
               <Chip size="small" label={`Exact: ${exactColumns.length}`} variant="outlined" />
             </Box>
           </Box>
-
+ 
           {/* Column Mapping Component */}
           {!crossSystemEnabled && (
             <Box mt={3}>
@@ -411,7 +455,7 @@ const MatchRulePage = () => {
               />
             </Box>
           )}
-
+ 
           {/* Info Note */}
           <Box
             sx={{
@@ -433,7 +477,7 @@ const MatchRulePage = () => {
               File type can be changed above. Column configuration will be set globally for all files.
             </Typography>
           </Box>
-
+ 
         </DialogContent>
         <DialogActions style={{ margin: '0.5rem' }}>
           <Button onClick={() => setEditingIndex(null)}>Cancel</Button>
@@ -445,5 +489,5 @@ const MatchRulePage = () => {
     </Box >
   );
 };
-
+ 
 export default MatchRulePage;

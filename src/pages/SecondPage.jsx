@@ -122,7 +122,7 @@ const Sidebar = ({ activeContent, setActiveContent, onProfileClick }) => {
                   borderRadius: 2,
                   mb: 3,
                   mx: 0,
-                 // background: "#2d284a",
+                  // background: "#2d284a",
                   color: "#fff",
                   mt: 1,
                   ":hover": {

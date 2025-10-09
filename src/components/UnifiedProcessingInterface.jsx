@@ -215,58 +215,58 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       });
   };
 
-  const handleAddFile = (ruleConfig) => {
-    if (!selectedSourceSystem || !selectedFile) {
-      alert('Please select a source system and file first');
+const handleAddFile = (ruleConfig) => {
+    if (!selectedSourceSystem) {
+      alert('Please select a source system first');
       return;
     }
-
-    const selectedFileObj = availableFiles.find(f => f.name === selectedFile);
-    if (!selectedFileObj) {
-      alert('Selected file not found');
-      return;
-    }
-
+ 
+    // Check if the source system is already added
     const exists = fileConfigs.some(
-      config => config.sourceSystem === selectedSourceSystem && config.filename === selectedFile
+      config => config.sourceSystem === selectedSourceSystem
     );
     if (exists) {
-      alert(`Configuration for ${selectedSourceSystem}/${selectedFile} already exists`);
+      alert(`Configuration for ${selectedSourceSystem} already exists`);
       return;
     }
-
-    let apiUrl;
-    if (selectedFileObj.type === 'source') {
-      apiUrl = `http://localhost:5001/api/columns/${entity}/${selectedSourceSystem}/${selectedFile}`;
-    } else {
-      apiUrl = `http://localhost:5001/api/output-columns/${selectedFile}`;
+ 
+    // Determine default file (source or processed output) for this source system
+    const sourceFiles = availableFiles.filter(f => f.type === 'source');
+    const outputFiles = availableFiles.filter(f => f.type === 'output');
+    const defaultFileObj = sourceFiles[0] || outputFiles[0];
+ 
+    if (!defaultFileObj) {
+      alert(`No files available for source system: ${selectedSourceSystem}`);
+      return;
     }
-
+ 
+    const apiUrl = defaultFileObj.type === 'source'
+      ? `http://localhost:5001/api/columns/${entity}/${selectedSourceSystem}/${defaultFileObj.name}`
+      : `http://localhost:5001/api/output-columns/${defaultFileObj.name}`;
+ 
     axios.get(apiUrl)
       .then(columnsResponse => {
         if (!columnsResponse.data || columnsResponse.data.length === 0) {
-          alert(`No columns found for file: ${selectedFile}`);
+          alert(`No columns found for source system: ${selectedSourceSystem}`);
           return;
         }
-
+ 
         const newConfig = {
-          id: `${selectedSourceSystem}-${selectedFile}-${Date.now()}`,
+          id: `${selectedSourceSystem}-${Date.now()}`,
           sourceSystem: selectedSourceSystem,
-          filename: selectedFile,
-          fileType: selectedFileObj.type,
-          displayName: selectedFileObj.displayName,
+          filename: defaultFileObj.name,
+          fileType: defaultFileObj.type,
+          displayName: defaultFileObj.displayName,
           columns: [...columnsResponse.data],
-          // Use the rule config passed from FileSystemMappingItem
           fuzzyColumns: ruleConfig?.fuzzyColumns || [],
           exactColumns: ruleConfig?.exactColumns || [],
           thresholds: ruleConfig?.thresholds || {},
           selectedRule: ruleConfig?.selectedRule || "",
           mergeRule: ruleConfig?.mergeRule || []
         };
-
+ 
         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);
         setSelectedSourceSystem('');
-        setSelectedFile('');
         setAvailableFiles([]);
       })
       .catch(error => {
@@ -294,39 +294,17 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
     );
   }, []);
 
-  const handleSingleFileProcess = (config) => {
-    // Basic validation
-    if (
-      !(Array.isArray(config.fuzzyColumns) && config.fuzzyColumns.length) &&
-      !(Array.isArray(config.exactColumns) && config.exactColumns.length)
-    ) {
-      alert('Please set column mappings before processing');
-      return;
-    }
-
-    const payload = {
-      entity,
-      source_system: config.sourceSystem,
-      filename: config.filename,
-      file_type: config.fileType,
-      fuzzy_columns: config.fuzzyColumns,
-      exact_columns: config.exactColumns,
-      thresholds: config.thresholds
-    };
-
-    console.log('Processing single file:', payload);
-
-    axios.post('http://localhost:5001/api/process-single', payload)
+const handleSingleFileProcess = () => {
+    axios.post('http://localhost:5001/api/process-single', {})
       .then(response => {
         alert(`✅ File processed successfully! Output: ${response.data.output_file}`);
-        // Refresh processed outputs
-        loadProcessedOutputs();
       })
       .catch(error => {
-        console.error("Error processing file:", error);
+        console.error("Error processing file:", error.response?.data || error.message);
         alert("❌ Failed to process file. Check backend connection.");
       });
   };
+ 
 
   const handleUseInCrossSystem = (sourceSystem, outputFile) => {
     // Switch to cross-system mode and add this file
@@ -629,86 +607,6 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
           </Paper>
         )}
 
-        {/* Processed Outputs Display Section */}
-        {/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
-          <>
-            <Divider sx={{ my: 3,color:'blue' }} />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h5" sx={{color:'whitesmoke'}}>
-                Processed Outputs for {entity}
-              </Typography>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setShowProcessedOutputs(!showProcessedOutputs)}
-              >
-                {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
-              </Button>
-            </Box>
-
-            <Collapse in={showProcessedOutputs}>
-              <Stack spacing={2}>
-                {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
-                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#2d3a4aff' }}>
-                    <Typography variant="h6" color="primary" gutterBottom>
-                      {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
-                    </Typography>
-                    <Grid container spacing={1}>
-                      {(outputs || []).map((outputFile, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
-                          <Paper
-                            elevation={1}
-                            sx={{
-                              p: 1.5,
-                              bgcolor: '#4d5170ff',
-                              border: '0px solid #e0e0e0',
-                              '&:hover': { boxShadow: 2 }
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              <Typography sx={{color:'#edba93ff'}} variant="body2" fontWeight="medium">
-                                📄 {outputFile}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  href={`http://localhost:5001/api/download/${outputFile}`}
-                                  target="_blank"
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  📥 Download
-                                </Button>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="success"
-                                  onClick={() => handleUseInCrossSystem(sourceSystem, outputFile)}
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  ➕ Add to Cross-System
-                                </Button>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="error"
-                                  onClick={() => handleDeleteSpecificOutput(sourceSystem, outputFile)}
-                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
-                                >
-                                  🗑️ Delete
-                                </Button>
-                              </Box>
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Paper>
-                ))}
-              </Stack>
-            </Collapse>
-          </>
-        )} */}
 
         <Divider sx={{ my: 3 }} />
 
@@ -729,9 +627,24 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2,
                     background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)'
                   }}>
+                    {!crossSystemEnabled && (
+                    <WorkingColumnMapping
+                      columns={config.columns}
+                      fuzzyColumns={config.fuzzyColumns}
+                      exactColumns={config.exactColumns}
+                      thresholds={config.thresholds}
+                      onMappingChange={(newFuzzy, newExact, newThresholds) => {
+                        updateConfigMapping(config.id, newFuzzy, newExact, newThresholds);
+                      }}
+                      sourceSystem={sourceSystems}
+                      entity={entity}
+                      selectedSourceSystem={selectedSourceSystem}
+                      setSelectedSourceSystem={setSelectedSourceSystem}
+                    />
+                  )}
                     <Box>
                       <Typography variant="h6" sx={{ color: '#cfccccff' }}>
-                        {config.sourceSystem} / {config.filename}
+                        {config.sourceSystem} / {"PeopleSoft9.1_header.xlsx"}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -761,7 +674,7 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                     </Box>
                   </Box>
 
-                  {!crossSystemEnabled && (
+                  {/* {!crossSystemEnabled && (
                     <WorkingColumnMapping
                       columns={config.columns}
                       fuzzyColumns={config.fuzzyColumns}
@@ -770,8 +683,12 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
                       onMappingChange={(newFuzzy, newExact, newThresholds) => {
                         updateConfigMapping(config.id, newFuzzy, newExact, newThresholds);
                       }}
+                      sourceSystem={sourceSystems}
+                      entity={entity}
+                      selectedSourceSystem={selectedSourceSystem}
+                      setSelectedSourceSystem={setSelectedSourceSystem}
                     />
-                  )}
+                  )} */}
 
                   {crossSystemEnabled && (
                     <Box sx={{ p: 2, bgcolor: '#f0f7ff', borderRadius: 1 }}>
@@ -865,3 +782,86 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
 };
 
 export default UnifiedProcessingInterface;
+
+
+
+{/* Processed Outputs Display Section */ }
+{/* {!crossSystemEnabled && Object.keys(processedOutputs).length > 0 && (
+          <>
+            <Divider sx={{ my: 3,color:'blue' }} />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" sx={{color:'whitesmoke'}}>
+                Processed Outputs for {entity}
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setShowProcessedOutputs(!showProcessedOutputs)}
+              >
+                {showProcessedOutputs ? 'Hide' : 'Show'} Outputs
+              </Button>
+            </Box>
+
+            <Collapse in={showProcessedOutputs}>
+              <Stack spacing={2}>
+                {Object.entries(processedOutputs).map(([sourceSystem, outputs]) => (
+                  <Paper key={sourceSystem} elevation={1} sx={{ p: 2, bgcolor: '#2d3a4aff' }}>
+                    <Typography variant="h6" color="primary" gutterBottom>
+                      {sourceSystem} ({Array.isArray(outputs) ? outputs.length : 0} files)
+                    </Typography>
+                    <Grid container spacing={1}>
+                      {(outputs || []).map((outputFile, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                          <Paper
+                            elevation={1}
+                            sx={{
+                              p: 1.5,
+                              bgcolor: '#4d5170ff',
+                              border: '0px solid #e0e0e0',
+                              '&:hover': { boxShadow: 2 }
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              <Typography sx={{color:'#edba93ff'}} variant="body2" fontWeight="medium">
+                                📄 {outputFile}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  href={`http://localhost:5001/api/download/${outputFile}`}
+                                  target="_blank"
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  📥 Download
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="success"
+                                  onClick={() => handleUseInCrossSystem(sourceSystem, outputFile)}
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  ➕ Add to Cross-System
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  onClick={() => handleDeleteSpecificOutput(sourceSystem, outputFile)}
+                                  sx={{ fontSize: '0.7rem', py: 0.5 }}
+                                >
+                                  🗑️ Delete
+                                </Button>
+                              </Box>
+                            </Box>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Paper>
+                ))}
+              </Stack>
+            </Collapse>
+          </>
+        )} */}

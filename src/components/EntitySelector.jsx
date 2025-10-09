@@ -38,7 +38,7 @@ const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   },
 }));
 
-const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
+const EntitySelector = ({ entities = [], selectedEntity, onSelect }) => (
   <div>
     <Typography variant="h5" gutterBottom sx={{ color: 'black' }}>
       Select Entity
@@ -73,7 +73,7 @@ const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
           },
         }}
       >
-        {entities.map(entity => (
+        {(entities || []).map(entity => (
           <CustomMenuItem key={entity} value={entity}>
             {entity}
           </CustomMenuItem>
@@ -82,5 +82,10 @@ const EntitySelector = ({ entities, selectedEntity, onSelect }) => (
     </FormControl>
   </div>
 );
+
+EntitySelector.defaultProps = {
+  entities: [],
+};
+
 
 export default EntitySelector;

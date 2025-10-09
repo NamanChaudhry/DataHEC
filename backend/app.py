@@ -10,6 +10,7 @@ from datetime import datetime
 from Profiling import integrated_profile_and_anomaly_with_charts
 from flask import send_from_directory
 import header_mapping
+import glob
 import asyncio
 # import dash
 # from dash import Dash, dcc, html, Input, Output
@@ -172,7 +173,7 @@ def process_excel_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzzy
         winner_start = time.time()
         if len(duplicate_rows) > 0:
             duplicate_rows = assign_winner(duplicate_rows, source_system_rule, rulebook, is_cross_system=False)
-            winner_rows = duplicate_rows[duplicate_rows['Cust_Id'] == duplicate_rows['winner']].copy()
+            winner_rows = duplicate_rows[duplicate_rows['Customer Name'] == duplicate_rows['winner']].copy()
         else:
             winner_rows = pd.DataFrame(columns=original_columns)
         
@@ -258,7 +259,7 @@ def process_output_file_with_stats(file_path, fuzzy_columns, exact_columns, fuzz
         winner_start = time.time()
         if len(duplicate_rows) > 0:
             duplicate_rows = assign_winner(duplicate_rows, source_system, rulebook, is_cross_system=False)
-            winner_rows = duplicate_rows[duplicate_rows['Cust_Id'] == duplicate_rows['winner']].copy()
+            winner_rows = duplicate_rows[duplicate_rows['Customer Name'] == duplicate_rows['winner']].copy()
         else:
             winner_rows = pd.DataFrame(columns=original_columns)
         
@@ -321,8 +322,10 @@ def get_header_mapping():
         print(f"Error in /api/header-mapping: {e}")
         return jsonify({"error": str(e)}), 500
 
+
 # API Routes
 # --- MATCH RULES API ---
+
 MATCH_RULES_FILE = os.path.join(STATIC_DIR, "matchrules.json")
 
 def load_match_rules():
@@ -334,18 +337,120 @@ def load_match_rules():
                 return []
     return []
 
+@app.route("/api/match-rules", methods=["GET"])
+def get_match_rules():
+    print("[DEBUG] GET /api/match-rules called")
+    try:
+        rules = load_match_rules()
+        print(f"[DEBUG] Loaded rules: {rules}")
+        return jsonify(rules)
+    except Exception as e:
+        print(f"[ERROR] Exception: {str(e)}")
+        return jsonify({"error": "Failed to fetch match rules"}), 500
+
+
+
+ 
 def save_match_rules(rules):
     with open(MATCH_RULES_FILE, "w") as f:
         json.dump(rules, f, indent=2)
 
-@app.route("/api/match-rules", methods=["GET"])
-def get_match_rules():
-    """Fetch all match rules"""
+
+
+@app.route("/api/match-rules", methods=["POST"])
+def add_match_rule():
+    """Add a new match rule"""
     try:
+        data = request.json
+        new_rule_name = data.get("rule")
+        new_description = data.get("description", "")
+        fuzzy_columns = data.get("fuzzy_columns", [])
+        exact_columns = data.get("exact_columns", [])
+        thresholds = data.get("thresholds", {})
+ 
+        if not new_rule_name:
+            return jsonify({"error": "Rule name is required"}), 400
+ 
         rules = load_match_rules()
-        return jsonify(rules)
+ 
+        # Check if rule name already exists (case insensitive)
+        if any(r["rule"].strip().lower() == new_rule_name.strip().lower() for r in rules):
+            return jsonify({"error": "Rule already exists"}), 400
+ 
+        # Append new rule object
+        rules.append({
+            "rule": new_rule_name.strip(),
+            "description": new_description.strip(),
+            "fuzzy_columns": fuzzy_columns,
+            "exact_columns": exact_columns,
+            "thresholds": thresholds
+        })
+ 
+        save_match_rules(rules)
+ 
+        return jsonify({"message": "Rule added successfully", "rules": rules})
+ 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+ 
+ 
+@app.route("/api/match-rules", methods=["PUT"])
+def update_match_rule():
+    """Update an existing match rule"""
+    try:
+        data = request.json
+        old_rule = data.get("oldRule")
+        new_rule = data.get("rule")
+        description = data.get("description", "")
+        fuzzy_columns = data.get("fuzzy_columns", [])
+        exact_columns = data.get("exact_columns", [])
+        thresholds = data.get("thresholds", {})
+ 
+        if not old_rule or not new_rule:
+            return jsonify({"error": "oldRule and rule are required"}), 400
+ 
+        rules = load_match_rules()
+ 
+        # Find index of the rule by matching rule name (case insensitive & trimmed)
+        index = next(
+            (i for i, r in enumerate(rules)
+             if r["rule"].strip().lower() == old_rule.strip().lower()),
+            None
+        )
+ 
+        if index is None:
+            return jsonify({"error": "Rule not found"}), 404
+ 
+        # Check for name conflict with other rules
+        if any(r["rule"].strip().lower() == new_rule.strip().lower() and i != index
+               for i, r in enumerate(rules)):
+            return jsonify({"error": "Rule already exists"}), 400
+ 
+        # Helper to clean column lists
+        def clean_columns(cols):
+            if not isinstance(cols, list):
+                return []
+            return [col.strip() for col in cols if isinstance(col, str) and col.strip()]
+ 
+        # Validate thresholds is dict
+        if not isinstance(thresholds, dict):
+            thresholds = {}
+ 
+        # Update the rule
+        rules[index] = {
+            "rule": new_rule.strip(),
+            "description": description.strip(),
+            "fuzzy_columns": clean_columns(fuzzy_columns),
+            "exact_columns": clean_columns(exact_columns),
+            "thresholds": thresholds
+        }
+ 
+        save_match_rules(rules)
+ 
+        return jsonify({"message": "Rule updated successfully", "rules": rules})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+   
     
 @app.route('/api/map_headers', methods=['POST'])
 def map_headers():
@@ -381,7 +486,7 @@ def map_headers():
     column_mapping = {k.strip(): v.strip() for k, v in column_mapping.items()}
 
     # Validate Cust_Id exists after mapping
-    required_id_col = column_mapping.get('Cust_Id', 'Cust_Id')  # fallback to 'Cust_Id' if not mapped
+    required_id_col = column_mapping.get('Customer Name', 'Customer Name')  # fallback to 'Cust_Id' if not mapped
     if required_id_col not in df.columns:
         return jsonify({'message': f"Required ID column '{required_id_col}' missing after mapping"}), 400
 
@@ -415,148 +520,162 @@ def map_headers():
         'files': saved_files
     })
 
+file_registry = {
+  "systemA": {
+    "customer": "backend/upload/systemA_customer.xlsx",
+    "address": "backend/upload/systemA_address.xlsx",
+    "contact": "backend/upload/systemA_contact.xlsx"
+  }
+}
 
     
 
-@app.route('/api/profile', methods=['POST'])
-def profile_api():
+@app.route('/api/system_stats', methods=['POST'])
+def system_stats():
     data = request.json
-    filepath = data.get('filepath')
-    sheet_name = data.get('sheet_name')
-    column_name = data.get('column_name')
+    source_system = data.get('source_system')
+    files = file_registry.get(source_system)
+    if not files:
+        return jsonify({'error': 'Source system not registered'}), 400
+
     try:
-        result = integrated_profile_and_anomaly_with_charts(filepath, sheet_name, column_name)
+        customer_df = pd.read_excel(files['customer'])
+        address_df = pd.read_excel(files['address'])
+        contact_df = pd.read_excel(files['contact'])
+
+        total_customers = len(customer_df)
+        total_address = len(address_df)
+        total_contact = len(contact_df)
+
+        # Customers without address
+        cust_no_address = customer_df[~customer_df['Customer Name'].isin(address_df['Customer Name'])]
+        # Customers without contact
+        cust_no_contact = customer_df[~customer_df['Customer Name'].isin(contact_df['Customer Name'])]
+
+        result = {
+            'total_customers': total_customers,
+            'total_address': total_address,
+            'total_contact': total_contact,
+            'customers_no_address': len(cust_no_address),
+            'customers_no_contact': len(cust_no_contact)
+        }
         return jsonify(result)
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
 
 
 
 
-@app.route("/api/match-rules", methods=["POST"])
-def add_match_rule():
-    """Add a new match rule"""
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+
+
+@app.route('/api/system_summary', methods=['POST', 'OPTIONS'])
+def system_summary():
+    if request.method == 'OPTIONS':
+        return '', 204
+
     try:
         data = request.json
-        new_rule_name = data.get("rule")
-        new_description = data.get("description", "")
-        fuzzy_columns = data.get("fuzzy_columns", [])
-        exact_columns = data.get("exact_columns", [])
-        thresholds = data.get("thresholds", {})
-
-        if not new_rule_name:
-            return jsonify({"error": "Rule name is required"}), 400
-
-        rules = load_match_rules()
-
-        # Check if rule name already exists (case insensitive)
-        if any(r["rule"].strip().lower() == new_rule_name.strip().lower() for r in rules):
-            return jsonify({"error": "Rule already exists"}), 400
-
-        # Append new rule object
-        rules.append({
-            "rule": new_rule_name.strip(),
-            "description": new_description.strip(),
-            "fuzzy_columns": fuzzy_columns,
-            "exact_columns": exact_columns,
-            "thresholds": thresholds
-        })
-
-        save_match_rules(rules)
-
-        return jsonify({"message": "Rule added successfully", "rules": rules})
-
+        print("Received data:", data)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("Error reading JSON:", e)
+        data = None
 
+    entity = data.get('entity') if data else None
+    print("Entity:", entity)
 
-@app.route("/api/match-rules", methods=["PUT"])
-def update_match_rule():
-    """Update an existing match rule"""
+    if not entity:
+        return jsonify({"error": "Entity (source system) not provided"}), 400
+
+    # Define file paths
+    header_file = os.path.join(DATA_DIR, f"{entity}_header.xlsx")
+    address_file = os.path.join(DATA_DIR, f"{entity}_address.xlsx")
+    contact_file = os.path.join(DATA_DIR, f"{entity}_contact.xlsx")
+
+    # Check files exist
+    for f in [header_file, address_file, contact_file]:
+        if not os.path.exists(f):
+            return jsonify({"error": f"File not found: {os.path.basename(f)}"}), 400
+
     try:
-        data = request.json
-        old_rule = data.get("oldRule")
-        new_rule = data.get("rule")
-        description = data.get("description", "")
-        fuzzy_columns = data.get("fuzzy_columns", [])
-        exact_columns = data.get("exact_columns", [])
-        thresholds = data.get("thresholds", {})
+        # Read Excel files
+        header_df = pd.read_excel(header_file)
+        address_df = pd.read_excel(address_file)
+        contact_df = pd.read_excel(contact_file)
 
-        if not old_rule or not new_rule:
-            return jsonify({"error": "oldRule and rule are required"}), 400
+        # Make sure 'Customer Id' column exists in all files
+        for df, name in [(header_df, "header"), (address_df, "address"), (contact_df, "contact")]:
+            if 'Customer Id' not in df.columns:
+                return jsonify({"error": f"'Customer Id' column missing in {name} file"}), 400
 
-        rules = load_match_rules()
+        # Get unique customer ids from header (main file)
+        customer_ids = header_df['Customer Id'].dropna().unique()
 
-        # Find index of the rule by matching rule name (case insensitive & trimmed)
-        index = next(
-            (i for i, r in enumerate(rules)
-             if r["rule"].strip().lower() == old_rule.strip().lower()),
-            None
-        )
+        # --- Define critical columns for address and contact ---
+        critical_address_cols = ['Address Line 1', 'City', 'Postal Code']  # adjust based on your data
+        critical_contact_cols = ['Phone', 'Email']  # adjust based on your data
 
-        if index is None:
-            return jsonify({"error": "Rule not found"}), 404
+        # Check for missing address customers
+        missing_address_ids = set()
+        for cust_id in customer_ids:
+            cust_addresses = address_df[address_df['Customer Id'] == cust_id]
+            if cust_addresses.empty:
+                missing_address_ids.add(cust_id)
+            else:
+                has_valid_address = False
+                for col in critical_address_cols:
+                    if col in cust_addresses.columns and cust_addresses[col].notna().any() and (cust_addresses[col] != '').any():
+                        has_valid_address = True
+                        break
+                if not has_valid_address:
+                    missing_address_ids.add(cust_id)
 
-        # Check for name conflict with other rules
-        if any(r["rule"].strip().lower() == new_rule.strip().lower() and i != index
-               for i, r in enumerate(rules)):
-            return jsonify({"error": "Rule already exists"}), 400
+        # Check for missing contact customers
+        missing_contact_ids = set()
+        for cust_id in customer_ids:
+            cust_contacts = contact_df[contact_df['Customer Id'] == cust_id]
+            if cust_contacts.empty:
+                missing_contact_ids.add(cust_id)
+            else:
+                has_valid_contact = False
+                for col in critical_contact_cols:
+                    if col in cust_contacts.columns and cust_contacts[col].notna().any() and (cust_contacts[col] != '').any():
+                        has_valid_contact = True
+                        break
+                if not has_valid_contact:
+                    missing_contact_ids.add(cust_id)
 
-        # Helper to clean column lists
-        def clean_columns(cols):
-            if not isinstance(cols, list):
-                return []
-            return [col.strip() for col in cols if isinstance(col, str) and col.strip()]
-
-        # Validate thresholds is dict
-        if not isinstance(thresholds, dict):
-            thresholds = {}
-
-        # Update the rule
-        rules[index] = {
-            "rule": new_rule.strip(),
-            "description": description.strip(),
-            "fuzzy_columns": clean_columns(fuzzy_columns),
-            "exact_columns": clean_columns(exact_columns),
-            "thresholds": thresholds
+        # Prepare summary response
+        summary = {
+            'customer_count': len(customer_ids),
+            'customers_no_address_count': len(missing_address_ids),
+            'customers_no_contact_count': len(missing_contact_ids),
+            'address_count': len(address_df),  # *** ADD THIS
+            'contact_count': len(contact_df),  # *** ADD THIS
+            'customer_columns': header_df.columns.tolist()  # *** AND THIS
         }
 
-        save_match_rules(rules)
 
-        return jsonify({"message": "Rule updated successfully", "rules": rules})
+        return jsonify(summary)
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+ 
+   
+@app.route('/api/uploads', methods=['GET'])
+def list_uploaded_files():
+    import os
+    UPLOAD_FOLDER = "uploads"
+    files = [f for f in os.listdir(UPLOAD_FOLDER)]
+    return jsonify(files)
+ 
+ 
     
-@app.route("/api/match-rules", methods=["DELETE"])
-def delete_match_rule():
-    """Delete a match rule"""
-    try:
-        data = request.json
-        rule_to_delete = data.get("rule")
 
-        if not rule_to_delete:
-            return jsonify({"error": "Rule name is required"}), 400
-
-        rules = load_match_rules()
-
-        # Find index of the rule by matching rule name (case insensitive & trimmed)
-        index = next(
-            (i for i, r in enumerate(rules)
-                if r["rule"].strip().lower() == rule_to_delete.strip().lower()),
-            None
-        )
-
-        if index is None:
-            return jsonify({"error": "Rule not found"}), 404
-
-        # Remove the rule
-        rules.pop(index)
-
-        save_match_rules(rules)
-
-        return jsonify({"message": "Rule deleted successfully", "rules": rules})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/entities', methods=['GET'])
 def get_entities():
@@ -643,120 +762,200 @@ def get_output_columns(filename):
         print(f"Error in get_output_columns: {e}")
         return jsonify({"error": str(e)}), 500
 
+# @app.route('/api/process-single', methods=['POST'])
+# def process_single_file():
+#     """Process a single file with detailed timing and statistics"""
+#     start_time = time.time()
+#     start_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+    
+#     try:
+#         print(f"\n=== SINGLE FILE PROCESSING START: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===")
+#         data = request.json
+        
+#         # Extract parameters
+#         entity = data.get('entity')
+#         source_system = data.get('source_system')
+#         filename = data.get('filename')
+#         file_type = data.get('file_type', 'source')
+#         fuzzy_columns = data.get('fuzzy_columns', [])
+#         exact_columns = data.get('exact_columns', [])
+#         thresholds = data.get('thresholds', {})
+#         rules = data.get('rules', [])
+
+#         # Validation
+#         if not all([entity, source_system, filename]):
+#             return jsonify({"error": "Missing required parameters: entity, source_system, filename"}), 400
+
+#         print(f"Entity: {entity}")
+#         print(f"Source System: {source_system}")
+#         print(f"Filename: {filename}")
+#         print(f"File Type: {file_type}")
+#         print(f"Fuzzy Columns: {fuzzy_columns}")
+#         print(f"Exact Columns: {exact_columns}")
+#         print(f"Thresholds: {thresholds}")
+
+#         # File loading phase
+#         file_load_start = time.time()
+        
+#         # Determine file path based on type
+#         if file_type == 'source':
+#             filepath = os.path.join(DATA_DIR, entity, source_system, filename)
+#         else:  # output
+#             filepath = os.path.join(OUTPUT_DIR, filename)
+        
+#         if not os.path.exists(filepath):
+#             return jsonify({"error": f"File not found: {filepath}"}), 404
+
+#         # Get file size
+#         file_size_mb = os.path.getsize(filepath) / 1024 / 1024
+#         print(f"File size: {file_size_mb:.2f} MB")
+
+#         # Load rulebook
+#         rulebook_path = os.path.join(STATIC_DIR, 'Rulebook.xlsx')
+#         if not os.path.exists(rulebook_path):
+#             return jsonify({"error": "Rulebook.xlsx not found in static_data directory"}), 404
+
+#         rulebook = pd.read_excel(rulebook_path)
+#         file_load_time = time.time() - file_load_start
+#         print(f"File loading time: {file_load_time:.3f} seconds")
+
+#         # Processing phase
+#         processing_start = time.time()
+        
+#         # Process based on file type
+#         if file_type == 'output':
+#             output_file, processing_stats = process_output_file_with_stats(
+#                 filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR, source_system
+#             )
+#         else:
+#             output_file, processing_stats = process_excel_file_with_stats(
+#                 filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR,rules=rules
+#             )
+
+#         processing_time = time.time() - processing_start
+#         print(f"Processing time: {processing_time:.3f} seconds")
+
+#         # Add to processed outputs registry
+#         output_filename = os.path.basename(output_file)
+#         add_to_processed_outputs(entity, source_system, output_filename)
+
+#         # Calculate final statistics
+#         end_time = time.time()
+#         end_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+#         total_time = end_time - start_time
+#         memory_used = max(0, end_memory - start_memory)
+
+#         print(f"=== PROCESSING COMPLETE ===")
+#         print(f"Total time: {total_time:.3f} seconds")
+#         print(f"Memory used: {memory_used:.2f} MB")
+#         if processing_stats.get('total_records', 0) > 0:
+#             print(f"Records per second: {processing_stats.get('total_records', 0) / total_time:.0f}")
+
+#         return jsonify({
+#             "message": f"✅ Processing complete! Output file: {output_filename}",
+#             "output_file": output_filename,
+#             "download_link": f"/api/download/{output_filename}",
+#             "processing_time_ms": int(total_time * 1000),
+#             "file_load_time_ms": int(file_load_time * 1000),
+#             "processing_only_time_ms": int(processing_time * 1000),
+#             "memory_used_mb": round(memory_used, 2),
+#             "file_size_mb": round(file_size_mb, 2),
+#             "total_records": processing_stats.get('total_records', 0),
+#             "duplicate_groups": processing_stats.get('duplicate_groups', 0),
+#             "final_records": processing_stats.get('final_records', 0),
+#             "duplicates_found": processing_stats.get('duplicates_found', 0),
+#             "performance_stats": {
+#                 "records_per_second": round(processing_stats.get('total_records', 0) / max(total_time, 0.001), 0),
+#                 "mb_per_second": round(file_size_mb / max(total_time, 0.001), 2),
+#                 "fuzzy_columns_count": len(fuzzy_columns),
+#                 "exact_columns_count": len(exact_columns)
+#             }
+#         })
+
+#     except Exception as e:
+#         end_time = time.time()
+#         total_time = end_time - start_time
+#         print(f"Error in process_single_file after {total_time:.3f}s: {str(e)}")
+#         import traceback
+#         traceback.print_exc()
+#         return jsonify({
+#             "error": str(e),
+#             "processing_time_ms": int(total_time * 1000),
+#             "failed": True
+#         }), 500
+
+
+   
 @app.route('/api/process-single', methods=['POST'])
 def process_single_file():
-    """Process a single file with detailed timing and statistics"""
+    """Process a single file with hardcoded path"""
     start_time = time.time()
     start_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
-    
+ 
     try:
         print(f"\n=== SINGLE FILE PROCESSING START: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===")
-        data = request.json
-        
-        # Extract parameters
-        entity = data.get('entity')
-        source_system = data.get('source_system')
-        filename = data.get('filename')
-        file_type = data.get('file_type', 'source')
-        fuzzy_columns = data.get('fuzzy_columns', [])
-        exact_columns = data.get('exact_columns', [])
-        thresholds = data.get('thresholds', {})
-        rules = data.get('rules', [])
-
-        # Validation
-        if not all([entity, source_system, filename]):
-            return jsonify({"error": "Missing required parameters: entity, source_system, filename"}), 400
-
-        print(f"Entity: {entity}")
-        print(f"Source System: {source_system}")
-        print(f"Filename: {filename}")
-        print(f"File Type: {file_type}")
-        print(f"Fuzzy Columns: {fuzzy_columns}")
-        print(f"Exact Columns: {exact_columns}")
-        print(f"Thresholds: {thresholds}")
-
-        # File loading phase
-        file_load_start = time.time()
-        
-        # Determine file path based on type
+       
+        # === HARDCODED FILE DETAILS ===
+        entity = "Customer"  # Change this to your entity
+        source_system = "People_Soft9.1"  # Change this to your source system
+        filename = "PeopleSoft9.1_header.xlsx"  # Change this to your file
+        file_type = "source"
+        fuzzy_columns = ["Customer Name","Capital IQ ID"]  # Example fuzzy columns
+        exact_columns = []      # Example exact columns
+        thresholds = {}           # Example threshold
+        rules = []                           # Example rules
+ 
+        # File loading
         if file_type == 'source':
             filepath = os.path.join(DATA_DIR, entity, source_system, filename)
-        else:  # output
+            if not os.path.exists(filepath):
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+        else:
             filepath = os.path.join(OUTPUT_DIR, filename)
-        
+ 
         if not os.path.exists(filepath):
             return jsonify({"error": f"File not found: {filepath}"}), 404
-
-        # Get file size
+ 
         file_size_mb = os.path.getsize(filepath) / 1024 / 1024
-        print(f"File size: {file_size_mb:.2f} MB")
-
+        print(f"Processing file: {filepath} ({file_size_mb:.2f} MB)")
+ 
         # Load rulebook
         rulebook_path = os.path.join(STATIC_DIR, 'Rulebook.xlsx')
         if not os.path.exists(rulebook_path):
-            return jsonify({"error": "Rulebook.xlsx not found in static_data directory"}), 404
-
+            return jsonify({"error": "Rulebook.xlsx not found"}), 404
         rulebook = pd.read_excel(rulebook_path)
-        file_load_time = time.time() - file_load_start
-        print(f"File loading time: {file_load_time:.3f} seconds")
-
-        # Processing phase
-        processing_start = time.time()
-        
-        # Process based on file type
-        if file_type == 'output':
-            output_file, processing_stats = process_output_file_with_stats(
-                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR, source_system
-            )
-        else:
-            output_file, processing_stats = process_excel_file_with_stats(
-                filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR,rules=rules
-            )
-
-        processing_time = time.time() - processing_start
-        print(f"Processing time: {processing_time:.3f} seconds")
-
-        # Add to processed outputs registry
+ 
+        # Processing
+        output_file, processing_stats = process_excel_file_with_stats(
+            filepath, fuzzy_columns, exact_columns, thresholds, rulebook, OUTPUT_DIR, rules=rules
+        )
+ 
+        # Register output
         output_filename = os.path.basename(output_file)
         add_to_processed_outputs(entity, source_system, output_filename)
-
-        # Calculate final statistics
+ 
+        # Timing & memory stats
         end_time = time.time()
-        end_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+        end_memory = psutil.Process().memory_info().rss / 1024 / 1024
         total_time = end_time - start_time
         memory_used = max(0, end_memory - start_memory)
-
-        print(f"=== PROCESSING COMPLETE ===")
-        print(f"Total time: {total_time:.3f} seconds")
-        print(f"Memory used: {memory_used:.2f} MB")
-        if processing_stats.get('total_records', 0) > 0:
-            print(f"Records per second: {processing_stats.get('total_records', 0) / total_time:.0f}")
-
+ 
         return jsonify({
             "message": f"✅ Processing complete! Output file: {output_filename}",
             "output_file": output_filename,
             "download_link": f"/api/download/{output_filename}",
             "processing_time_ms": int(total_time * 1000),
-            "file_load_time_ms": int(file_load_time * 1000),
-            "processing_only_time_ms": int(processing_time * 1000),
             "memory_used_mb": round(memory_used, 2),
             "file_size_mb": round(file_size_mb, 2),
             "total_records": processing_stats.get('total_records', 0),
             "duplicate_groups": processing_stats.get('duplicate_groups', 0),
             "final_records": processing_stats.get('final_records', 0),
             "duplicates_found": processing_stats.get('duplicates_found', 0),
-            "performance_stats": {
-                "records_per_second": round(processing_stats.get('total_records', 0) / max(total_time, 0.001), 0),
-                "mb_per_second": round(file_size_mb / max(total_time, 0.001), 2),
-                "fuzzy_columns_count": len(fuzzy_columns),
-                "exact_columns_count": len(exact_columns)
-            }
         })
-
+ 
     except Exception as e:
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"Error in process_single_file after {total_time:.3f}s: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -764,7 +963,6 @@ def process_single_file():
             "processing_time_ms": int(total_time * 1000),
             "failed": True
         }), 500
-
 
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -1258,7 +1456,7 @@ def performance_benchmark():
             return ''.join(random.choices(string.ascii_lowercase, k=length))
         
         test_data = {
-            'Cust_Id': list(range(1, test_size + 1)),
+            'Customer Name': list(range(1, test_size + 1)),
             'first_name': [random_string(8) for _ in range(test_size)],
             'last_name': [random_string(10) for _ in range(test_size)],
             'email': [f'{random_string(5)}@{random_string(5)}.com' for _ in range(test_size)],

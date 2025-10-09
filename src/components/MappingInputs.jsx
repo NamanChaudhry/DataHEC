@@ -24,12 +24,12 @@ import CallMergeIcon from '@mui/icons-material/CallMerge';
 
 const MappingInputs = ({
   entity,
-  sourceSystems,
+  sourceSystems = [],
   selectedSourceSystem,
   setSelectedSourceSystem,
   selectedFile,
   setSelectedFile,
-  availableFiles,
+  availableFiles = [],
   setAvailableFiles,
 }) => {
   const [showTable, setShowTable] = useState(false);
@@ -38,20 +38,9 @@ const MappingInputs = ({
   const [categoriesMapping, setCategoriesMapping] = useState({});
 
   const targetOptions = [
-    "Customer ID",
-    "Customer Name",
-    "Tax ID",
-    "DUNS Number",
-    "Account Type",
-    "Address",
-    "City",
-    "State",
-    "Postal Code",
-    "Country",
-    "Phone",
-    "Email",
-    "Website",
-    "Transaction Date",
+    "Customer ID", "Customer Name", "Tax ID", "DUNS Number", "Account Type",
+    "Address", "City", "State", "Postal Code", "Country",
+    "Phone", "Email", "Website", "Transaction Date",
   ];
   const categoryOptions = ["Header", "Address", "Contact"];
 
@@ -65,7 +54,7 @@ const MappingInputs = ({
 
   const handleFileChange = (file) => {
     setSelectedFile(file);
-    setAvailableFiles((prev) => [
+    setAvailableFiles((prev = []) => [
       ...prev,
       {
         name: file.name,
@@ -105,7 +94,6 @@ const MappingInputs = ({
     }
   };
 
-  // Updated Save handler: send all necessary info to backend
   const handleSave = async () => {
     if (!selectedFile) {
       alert("No file uploaded");
@@ -136,12 +124,20 @@ const MappingInputs = ({
         body: formData,
       });
 
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        data = null;
+      }
+
       if (!response.ok) {
+        console.error('Backend returned:', rawText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      alert(data.message || "Files saved successfully!");
+      alert((data && data.message) || "Files saved successfully!");
     } catch (error) {
       console.error("Error saving file:", error);
       alert("Error saving the file.");
@@ -151,20 +147,13 @@ const MappingInputs = ({
   return (
     <Box sx={{ width: "100%", overflow: "visible" }}>
       <Stack spacing={3}>
-        {/* Source System + Upload File Row */}
         <Stack direction="row" spacing={3} alignItems="flex-start">
           <Box flex={1}>
-            {/* Source System Picker */}
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}
-            >
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}>
               Source System
             </Typography>
-            <FormControl fullWidth variant="outlined" sx={{ /* styling omitted for brevity */ }}>
-              <InputLabel sx={{
-                fontWeight: 500, fontSize: 12, color: "#acc1d7ff",
-              }}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel sx={{ fontWeight: 500, fontSize: 12, color: "#acc1d7ff" }}>
                 Select source system
               </InputLabel>
               <Select
@@ -172,23 +161,15 @@ const MappingInputs = ({
                 onChange={(e) => setSelectedSourceSystem(e.target.value)}
                 disabled={!entity}
               >
-                <MenuItem value="">
-                  <em>Select source system...</em>
-                </MenuItem>
-                {sourceSystems.map((system) => (
-                  <MenuItem key={system} value={system}>
-                    {system}
-                  </MenuItem>
+                <MenuItem value=""><em>Select source system...</em></MenuItem>
+                {(sourceSystems || []).map((system) => (
+                  <MenuItem key={system} value={system}>{system}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Box>
-          {/* Upload File */}
           <Box flex={1}>
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}
-            >
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}>
               Upload File
             </Typography>
             <FormControl fullWidth>
@@ -204,9 +185,7 @@ const MappingInputs = ({
                   "&:hover": { backgroundColor: "#3a3b47", borderColor: "#7cb342" },
                 }}
               >
-                {selectedSourceSystem
-                  ? `Upload File for ${selectedSourceSystem}`
-                  : "Upload File"}
+                {selectedSourceSystem ? `Upload File for ${selectedSourceSystem}` : "Upload File"}
                 <input
                   type="file"
                   hidden
@@ -251,7 +230,6 @@ const MappingInputs = ({
             Map
           </Button>
         </Box>
-        {/* Mapping Table */}
         {showTable && (
           <>
             <Table sx={{ mt: 6, width: "100%", borderCollapse: "separate", borderSpacing: 0, border: "1px solid #90caf9", borderRadius: 2, overflow: "hidden" }}>
@@ -271,12 +249,14 @@ const MappingInputs = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sourceColumns.map((col, index) => (
-                  <TableRow key={index}
+                {(sourceColumns || []).map((col, index) => (
+                  <TableRow
+                    key={index}
                     sx={{
                       backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e3f2fd",
                       "&:hover": { backgroundColor: "#cce4ff" },
-                    }}>
+                    }}
+                  >
                     <TableCell sx={{ fontWeight: 500, fontSize: "0.9rem", padding: "8px" }}>
                       {col}
                     </TableCell>
@@ -349,6 +329,12 @@ const MappingInputs = ({
       </Stack>
     </Box>
   );
+};
+
+// Defensive defaulting for props in case parent forgets
+MappingInputs.defaultProps = {
+  sourceSystems: [],
+  availableFiles: [],
 };
 
 export default MappingInputs;
