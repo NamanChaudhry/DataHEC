@@ -215,12 +215,12 @@ const UnifiedProcessingInterface = ({ entity, onProcess, sourceSystems, columns 
       });
   };
 
-const handleAddFile = (ruleConfig) => {
+  const handleAddFile = (ruleConfig) => {
     if (!selectedSourceSystem) {
       alert('Please select a source system first');
       return;
     }
- 
+
     // Check if the source system is already added
     const exists = fileConfigs.some(
       config => config.sourceSystem === selectedSourceSystem
@@ -229,28 +229,28 @@ const handleAddFile = (ruleConfig) => {
       alert(`Configuration for ${selectedSourceSystem} already exists`);
       return;
     }
- 
+
     // Determine default file (source or processed output) for this source system
     const sourceFiles = availableFiles.filter(f => f.type === 'source');
     const outputFiles = availableFiles.filter(f => f.type === 'output');
     const defaultFileObj = sourceFiles[0] || outputFiles[0];
- 
+
     if (!defaultFileObj) {
       alert(`No files available for source system: ${selectedSourceSystem}`);
       return;
     }
- 
+
     const apiUrl = defaultFileObj.type === 'source'
       ? `http://localhost:5001/api/columns/${entity}/${selectedSourceSystem}/${defaultFileObj.name}`
       : `http://localhost:5001/api/output-columns/${defaultFileObj.name}`;
- 
+
     axios.get(apiUrl)
       .then(columnsResponse => {
         if (!columnsResponse.data || columnsResponse.data.length === 0) {
           alert(`No columns found for source system: ${selectedSourceSystem}`);
           return;
         }
- 
+
         const newConfig = {
           id: `${selectedSourceSystem}-${Date.now()}`,
           sourceSystem: selectedSourceSystem,
@@ -264,7 +264,7 @@ const handleAddFile = (ruleConfig) => {
           selectedRule: ruleConfig?.selectedRule || "",
           mergeRule: ruleConfig?.mergeRule || []
         };
- 
+
         setFileConfigs(prevConfigs => [...prevConfigs, newConfig]);
         setSelectedSourceSystem('');
         setAvailableFiles([]);
@@ -294,7 +294,7 @@ const handleAddFile = (ruleConfig) => {
     );
   }, []);
 
-const handleSingleFileProcess = () => {
+  const handleSingleFileProcess = () => {
     axios.post('http://localhost:5001/api/process-single', {})
       .then(response => {
         alert(`✅ File processed successfully! Output: ${response.data.output_file}`);
@@ -304,7 +304,7 @@ const handleSingleFileProcess = () => {
         alert("❌ Failed to process file. Check backend connection.");
       });
   };
- 
+
 
   const handleUseInCrossSystem = (sourceSystem, outputFile) => {
     // Switch to cross-system mode and add this file
@@ -623,11 +623,7 @@ const handleSingleFileProcess = () => {
                   borderRadius: 2,
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(255, 255, 255, 0.08)'
                 }}>
-                  <Box sx={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2,
-                    background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)'
-                  }}>
-                    {!crossSystemEnabled && (
+                  {!crossSystemEnabled && (
                     <WorkingColumnMapping
                       columns={config.columns}
                       fuzzyColumns={config.fuzzyColumns}
@@ -642,6 +638,10 @@ const handleSingleFileProcess = () => {
                       setSelectedSourceSystem={setSelectedSourceSystem}
                     />
                   )}
+                  <Box sx={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.2, borderRadius: 2,
+                    background: 'linear-gradient(135deg, #0d3965 0%, #205988 100%)'
+                  }}>
                     <Box>
                       <Typography variant="h6" sx={{ color: '#cfccccff' }}>
                         {config.sourceSystem} / {"PeopleSoft9.1_header.xlsx"}
