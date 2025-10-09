@@ -148,7 +148,7 @@ const MappingInputs = ({
     <Box sx={{ width: "100%", overflow: "visible" }}>
       <Stack spacing={3}>
         <Stack direction="row" spacing={3} alignItems="flex-start">
-          <Box flex={1}>
+          {/* <Box flex={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}>
               Source System
             </Typography>
@@ -167,7 +167,66 @@ const MappingInputs = ({
                 ))}
               </Select>
             </FormControl>
+          </Box> */}
+          <Box flex={1}>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}
+            >
+              Source System
+            </Typography>
+            <FormControl
+              fullWidth
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  backgroundColor: "#2d284a",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  "& fieldset": { borderColor: "#90caf9" },
+                  "&:hover fieldset": { borderColor: "#42a5f5" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#1976d2",
+                    borderWidth: "2px",
+                  },
+                },
+                "& .MuiSelect-select": {
+                  padding: "14px",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  color: "#a9a7a7ff",
+                  backgroundColor: "#2d284a",
+                  borderRadius: "12px",
+                },
+                "& .MuiSvgIcon-root": {
+                  color: "white",
+                },
+              }}
+            >
+              <InputLabel
+                sx={{
+                  fontWeight: 500,
+                  fontSize: 12,
+                  color: "#acc1d7ff",
+                }}
+              >
+                Select source system
+              </InputLabel>
+              <Select
+                value={selectedSourceSystem}
+                onChange={(e) => setSelectedSourceSystem(e.target.value)}
+                disabled={!entity}
+              >
+                <MenuItem value="">
+                  <em>Select source system...</em>
+                </MenuItem>
+                {(sourceSystems || []).map((system) => (
+                  <MenuItem key={system} value={system}>{system}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
+
           <Box flex={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1976d2", mb: 1 }}>
               Upload File
